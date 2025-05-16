@@ -1,0 +1,39 @@
+﻿@{
+    ViewData["Title"] = "Unprocessed Scripts";
+    Layout = "_PharmaLayout";
+}
+
+<div class="main-content">
+    <h2>Prescriptions Ready for Dispensing</h2>
+
+    <div class="search-container">
+        <div class="search-bar">
+            <input type="text" placeholder="Search by patient name or ID..." id="searchInput">
+            <button onclick="searchScripts()"><i class="fas fa-search"></i> Search</button>
+        </div>
+    </div>
+
+    <div class="loading" id="loading">
+        <div class="loading-spinner"></div> Searching...
+    </div>
+
+    <div class="scripts-list" id="scriptsList">
+        <!-- Sample Script Cards Injected by JavaScript -->
+    </div>
+</div>
+
+<!-- MODALS -->
+<div class="modal" id="instructionModal">
+    <div class="modal-content">
+        <h3><i class="fas fa-edit"></i> Custom Instructions</h3>
+        <textarea id="customInstructions" rows="4" style="width: 100%;"></textarea>
+        <div style="text-align: right; margin-top: 20px;">
+            <button class="btn" onclick="closeModal('instructionModal')">Cancel</button>
+            <button class="btn btn-add" onclick="saveCustomInstruction()">Save</button>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/unprocessedScripts.js"></script>
+}
