@@ -1,35 +1,127 @@
 ﻿@{
     ViewData["Title"] = "Unprocessed Scripts";
-    Layout = "_PharmaLayout";
+    Layout = "~/Views/Shared/PharmacistLayouts/_UnprocessedScriptsLayout.cshtml";
 }
 
 <div class="main-content">
-    <h2>Prescriptions Ready for Dispensing</h2>
+    <div class="page-header">
+        <h2><i class="fas fa-file-prescription"></i> Prescriptions Ready for Dispensing</h2>
+    </div>
 
     <div class="search-container">
         <div class="search-bar">
             <input type="text" placeholder="Search by patient name or ID..." id="searchInput">
-            <button onclick="searchScripts()"><i class="fas fa-search"></i> Search</button>
+            <button class="search-btn" onclick="searchScripts()">
+                <i class="fas fa-search"></i> Search
+            </button>
         </div>
     </div>
 
     <div class="loading" id="loading">
-        <div class="loading-spinner"></div> Searching...
+        <div class="loading-spinner"></div>
+        <span>Searching prescriptions...</span>
     </div>
 
     <div class="scripts-list" id="scriptsList">
-        <!-- Sample Script Cards Injected by JavaScript -->
-    </div>
-</div>
+        <!-- Script Card 1 -->
+        <div class="script-card">
+            <div class="script-header">
+                <div class="patient-info">
+                    <span class="patient-name">John Doe</span>
+                    <span class="patient-id">(ID: 9001011234081)</span>
+                </div>
+                <span class="script-status status-ready">Ready</span>
+            </div>
 
-<!-- MODALS -->
-<div class="modal" id="instructionModal">
-    <div class="modal-content">
-        <h3><i class="fas fa-edit"></i> Custom Instructions</h3>
-        <textarea id="customInstructions" rows="4" style="width: 100%;"></textarea>
-        <div style="text-align: right; margin-top: 20px;">
-            <button class="btn" onclick="closeModal('instructionModal')">Cancel</button>
-            <button class="btn btn-add" onclick="saveCustomInstruction()">Save</button>
+            <div class="script-details">
+                <div class="detail-row">
+                    <span class="detail-label">Primary Doctor:</span>
+                    <span class="detail-value">Dr. Sarah Smith (PR1234567)</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Date:</span>
+                    <span class="detail-value">2023-05-15</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Status:</span>
+                    <span class="detail-value repeat">Repeat (2 remaining)</span>
+                </div>
+            </div>
+
+            <div class="script-actions">
+                <button class="btn dispense-btn">
+                    <i class="fas fa-pills"></i> Dispense Selected
+                </button>
+                <button class="btn email-btn">
+                    <i class="fas fa-envelope"></i> Email Patient
+                </button>
+            </div>
+        </div>
+
+        <!-- Script Card 2 -->
+        <div class="script-card">
+            <div class="script-header">
+                <div class="patient-info">
+                    <span class="patient-name">Amanda Johnson</span>
+                    <span class="patient-id">(ID: 8902021234082)</span>
+                </div>
+                <span class="script-status status-ready">Ready</span>
+            </div>
+
+            <div class="script-details">
+                <div class="detail-row">
+                    <span class="detail-label">Doctor:</span>
+                    <span class="detail-value">Dr. Michael Brown (PR7654321)</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Date:</span>
+                    <span class="detail-value">2023-05-14</span>
+                </div>
+            </div>
+
+            <div class="script-actions">
+                <button class="btn dispense-btn">
+                    <i class="fas fa-pills"></i> Dispense Selected
+                </button>
+                <button class="btn email-btn">
+                    <i class="fas fa-envelope"></i> Email Patient
+                </button>
+            </div>
+        </div>
+
+        <!-- Script Card 3 -->
+        <div class="script-card">
+            <div class="script-header">
+                <div class="patient-info">
+                    <span class="patient-name">Lunga Dlamini</span>
+                    <span class="patient-id">(ID: 8803031234083)</span>
+                </div>
+                <span class="script-status status-ready">Ready</span>
+            </div>
+
+            <div class="script-details">
+                <div class="detail-row">
+                    <span class="detail-label">Primary Doctor:</span>
+                    <span class="detail-value">Dr. Thando Náoai (PR9876543)</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Date:</span>
+                    <span class="detail-value">2023-05-12</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Status:</span>
+                    <span class="detail-value repeat">Repeat (FINAL)</span>
+                </div>
+            </div>
+
+            <div class="script-actions">
+                <button class="btn dispense-btn">
+                    <i class="fas fa-pills"></i> Dispense Selected
+                </button>
+                <button class="btn email-btn">
+                    <i class="fas fa-envelope"></i> Email Patient
+                </button>
+            </div>
         </div>
     </div>
 </div>
