@@ -29,37 +29,7 @@
             position: fixed;
         }
         */
-        .sidebar a {
-                display: block;
-                padding: 1rem 2rem;
-                color: white;
-                text-decoration: none;
-                transition:  0.3s;
-            }
-
-                .sidebar a:hover, .dropdown-btn:hover {
-                    background-color: #00695c;
-                }
- 
-        .dropdown-btn{
-            transition: 0.3s;
-        }
-              
-        .dropdown-container {
-            display: none;
-            background-color: #3e556b;
-            padding-left: 20px;
-            
-           
-           
-        }
-
-            .dropdown-container a {
-                font-size: 14px;
-                text-decoration: none;
-                color: #fff
-            }
-
+       
         .main-content {
             margin-left: 220px;
             padding: 2rem;
@@ -137,37 +107,39 @@
             margin-bottom: 15px;
         }
 
-     /*    .sidebar h2 {
-            font-size: 22px;
-            margin: 0;
-            color: white;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
- */
-          
-
-        .sidebar-nav {
-            padding: 0 10px;
-        }
-/* 
         .sidebar a {
-            color: #ecf0f1;
+            display: block;
+            padding: 1rem 2rem;
+            color: white;
             text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin: 8px 0;
-            padding: 10px 15px;
-            border-radius: 5px;
-            transition: all 0.3s;
-        } */
+            transition: 0.3s;
+        }
 
-           
+            .sidebar a:hover, .dropdown-btn:hover {
+                background-color: #00695c;
+            }
 
-      /*   .sidebar a, .dropdown-btn:hover {
-            background-color: #34495e;
+        .dropdown-btn {
+            transition: 0.3s;
+        }
+
+        .dropdown-container {
+            display: none;
+            background-color: #3e556b;
+            padding-left: 20px;
+            transition: 0.3s;
+        }
+
+            .dropdown-container a {
+                font-size: 14px;
+                text-decoration: none;
+                color: #fff;
+               
+            }
+
+          
+     /*    .sidebar-nav {
+            padding: 0 10px;
         }
  */
         .sidebar-footer {
@@ -185,6 +157,7 @@
             border-bottom: 2px solid #3498db;
             padding-bottom: 10px;
             margin-bottom: 20px;
+            
         }
 
         .topbar {
@@ -200,6 +173,27 @@
             justify-content: space-between;
             align-items: center;
             z-index: 999;
+        }
+
+           /*  ==== Allerts ====== */
+        .alert-warning {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            color: #856404;
+        }
+
+       /*  ===== Tables ===== */
+        .tables {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .tables th
+          {
+            background: #3498db;
+            color: white;
+            padding: 12px;
+            text-align: left;
         }
     </style>
 </head>
@@ -223,28 +217,29 @@
         <br />
        
        
-        <a class="sidebar-item" asp-controller="PharmacyManager" asp-action="index">Home</a>
+        <a class="sidebar-item p-3" asp-controller="PharmacyManager" asp-action="index">Home</a>
 
-        <button class=" sidebar-item dropdown-btn">Pharmacy </button>
+        <button class=" sidebar-item dropdown-btn">Pharmacy <span><img style="height:10px;" src="~/css/img/Manager_img/arrow-down-sign-to-navigate.png" /></span></button>
         <div class="dropdown-container">
             <a asp-controller="PharmacyManager" asp-action="AddPharmacyInfo">Pharmacy details</a>
             <a asp-controller="PharmacyManager" asp-action="AddDoctor">Docters</a>
             <a asp-controller="PharmacyManager" asp-action="AddPharmacists">Pharmacists</a>
         </div>
 
-        <button class=" sidebar-item dropdown-btn">Medication </button>
+        <button class=" sidebar-item dropdown-btn">Medication <img style="height:10px;" src="~/css/img/Manager_img/arrow-down-sign-to-navigate.png" /></span></button>
         <div class="dropdown-container">
             <a asp-controller="PharmacyManager" asp-action="AddActiveIngredients">Add Active indredients</a>
             <a asp-controller="PharmacyManager" asp-action="AddDosageForms">Add Dosage Form</a>
             <a asp-controller="PharmacyManager" asp-action="AddMedication">Add Medication</a>
         </div>
-        <button class=" sidebar-item dropdown-btn">Stock & Orders </button>
+        <button class=" sidebar-item dropdown-btn">Stock & Orders <img style="height:10px;" src="~/css/img/Manager_img/arrow-down-sign-to-navigate.png" /></span></button>
         <div class="dropdown-container">
-            <a href="/roles">Order Medication</a>
+            <a asp-controller="PharmacyManager" asp-action="Orders">Order Medication</a>
             <a asp-controller="PharmacyManager" asp-action="StockManagement">Manage Stock</a>
 
         </div>
-        <a class="sidebar-item" asp-controller="PharmacyManager" asp-action="Reports">Reports</a>
+        <a class="sidebar-item p-3" asp-controller="PharmacyManager" asp-action="Reports">Reports</a>
+        <a class="sidebar-item p-3" asp-controller="PharmacyManager" asp-action="Reports">Logout</a>
     </div>
 
 

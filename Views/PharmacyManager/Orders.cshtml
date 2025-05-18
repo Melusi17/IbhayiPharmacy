@@ -1,17 +1,21 @@
 ﻿@{
     ViewData["Title"] = "Medication Orders";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    Layout = "~/Views/Shared/_ManagerLayout.cshtml";
+
 }
 
 <div class="container mt-4">
-    <h2 class="mb-4">Medication Orders</h2>
-    <div style="padding:5px;margin:2px;border-radius:5px;box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);display:grid;" class=" bord bg-warning text-dark">
+   
+   @*  <div style="padding:5px;margin:2px;border-radius:5px;box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);display:grid;" class=" bord bg-warning text-dark">
         <b>Low Stock Alert</b>
         <small>There are at items with stock below re-order level</small>
+    </div> *@
+    <div class="alert alert-warning " style="display: block;">
+        <i class="fas fa-box-open"></i> <strong>LOW STOCK:</strong> This medication is near reorder level!
     </div>
     <!-- Low Stock Alerts -->
-    <div class="card mb-4 ">
-       
+    <div class="card p-3 ">
+        <h6 class="title-underline">Medication Orders</h6>
         <div class="card-body">
            
             <table class="table table-sm table-bordered align-middle">
@@ -50,14 +54,14 @@
         </div>
     </div>
 
-    <!-- Past Orders -->
-    <div class="card">
-        <div class="card-header">Past Orders</div>
+    
+    <div class="card p-3">
+        <h6 class="title-underline">Orders</h6>
         <div class="card-body">
-            <table class="table table-hover align-middle">
+            <table class="table-primary table-hover align-middle">
                 <thead class="table-light">
                     <tr>
-                        <th>Order #</th>
+                        <th>Order</th>
                         <th>Date</th>
                         <th>Supplier</th>
                         <th>Items Ordered</th>
@@ -65,7 +69,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @* Dummy Data *@
+                  
                     <tr>
                         <td>ORD-1001</td>
                         <td>2025-04-01</td>
@@ -86,6 +90,8 @@
                     </tr>
                 </tbody>
             </table>
+
+
         </div>
     </div>
 </div>
