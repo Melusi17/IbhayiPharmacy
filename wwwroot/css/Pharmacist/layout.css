@@ -83,11 +83,6 @@
     }
 
 /* ===== MAIN CONTENT MARGIN TO ACCOMMODATE SIDEBAR/TOPBAR ===== */
-.main-content {
-    margin-left: 100px;
-    margin-top: 30px;
-    padding: 30px;
-}
 
 /* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
@@ -99,8 +94,5 @@
         left: 180px;
     }
 
-    .main-content {
-        margin-left: 180px;
-        padding: 15px;
-    }
+  
 }
