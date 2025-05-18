@@ -1,0 +1,260 @@
+﻿/* Main Content */
+.main-content {
+    margin-left: 220px;
+    margin-top: 60px;
+    padding: 30px;
+    width: calc(100% - 220px);
+}
+
+/* Orders Page Styles */
+.search-container {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    margin-bottom: 30px;
+}
+
+.search-bar {
+    display: flex;
+    gap: 15px;
+}
+
+    .search-bar input {
+        flex: 1;
+        padding: 10px 15px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 16px;
+    }
+
+    .search-bar button {
+        background-color: #3498db;
+        color: white;
+        border: none;
+        padding: 0 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+        .search-bar button:hover {
+            background-color: #2980b9;
+        }
+
+.orders-list {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    overflow: hidden;
+}
+
+.order-card {
+    padding: 20px;
+    border-bottom: 1px solid #eee;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+    .order-card:hover {
+        background-color: #f8fafc;
+    }
+
+    .order-card.expanded {
+        background-color: #f0f7ff;
+    }
+
+.order-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.order-patient, .order-doctor {
+    font-weight: 600;
+}
+
+.order-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    color: #666;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+.order-status {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    background: #e0e0e0;
+    color: #333;
+}
+
+.status-packing {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.status-ready {
+    background: #d4edda;
+    color: #155724;
+}
+
+.status-rejected {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.order-repeat {
+    color: #d35400;
+    font-weight: 600;
+}
+
+.order-actions {
+    float: right;
+    display: flex;
+    gap: 10px;
+}
+
+.action-btn {
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 14px;
+}
+
+.pack-btn {
+    background-color: #f39c12;
+}
+
+.collect-btn {
+    background-color: #2ecc71;
+}
+
+.email-btn {
+    background-color: #3498db;
+}
+
+.action-btn:hover {
+    transform: scale(1.05);
+    opacity: 0.9;
+}
+
+.order-details {
+    display: none;
+    margin-top: 15px;
+    padding: 15px;
+    background: white;
+    border-radius: 5px;
+    border: 1px solid #eee;
+}
+
+    .order-details table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .order-details th {
+        background: #3498db;
+        color: white;
+        padding: 10px;
+        text-align: left;
+    }
+
+    .order-details td {
+        padding: 10px;
+        border-bottom: 1px solid #eee;
+    }
+
+.med-badge {
+    display: inline-block;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.badge-s0 {
+    background: #d4edda;
+    color: #155724;
+}
+
+.badge-s1 {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.badge-s2 {
+    background: #ffeeba;
+    color: #856404;
+}
+
+.badge-s3 {
+    background: #bee5eb;
+    color: #0c5460;
+}
+
+.badge-s4 {
+    background: #f5c6cb;
+    color: #721c24;
+}
+
+.badge-s5 {
+    background: #c6c8ca;
+    color: #1b1e21;
+}
+
+.badge-s6 {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.badge-s7 {
+    background: #343a40;
+    color: white;
+}
+
+.filter-container {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.filter-btn {
+    padding: 8px 15px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    background: white;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+    .filter-btn:hover, .filter-btn.active {
+        background: #3498db;
+        color: white;
+        border-color: #3498db;
+    }
+
+/* Animation for expanding */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.expanded .order-details {
+    display: block;
+    animation: fadeIn 0.3s ease-out;
+}
