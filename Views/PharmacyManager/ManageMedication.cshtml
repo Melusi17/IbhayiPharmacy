@@ -1,0 +1,64 @@
+﻿
+@{
+    ViewData["Title"] = "ManageMedication";
+    Layout = "~/Views/Shared/_ManagerLayout.cshtml";
+
+  
+}
+
+<div class="container mt-4">
+   
+
+    <!-- Medications Table -->
+    <div class="card">
+        <div class="card-header">Existing Medications</div>
+        <div class="card-body">
+            <table class="table table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>#</th>
+                        <th>Name</th>
+                        <th>Schedule</th>
+                        <th>Form</th>
+                        <th>Supplier</th>
+                        <th>Re-order Level</th>
+                        <th>Qty On Hand</th>
+                        <th>Price</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @* Dummy Data *@
+                    <tr>
+                        <td>1</td>
+                        <td>Myprodol</td>
+                        <td>3</td>
+                        <td>Capsule</td>
+                        <td>PharmaDirect</td>
+                        <td>20</td>
+                        <td>150</td>
+                        <td>R29.99</td>
+                        <td>
+                            <button class="btn btn-sm btn-warning me-2">Edit</button>
+                            <button class="btn btn-sm btn-danger">Delete</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>Panado</td>
+                        <td>0</td>
+                        <td>Tablet</td>
+                        <td>MedLife Distributors</td>
+                        <td>10</td>
+                        <td>90</td>
+                        <td>R14.50</td>
+                        <td>
+                            <button class="btn btn-sm btn-warning me-2">Edit</button>
+                            <button class="btn btn-sm btn-danger">Delete</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

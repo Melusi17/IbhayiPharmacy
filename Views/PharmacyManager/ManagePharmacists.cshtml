@@ -1,0 +1,60 @@
+﻿
+@{
+    ViewData["Title"] = "ManagePharmacists";
+}
+
+@{
+    ViewData["Title"] = "Manage Pharmacists";
+    Layout = "~/Views/Shared/_ManagerLayout.cshtml";
+}
+
+<div class="container mt-4">
+   
+
+    <!-- Pharmacists Table -->
+    <div class="card">
+        <div class="card-header">Existing Pharmacists</div>
+        <div class="card-body">
+            <table class="table table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>#</th>
+                        <th>Name</th>
+                        <th>ID Number</th>
+                        <th>Phone</th>
+                        <th>Email</th>
+                        <th>HCR No.</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @* Dummy Data *@
+                    <tr>
+                        <td>1</td>
+                        <td>Thuli Mthembu</td>
+                        <td>9001234567890</td>
+                        <td>082 123 4567</td>
+                        <td>thuli.m@pharmacy.co.za</td>
+                        <td>HCR-000123</td>
+                        <td>
+                            <button class="btn btn-sm btn-warning me-2">Edit</button>
+                            <button class="btn btn-sm btn-danger">Delete</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>Peter Ndlovu</td>
+                        <td>8511225678901</td>
+                        <td>083 456 7890</td>
+                        <td>peter.n@pharmacy.co.za</td>
+                        <td>HCR-000456</td>
+                        <td>
+                            <button class="btn btn-sm btn-warning me-2">Edit</button>
+                            <button class="btn btn-sm btn-danger">Delete</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,22 @@
+﻿
+@{
+    ViewData["Title"] = "AddDosageForms";
+    Layout = "~/Views/Shared/_ManagerLayout.cshtml";
+
+}
+
+<h2 class="mb-4">Dosage Forms</h2>
+
+<!-- Add New Dosage Form -->
+<div class="card mb-4">
+    <div class="card-header">Add New Dosage Form</div>
+    <div class="card-body">
+        <form>
+            <div class="mb-3">
+                <label for="dosageFormName" class="form-label">Dosage Form Name</label>
+                <input type="text" class="form-control" id="dosageFormName" placeholder="e.g. Tablet, Syrup">
+            </div>
+            <button type="submit" class="btn btn-primary">Add Dosage Form</button>
+        </form>
+    </div>
+</div>

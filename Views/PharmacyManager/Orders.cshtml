@@ -1,0 +1,91 @@
+﻿@{
+    ViewData["Title"] = "Medication Orders";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-4">Medication Orders</h2>
+    <div style="padding:5px;margin:2px;border-radius:5px;box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);display:grid;" class=" bord bg-warning text-dark">
+        <b>Low Stock Alert</b>
+        <small>There are at items with stock below re-order level</small>
+    </div>
+    <!-- Low Stock Alerts -->
+    <div class="card mb-4 ">
+       
+        <div class="card-body">
+           
+            <table class="table table-sm table-bordered align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Medication</th>
+                        <th>Supplier</th>
+                        <th>Qty On Hand</th>
+                        <th>Re-order Level</th>
+                        <th>Order Quantity</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @* Dummy data *@
+                    <tr>
+                        <td>Panado</td>
+                        <td>MedLife Distributors</td>
+                        <td>12</td>
+                        <td>20</td>
+                        <td>
+                            <input type="number" class="form-control form-control-sm" placeholder="e.g. 50">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Myprodol</td>
+                        <td>PharmaDirect</td>
+                        <td>18</td>
+                        <td>25</td>
+                        <td>
+                            <input type="number" class="form-control form-control-sm" placeholder="e.g. 40">
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <button class="btn btn-primary mt-3">Generate Order & Send Email</button>
+        </div>
+    </div>
+
+    <!-- Past Orders -->
+    <div class="card">
+        <div class="card-header">Past Orders</div>
+        <div class="card-body">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Order #</th>
+                        <th>Date</th>
+                        <th>Supplier</th>
+                        <th>Items Ordered</th>
+                        <th>Mark Received</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @* Dummy Data *@
+                    <tr>
+                        <td>ORD-1001</td>
+                        <td>2025-04-01</td>
+                        <td>PharmaDirect</td>
+                        <td>Myprodol (40)</td>
+                        <td>
+                            <button class="btn btn-sm btn-success">Mark as Received</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>ORD-1000</td>
+                        <td>2025-03-29</td>
+                        <td>MedLife Distributors</td>
+                        <td>Panado (50), Allergex (20)</td>
+                        <td>
+                            <button class="btn btn-sm btn-success">Mark as Received</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
