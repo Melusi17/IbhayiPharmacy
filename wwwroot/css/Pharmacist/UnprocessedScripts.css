@@ -1,35 +1,31 @@
-﻿/* ===== UNPROCESSED SCRIPTS PAGE STYLES ===== */
-
-/* Main Content Area - Tight Layout */
+﻿/* Main Content */
 .main-content {
-    margin-left: 220px; /* Matches sidebar width */
-    margin-top: 60px; /* Matches topbar height */
-    padding: 20px;
+    margin-left: 220px;
+    margin-top: 60px;
+    padding: 30px;
     width: calc(100% - 220px);
-    min-height: calc(100vh - 60px);
-    background-color: #f5f7fa;
 }
 
-/* Search Container */
+/* Scripts Page Styles */
 .search-container {
     background: white;
-    padding: 15px;
+    padding: 20px;
     border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    margin-bottom: 20px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    margin-bottom: 30px;
 }
 
 .search-bar {
     display: flex;
-    gap: 10px;
+    gap: 15px;
 }
 
     .search-bar input {
         flex: 1;
         padding: 10px 15px;
         border: 1px solid #ddd;
-        border-radius: 4px;
-        font-size: 14px;
+        border-radius: 5px;
+        font-size: 16px;
     }
 
     .search-bar button {
@@ -37,7 +33,7 @@
         color: white;
         border: none;
         padding: 0 20px;
-        border-radius: 4px;
+        border-radius: 5px;
         cursor: pointer;
         transition: background 0.2s;
     }
@@ -46,43 +42,61 @@
             background-color: #2980b9;
         }
 
-/* Scripts List */
 .scripts-list {
     background: white;
     border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    overflow: hidden;
 }
 
-/* Script Cards */
 .script-card {
-    padding: 15px;
+    padding: 20px;
     border-bottom: 1px solid #eee;
     transition: all 0.2s;
+    cursor: pointer;
 }
 
     .script-card:hover {
         background-color: #f8fafc;
     }
 
+    .script-card.expanded {
+        background-color: #f0f7ff;
+        box-shadow: 0 4px 12px rgba(52, 152, 219, 0.2);
+    }
+
 .script-header {
     display: flex;
     justify-content: space-between;
-    align-items: center;
     margin-bottom: 10px;
 }
 
-.script-patient {
+.script-patient, .script-doctor {
     font-weight: 600;
-    color: #2c3e50;
-    font-size: 16px;
+}
+
+.script-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    color: #666;
+    font-size: 14px;
+    margin-bottom: 10px;
 }
 
 .script-status {
     display: inline-block;
-    padding: 3px 10px;
+    padding: 3px 8px;
     border-radius: 12px;
     font-size: 12px;
     font-weight: 600;
+    background: #e0e0e0;
+    color: #333;
+}
+
+.status-pending {
+    background: #fff3cd;
+    color: #856404;
 }
 
 .status-ready {
@@ -90,92 +104,132 @@
     color: #155724;
 }
 
-.script-meta {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-    color: #666;
-    font-size: 14px;
-    margin-bottom: 10px;
-}
-
 .script-repeat {
     color: #d35400;
     font-weight: 600;
 }
 
-/* Action Buttons */
-.script-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-    margin-top: 10px;
-}
-
-.dispense-btn, .email-btn {
-    padding: 8px 15px;
-    border-radius: 4px;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s;
-    border: none;
-}
-
 .dispense-btn {
     background-color: #27ae60;
     color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    float: right;
+    transition: all 0.2s;
+    margin-left: 10px;
 }
+
+    .dispense-btn:hover {
+        background-color: #219653;
+        transform: scale(1.05);
+    }
 
 .email-btn {
     background-color: #3498db;
     color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    float: right;
+    transition: all 0.2s;
 }
 
-    .dispense-btn:hover, .email-btn:hover {
-        opacity: 0.9;
-        transform: translateY(-1px);
+    .email-btn:hover {
+        background-color: #2980b9;
+        transform: scale(1.05);
     }
 
-/* Loading Indicator */
+.script-details {
+    display: none;
+    margin-top: 15px;
+    padding: 15px;
+    background: white;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.expanded .script-details {
+    display: block;
+}
+
+.doctor-prescriptions {
+    display: flex;
+    gap: 15px;
+    margin-top: 15px;
+    overflow-x: auto;
+    padding-bottom: 10px;
+}
+
+.prescription-option {
+    border: 2px solid #ddd;
+    border-radius: 5px;
+    padding: 10px;
+    min-width: 200px;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+    .prescription-option:hover {
+        border-color: #3498db;
+        transform: translateY(-3px);
+    }
+
+    .prescription-option.selected {
+        border-color: #27ae60;
+        background-color: #e8f5e9;
+    }
+
+.prescription-pdf {
+    height: 250px;
+    width: 100%;
+    border: 1px dashed #3498db;
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #7f8c8d;
+}
+
+.prescription-meta {
+    font-size: 13px;
+    color: #666;
+    margin-top: 5px;
+}
+
 .loading {
     display: none;
     text-align: center;
-    padding: 15px;
-    color: #666;
+    padding: 20px;
 }
 
 .loading-spinner {
     display: inline-block;
-    width: 18px;
-    height: 18px;
+    width: 20px;
+    height: 20px;
     border: 3px solid rgba(0,0,0,0.1);
     border-radius: 50%;
     border-top-color: #3498db;
-    animation: spin 1s linear infinite;
-    margin-right: 8px;
-    vertical-align: middle;
+    animation: spin 1s ease-in-out infinite;
 }
 
 @keyframes spin {
     to {
         transform: rotate(360deg);
-    }
-}
-
-/* Responsive Adjustments */
-@media (max-width: 768px) {
-    .main-content {
-        margin-left: 180px;
-        width: calc(100% - 180px);
-        padding: 15px;
-    }
-
-    .script-actions {
-        flex-direction: column;
-    }
-
-    .dispense-btn, .email-btn {
-        width: 100%;
     }
 }
