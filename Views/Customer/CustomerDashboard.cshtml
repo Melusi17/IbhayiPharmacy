@@ -1,0 +1,60 @@
+﻿@{
+    ViewData["Title"] = "Customer Dashboard";
+    Layout = null; // Remove if you're using a shared layout like _Layout.cshtml
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Customer Dashboard</title>
+    <link rel="stylesheet" href="~/css/Customer/CustomerDashboard.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+    <div class="dashboard-wrapper">
+
+        <!-- Left Sidebar -->
+        <aside class="sidebar sidebar-left">
+            <div class="logo-container">
+                <img src="~/css/img/ibhayi2.png" alt="System Logo" class="logo" />
+            </div>
+            <div class="sidebar-content">
+                <nav>
+                    <ul>
+                        <li onclick="navigateTo('uploadPrescription')">📥 Upload Prescription</li>
+                        <li onclick="navigateTo('placeOrder')">🛒 Place Orders</li>
+                        <li onclick="navigateTo('trackOrders')">📦 Track Orders</li>
+                        <li onclick="navigateTo('manageRepeats')">🔁 Manage Repeats</li>
+                        <li onclick="navigateTo('viewReports')">📄 View Reports</li>
+                    </ul>
+                </nav>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content" id="mainContent">
+            <!-- Content will be dynamically loaded here -->
+        </main>
+
+        <!-- Right Sidebar -->
+        <aside class="sidebar sidebar-right">
+            <div class="profile-container">
+                <div class="profile-icon" onclick="toggleProfileMenu()">
+                    <img src="~/images/Profile.png" alt="Profile" />
+                </div>
+                <div id="profileMenu" class="profile-menu hidden">
+                    <a href="#">⚙️ Settings</a>
+                    <a href="#" onclick="logout()">🚪 Logout</a>
+                </div>
+            </div>
+            <div class="notifications">
+                <h4>🔔 Notifications</h4>
+                <p>No new notifications</p>
+            </div>
+        </aside>
+    </div>
+
+    <script src="~/js/Customer/CustomerDashboard.js"></script>
+</body>
+</html>
