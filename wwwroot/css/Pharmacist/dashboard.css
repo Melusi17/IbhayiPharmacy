@@ -70,3 +70,9 @@
     .recent-item:last-child {
         border-bottom: none;
     }
+
+.dashboard-link {
+    text-decoration: none;
+    color: inherit;
+    display: inline-block;
+}

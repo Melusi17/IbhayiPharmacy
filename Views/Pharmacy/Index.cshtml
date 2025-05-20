@@ -16,13 +16,15 @@
                 <span>Total Prescriptions</span>
             </div>
         </div>
-        <div class="dashboard-card">
-            <i class="fas fa-box-open"></i>
-            <div class="card-info">
-                <h3>76</h3>
-                <span>Processed Orders</span>
+        <a asp-controller="Pharmacy" asp-action="dispensedOrders" class="dashboard-link">
+            <div class="dashboard-card">
+                <i class="fas fa-box-open"></i>
+                <div class="card-info">
+                    <h3>76</h3>
+                    <span>Processed & Dispensed Orders History</span>
+                </div>
             </div>
-        </div>
+        </a>
         <div class="dashboard-card">
             <i class="fas fa-ban"></i>
             <div class="card-info">
