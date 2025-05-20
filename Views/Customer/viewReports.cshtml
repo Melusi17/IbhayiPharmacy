@@ -1,0 +1,67 @@
+﻿@{
+    ViewData["Title"] = "Place Order";
+    Layout = "~/Views/Shared/CustomerLayout/_CustomerLayout.cshtml";
+}
+<div class="upload-prescription-panel">
+    <h2>📊 Medication Order Reports</h2>
+    <table class="prescription-table">
+        <thead>
+            <tr>
+                <th>Order Date</th>
+                <th>Doctor</th>
+                <th>Medication</th>
+                <th>Instruction</th>
+                <th>Qty</th>
+                <th>Repeats</th>
+                <th>Price (R)</th>
+                <th>Total (R)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>2025-05-13</td>
+                <td>Dr. John Smith</td>
+                <td>Amoxicillin 250mg</td>
+                <td>1 capsule three times a day</td>
+                <td>20</td>
+                <td>1</td>
+                <td>80.00</td>
+                <td>80.00</td>
+            </tr>
+            <tr>
+                <td>2025-05-13</td>
+                <td>Dr. John Smith</td>
+                <td>Ibuprofen 200mg</td>
+                <td>1 tablet twice a day</td>
+                <td>15</td>
+                <td>0</td>
+                <td>45.00</td>
+                <td>45.00</td>
+            </tr>
+        </tbody>
+        <tfoot>
+            <tr style="font-weight: bold;">
+                <td colspan="7" style="text-align: right;">Total Due:</td>
+                <td>125.00</td>
+            </tr>
+            <tr style="font-weight: bold;">
+                <td colspan="7" style="text-align: right;">VAT (15%):</td>
+                <td>18.75</td>
+            </tr>
+            <tr style="font-weight: bold; background-color: #e0f7fa;">
+                <td colspan="7" style="text-align: right;">Total with VAT:</td>
+                <td>143.75</td>
+            </tr>
+        </tfoot>
+    </table>
+
+</div>
+<div class="upload-prescription-panel">
+    <h2>📄 Generate Medication Report</h2>
+    <label for="reportDate">Select Date:</label>
+    <input type="date" id="reportDate" style="margin-bottom: 15px;" />
+
+    <button class="btn-upload" onclick="generatePDFReport()">🧾 Generate PDF</button>
+
+    <div id="reportResults" style="margin-top: 20px;"></div>
+</div>

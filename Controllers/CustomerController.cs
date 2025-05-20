@@ -16,6 +16,25 @@ namespace IbhayiPharmacy.Controllers
         {
             return View();
         }
-
+        public IActionResult UploadPrescription()
+        {
+            return View();
+        }
+        public IActionResult PlaceOrder()
+        {
+            return View();
+        }
+        public IActionResult TrackOrder()
+        {
+            return View();
+        }
+        public IActionResult ManageRepeats()
+        {
+            return View();
+        }
+        public IActionResult ViewReports()
+        {
+            return View();
+        }
     }
 }

@@ -1,0 +1,47 @@
+﻿@{
+    ViewData["Title"] = "Place Order";
+    Layout = "~/Views/Shared/CustomerLayout/_CustomerLayout.cshtml";
+}
+<div class="track-order-panel upload-prescription-panel">
+<h2>Place Medication Order</h2>
+
+<div class="form-group">
+    <label for="orderDate">Date:</label>
+    <input type="date" id="orderDate">
+</div>
+
+<div class="form-group">
+    <label for="doctorSelect">Select Doctor:</label>
+    <select id="doctorSelect">
+        <option value="">-- Choose a Doctor --</option>
+        <option value="1">Dr. Smith</option>
+        <option value="2">Dr. Johnson</option>
+    </select>
+    <button onclick="addMedications()">Add Medications</button>
+</div>
+
+<table id="medicationTable" style="display:none">
+    <thead>
+        <tr>
+            <th>Select</th>
+            <th>Doctor</th>
+            <th>Medication</th>
+            <th>Qty</th>
+            <th>Repeats</th>
+            <th>Instructions</th>
+            <th>Price</th>
+        </tr>
+    </thead>
+    <tbody id="medicationBody"></tbody>
+</table>
+
+<div class="summary">
+    Subtotal: R<span id="subtotal">0.00</span><br>
+    Tax (15%): R<span id="tax">0.00</span><br>
+    Total Due: R<span id="total">0.00</span>
+</div>
+
+</div>
+
+
+

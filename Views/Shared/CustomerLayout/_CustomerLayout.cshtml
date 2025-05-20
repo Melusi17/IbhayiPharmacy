@@ -1,13 +1,11 @@
-﻿@{
-    ViewData["Title"] = "Customer Dashboard";
-    Layout = null; // Remove if you're using a shared layout like _Layout.cshtml
-}
-
+﻿@*
+    File: Views/Shared/_CustomerLayout.cshtml
+*@
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Customer Dashboard</title>
+    <title>@ViewData["Title"] - Customer Dashboard</title>
     <link rel="stylesheet" href="~/css/Customer/CustomerDashboard.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
@@ -16,32 +14,33 @@
 
         <!-- Left Sidebar -->
         <aside class="sidebar sidebar-left">
-            <div class="logo-container">
-                <img src="~/css/img/ibhayi2.png" alt="System Logo" class="logo" />
+            <div class="sidebar-header">
+                <img style="height:160px;width:220px;" src="~/css/img/ibhayi2.png" />
             </div>
             <div class="sidebar-content">
                 <nav>
-                    <ul>
-                        <li onclick="navigateTo('uploadPrescription')">📥 Upload Prescription</li>
-                        <li onclick="navigateTo('placeOrder')">🛒 Place Orders</li>
-                        <li onclick="navigateTo('trackOrders')">📦 Track Orders</li>
-                        <li onclick="navigateTo('manageRepeats')">🔁 Manage Repeats</li>
-                        <li onclick="navigateTo('viewReports')">📄 View Reports</li>
-                    </ul>
+                    <div class="sidebar-button-container">
+                        <a asp-controller="Customer" asp-action="uploadPrescription" class="sidebar-button">📥 Upload Prescription</a>
+                        <a asp-controller="Customer" asp-action="placeOrder" class="sidebar-button">🛒 Place Orders</a>
+                        <a asp-controller="Customer" asp-action="trackOrder" class="sidebar-button">📦 Track Orders</a>
+                        <a asp-controller="Customer" asp-action="manageRepeats" class="sidebar-button">🔁 Manage Repeats</a>
+                        <a asp-controller="Customer" asp-action="viewReports" class="sidebar-button">📄 View Reports</a>
+                    </div>
                 </nav>
             </div>
+
         </aside>
 
         <!-- Main Content -->
         <main class="main-content" id="mainContent">
-            <!-- Content will be dynamically loaded here -->
+            @RenderBody()
         </main>
 
         <!-- Right Sidebar -->
         <aside class="sidebar sidebar-right">
             <div class="profile-container">
                 <div class="profile-icon" onclick="toggleProfileMenu()">
-                    <img src="~/images/Profile.png" alt="Profile" />
+                    <img src="~/css/img/Customer_img/Profile.png" alt="Profile" />
                 </div>
                 <div id="profileMenu" class="profile-menu hidden">
                     <a href="#">⚙️ Settings</a>
