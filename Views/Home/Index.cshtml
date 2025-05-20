@@ -1,8 +1,49 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    Layout = null;
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login Page</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="~/css/Login.css" asp-append-version="true" />
+</head>
+<body>
+    <div class="login-container">
+        <h2>LOGIN</h2>
+
+        <form asp-controller="Customer" asp-action="CustomerDashboard" method="post">
+           @*  <div class="input-group">
+                <input type="email" name="Email" placeholder="Email" required />
+            </div>
+            <div class="input-group">
+                <input type="password" name="Password" placeholder="Password" required />
+            </div> *@
+
+            <div class="button-group">
+                <form asp-controller="Customer" asp-action="CustomerDashboard" method="get" style="display:inline;">
+                    <button type="submit" class="btn-login">Customer</button>
+                </form>
+
+                <form asp-controller="Pharmacy" asp-action="Dispensary" method="get" style="display:inline;">
+                    <button type="submit" class="btn-login">Pharmacist</button>
+                </form>
+
+                <form asp-controller="PharmacyManager" asp-action="Index" method="get" style="display:inline;">
+                    <button type="submit" class="btn-login">Pharmacy Manager</button>
+                </form>
+            </div>
+
+
+            <p class="signup-text">
+                Don't have an account?
+                <a asp-controller="Customer" asp-action="Register">Sign up</a>
+            </p>
+        </form>
+    </div>
+
+    <script src="~/js/Login.js" asp-append-version="true"></script>
+</body>
+</html>
