@@ -1,0 +1,43 @@
+﻿@{
+    ViewData["Title"] = "Track Order";
+    Layout = "~/Views/Shared/CustomerLayout/_CustomerLayout.cshtml";
+}
+<div class="track-order-panel upload-prescription-panel">
+    <h2>📦 Track Orders</h2>
+    <table class="prescription-table">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Doctor</th>
+                <th>Medication</th>
+                <th>Qty</th>
+                <th>Instruction</th>
+                <th>Repeats</th>
+                <th>Price (R)</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody id="orderList">
+            <tr>
+                <td>2025-05-13</td>
+                <td>Dr. John Smith</td>
+                <td>Amoxicillin 250mg</td>
+                <td>20</td>
+                <td>1 capsule three times a day</td>
+                <td>1</td>
+                <td>150.00</td>
+                <td><span class="status ordered">Ordered</span></td>
+            </tr>
+            <tr>
+                <td>2025-05-13</td>
+                <td>Dr. John Smith</td>
+                <td>Ibuprofen 200mg</td>
+                <td>15</td>
+                <td>Take after meals</td>
+                <td>0</td>
+                <td>75.00</td>
+                <td><span class="status ordered">Ordered</span></td>
+            </tr>
+        </tbody>
+    </table>
+</div>

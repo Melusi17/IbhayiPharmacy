@@ -1,0 +1,33 @@
+﻿@{
+    ViewData["Title"] = "Place Order";
+    Layout = "~/Views/Shared/CustomerLayout/_CustomerLayout.cshtml";
+}
+<div class="upload-prescription-panel">
+    <h2>🔁 Manage Repeats</h2>
+    <table class="prescription-table">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Doctor</th>
+                <th>Medication</th>
+                <th>Instruction</th>
+                <th>Qty</th>
+                <th>Repeats Left</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody id="repeatsList">
+            <tr>
+                <td>2025-05-13</td>
+                <td>Dr. John Smith</td>
+                <td>Amoxicillin 250mg</td>
+                <td>1 capsule three times a day</td>
+                <td>20</td>
+                <td id="repeatCount1">1</td>
+                <td>
+                    <button class="btn-upload" onclick="requestRefill('repeatCount1', this)">Request Refill</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
