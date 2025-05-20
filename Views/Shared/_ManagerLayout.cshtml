@@ -48,7 +48,8 @@
         }
 
         .btn {
-            background-color: #00695c;
+           /*  background-color: #00695c; */
+            background-color: #1f9f77;
             color: white;
             border: none;
             padding: 0.6rem 1.2rem;
@@ -57,10 +58,12 @@
             margin-right: 10px;
             text-decoration: none;
             display: inline-block;
+            transition: 0.3s;
         }
 
             .btn:hover {
-                background-color: #004d40;
+                background-color: #00695c;
+                
             }
 
         .wrapper {
@@ -235,7 +238,7 @@
 
         </div>
         <a class="sidebar-item p-3" asp-controller="PharmacyManager" asp-action="Reports">Reports</a>
-        <a class="sidebar-item p-3" asp-controller="PharmacyManager" asp-action="Reports"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        <a class="sidebar-item p-3" asp-controller="Home" asp-action="Index"><i class="fas fa-sign-out-alt"></i> Logout</a>
     </div>
 
 
@@ -243,7 +246,7 @@
 
 
     <div style="    margin-left: 220px;
-    margin-top: 60px;
+    margin-top: 50px;
     padding: 30px;">
             <main role="main" class="pb-3">
                 @RenderBody()
