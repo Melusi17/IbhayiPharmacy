@@ -1,9 +1,4 @@
-﻿
-@{
-    ViewData["Title"] = "ManagePharmacists";
-}
-
-@{
+﻿@{
     ViewData["Title"] = "Manage Pharmacists";
     Layout = "~/Views/Shared/_ManagerLayout.cshtml";
 }
@@ -12,13 +7,13 @@
    
 
     <!-- Pharmacists Table -->
-    <div class="card">
-        <div class="card-header">Existing Pharmacists</div>
+    <div class="card p-3">
+        <h6 class="title-underline">Existing Pharmacists</h6>
         <div class="card-body">
-            <table class="table table-hover">
-                <thead class="table-light">
+            <table class="table table-hover table-borderless">
+                <thead class="table-light" style=" color: #2c3e50;">
                     <tr>
-                        <th>#</th>
+                        
                         <th>Name</th>
                         <th>ID Number</th>
                         <th>Phone</th>
@@ -28,9 +23,9 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @* Dummy Data *@
+ 
                     <tr>
-                        <td>1</td>
+                       
                         <td>Thuli Mthembu</td>
                         <td>9001234567890</td>
                         <td>082 123 4567</td>
@@ -42,7 +37,7 @@
                         </td>
                     </tr>
                     <tr>
-                        <td>2</td>
+                        
                         <td>Peter Ndlovu</td>
                         <td>8511225678901</td>
                         <td>083 456 7890</td>

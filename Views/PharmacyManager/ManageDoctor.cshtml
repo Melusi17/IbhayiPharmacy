@@ -1,9 +1,4 @@
-﻿
-@{
-    ViewData["Title"] = "ManageDoctor";
-}
-
-@{
+﻿@{
     ViewData["Title"] = "Manage Doctors";
     Layout = "~/Views/Shared/_ManagerLayout.cshtml";
 }
@@ -11,14 +6,14 @@
 <div class="container mt-4">
   
 
-    <!-- Doctor List Table -->
-    <div class="card">
-        <div class="card-header">Existing Doctors</div>
+    
+    <div class="card p-3">
+        <h6 class="title-underline">Existing Doctors</h6>
         <div class="card-body">
-            <table class="table table-hover">
-                <thead class="table-light">
+            <table class="table table-hover table-borderless">
+                <thead class="table-light" style=" color: #2c3e50;">
                     <tr>
-                        <th>#</th>
+                        
                         <th>Name</th>
                         <th>Practice Number</th>
                         <th>Contact</th>
@@ -27,9 +22,9 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @* Dummy Data *@
+                   
                     <tr>
-                        <td>1</td>
+                        
                         <td>John Smith</td>
                         <td>PRC-987654</td>
                         <td>071 123 4567</td>
@@ -40,7 +35,7 @@
                         </td>
                     </tr>
                     <tr>
-                        <td>2</td>
+                       
                         <td>Mary Langa</td>
                         <td>PRC-543210</td>
                         <td>072 456 7890</td>

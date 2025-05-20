@@ -1,28 +1,28 @@
 ﻿
 @{
     ViewData["Title"] = "Dosage Forms";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    Layout = "~/Views/Shared/_ManagerLayout.cshtml";
 }
 
 <div class="container mt-4">
   
 
     <!-- Dosage Forms Table -->
-    <div class="card">
-        <div class="card-header">Existing Dosage Forms</div>
+    <div class="card p-3">
+        <h6 class="title-underline">Existing Dosage Forms</h6>
         <div class="card-body">
-            <table class="table table-hover">
-                <thead class="table-light">
+            <table class="table table-hover table-borderless">
+                <thead class="table-light" style=" color: #2c3e50;">
                     <tr>
-                        <th>#</th>
+                        
                         <th>Form Name</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @* Dummy Data *@
+                    
                     <tr>
-                        <td>1</td>
+                       
                         <td>Tablet</td>
                         <td>
                             <button class="btn btn-sm btn-warning me-2">Edit</button>
@@ -30,7 +30,7 @@
                         </td>
                     </tr>
                     <tr>
-                        <td>2</td>
+                        
                         <td>Syrup</td>
                         <td>
                             <button class="btn btn-sm btn-warning me-2">Edit</button>
@@ -38,7 +38,7 @@
                         </td>
                     </tr>
                     <tr>
-                        <td>3</td>
+                        
                         <td>Capsule</td>
                         <td>
                             <button class="btn btn-sm btn-warning me-2">Edit</button>
