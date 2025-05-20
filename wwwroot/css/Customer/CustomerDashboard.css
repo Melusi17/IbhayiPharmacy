@@ -269,6 +269,12 @@ input[type="file"] {
     border-radius: 12px;
     margin-bottom: 30px;
     box-shadow: 0 0 10px rgba(0,0,0,0.05);
+
+    width: 90%;               /* Custom width, adjust as needed */
+    max-width: 1200px;        /* Set a max width */
+    height: auto;             /* or set fixed height like 600px */
+    padding: 40px 30px;       /* More spacing inside the panel */
+    margin: 20px auto;   
 }
 
     .upload-prescription-panel h2 {
