@@ -24,6 +24,11 @@ namespace IbhayiPharmacy.Controllers
             return View();
         }
 
+        public IActionResult dispensedOrders()
+        {
+            return View();
+        }
+
         public IActionResult processedOrders()
         {
             return View();
