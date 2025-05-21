@@ -85,10 +85,12 @@
         }
 </style>
 <div class="container">
-   
+    <div class="alert alert-warning " style="display: block;">
+        <i class="fas fa-box-open"></i> <strong>LOW STOCK:</strong> This medication is near reorder level!
+    </div>
   
-    <div class="card meds-card p-3">
-        <h6 class="title-underline"><i class="fas fa-pills "></i> Medication</h6>
+    <div class="card meds-card p-3 mb-4">
+        <h5 class="title-underline"><i class="fas fa-pills "></i> Medication</h5>
 
  
 
@@ -98,6 +100,7 @@
                     <th width="25%">Medication</th>
                     <th width="15%">Dosage Form</th>
                     <th width="10%">Qty</th>
+                    <th width="10%"></th>
                
                    
                     <th width="5%"></th>
@@ -148,62 +151,6 @@
 
 
 
-
-
-
-
-
-
-
-
-
-    <div class="alert alert-warning " style="display: block;">
-        <i class="fas fa-box-open"></i> <strong>LOW STOCK:</strong> This medication is near reorder level!
-    </div>
-    <!-- Low Stock Alerts -->
-    <div class="card p-3 ">
-        <h6 class="title-underline">Medication Orders</h6>
-        <div class="card-body">
-           
-            <table class="table table-sm table-bordered align-middle">
-                <thead class="table-light">
-                    <tr>
-                        <th>Medication</th>
-                        <th>Supplier</th>
-                        <th>Qty On Hand</th>
-                        <th>Re-order Level</th>
-                        <th>Order Quantity</th>
-                    </tr>
-                </thead>
-                <tbody>
-                
-                    <tr>
-                        <td>Panado</td>
-                        <td>MedLife Distributors</td>
-                        <td>12</td>
-                        <td>20</td>
-                        <td>
-                            <input type="number" class="form-control form-control-sm" placeholder="e.g. 50">
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Myprodol</td>
-                        <td>PharmaDirect</td>
-                        <td>18</td>
-                        <td>25</td>
-                        <td>
-                            <input type="number" class="form-control form-control-sm" placeholder="e.g. 40">
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-            <button class="btn btn-primary mt-3">Generate Order & Send Email</button>
-        </div>
-    </div>
-
-
-
-
     
     <div class="card p-3">
         <h6 class="title-underline">Orders</h6>
@@ -215,7 +162,7 @@
                         <th>Date</th>
                         <th>Supplier</th>
                         <th>Items Ordered</th>
-                        <th>Mark Received</th>
+                        <th>Quantity</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -225,18 +172,16 @@
                         <td>2025-04-01</td>
                         <td>PharmaDirect</td>
                         <td>Myprodol (40)</td>
-                        <td>
-                            <button class="btn btn-sm btn-success">Mark as Received</button>
-                        </td>
+                        <td>40</td>
+                        < 
                     </tr>
                     <tr>
                         <td>ORD-1000</td>
                         <td>2025-03-29</td>
                         <td>MedLife Distributors</td>
                         <td>Panado (50), Allergex (20)</td>
-                        <td>
-                            <button class="btn btn-sm btn-success">Mark as Received</button>
-                        </td>
+                        <td>800</td>
+                      
                     </tr>
                 </tbody>
             </table>
