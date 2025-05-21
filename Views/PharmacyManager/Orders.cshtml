@@ -4,12 +4,159 @@
 
 }
 
-<div class="container mt-4">
+<style>
+    .meds-card {
+        grid-area: meds;
+    }
+    /* ===== MEDICATION TABLE ===== */
+    .medication-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+
+        .medication-table th {
+            background: #3498db;
+            color: white;
+            padding: 12px;
+            text-align: left;
+        }
+
+        .medication-table td {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            vertical-align: top;
+        }
+
+        .medication-table select,
+        .medication-table input {
+            margin: 0;
+        }
+
+    .med-details {
+        font-size: 12px;
+        color: #7f8c8d;
+        margin-top: 5px;
+    }
+
+    .remove-btn {
+        color: #e74c3c;
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 16px;
+    }
+
+    /* ===== SEARCHABLE MEDICATION DROPDOWN ===== */
+    .medication-select-container {
+        position: relative;
+    }
+
+    .medication-search {
+        width: 100%;
+        padding: 8px 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        margin-bottom: 5px;
+        font-size: 14px;
+    }
+
+    .medication-options {
+        position: absolute;
+        width: 100%;
+        max-height: 200px;
+        overflow-y: auto;
+        background: white;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        z-index: 100;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        display: none;
+    }
+
+    .medication-option {
+        padding: 8px 10px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+
+        .medication-option:hover {
+            background-color: #f5f5f5;
+        }
+</style>
+<div class="container">
    
-   @*  <div style="padding:5px;margin:2px;border-radius:5px;box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);display:grid;" class=" bord bg-warning text-dark">
-        <b>Low Stock Alert</b>
-        <small>There are at items with stock below re-order level</small>
-    </div> *@
+  
+    <div class="card meds-card p-3">
+        <h6 class="title-underline"><i class="fas fa-pills "></i> Medication</h6>
+
+ 
+
+        <table class="medication-table">
+            <thead>
+                <tr>
+                    <th width="25%">Medication</th>
+                    <th width="15%">Dosage Form</th>
+                    <th width="10%">Qty</th>
+               
+                   
+                    <th width="5%"></th>
+                </tr>
+            </thead>
+            <tbody id="medsTableBody">
+                <tr id="row-1747813573508">
+                    <td>
+                        <div class="medication-select-container">
+                            <select class="medication-select" id="med-select-1747813573508" onchange="updateMedDetails(this, 1747813573508)">
+                                <option value="">Select medication...</option>
+                                <option value="1" data-forms="Capsule">Amoxicillin 500mg (S4)</option>
+                                <option value="2" data-forms="Tablet">Lisinopril 10mg (S2)</option>
+                                <option value="3" data-forms="Tablet,Capsule">Panado Extra (S0)</option>
+                                <option value="4" data-forms="Inhaler">Ventolin Inhaler (S3)</option>
+                            </select>
+                            <div class="medication-options" id="med-options-1747813573508"><div class="medication-option" data-id="1">Amoxicillin 500mg (S4)</div><div class="medication-option" data-id="2">Lisinopril 10mg (S2)</div><div class="medication-option" data-id="3">Panado Extra (S0)</div><div class="medication-option" data-id="4">Ventolin Inhaler (S3)</div></div>
+                        </div>
+                    </td>
+                    <td>
+                        <select class="dosage-form-select" id="form-1747813573508">
+                            <option value="">Select form</option>
+                        </select>
+                    </td>
+                    <td><input type="number" min="1" value="1" class="qty-input"></td>
+                   
+                    <td><div class="med-details" id="details-1747813573508"></div></td>
+                    <td><button class="remove-btn" onclick="removeRow(1747813573508)"><i class="fas fa-trash"></i></button></td>
+                </tr>
+            </tbody>
+        </table>
+
+
+        <div class="form-footer d-flex justify-content-between">
+            <button class="btn btn-add" id="addMedBtn" type="button"><i class="fas fa-plus"></i> Add Medication</button>
+
+            <button class="btn btn-primary mt-2"><i class="fas fa-save"></i> Generate Order & Send Email</button>
+
+        </div>
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     <div class="alert alert-warning " style="display: block;">
         <i class="fas fa-box-open"></i> <strong>LOW STOCK:</strong> This medication is near reorder level!
     </div>
@@ -29,7 +176,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @* Dummy data *@
+                
                     <tr>
                         <td>Panado</td>
                         <td>MedLife Distributors</td>
@@ -53,6 +200,9 @@
             <button class="btn btn-primary mt-3">Generate Order & Send Email</button>
         </div>
     </div>
+
+
+
 
     
     <div class="card p-3">
