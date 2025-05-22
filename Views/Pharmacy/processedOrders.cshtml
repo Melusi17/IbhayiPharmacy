@@ -3,25 +3,25 @@
     Layout = "~/Views/Shared/PharmacistLayouts/_ProcessedOrdersLayout.cshtml";
 }
 
-<div >
+<div>
     <h2>Order Status Tracking</h2>
 
     <div class="filter-container">
-        <button class="filter-btn active" onclick="filterOrders('all')">All Orders</button>
-        <button class="filter-btn" onclick="filterOrders('packing')">Packing</button>
-        <button class="filter-btn" onclick="filterOrders('ready')">Ready for Collection</button>
-        <button class="filter-btn" onclick="filterOrders('rejected')">Rejected</button>
+        <button class="filter-btn active" data-filter="all">All Orders</button>
+        <button class="filter-btn" data-filter="packing">Packing</button>
+        <button class="filter-btn" data-filter="ready">Ready for Collection</button>
+        <button class="filter-btn" data-filter="rejected">Rejected</button>
     </div>
 
     <div class="search-container">
         <div class="search-bar">
             <input type="text" placeholder="Search by patient name or ID..." id="searchInput">
-            <button onclick="searchOrders()"><i class="fas fa-search"></i> Search</button>
+            <button><i class="fas fa-search"></i> Search</button>
         </div>
     </div>
 
     <div class="orders-list" id="ordersList">
-        <!-- Order 1 - Ready for Packing -->
+        <!-- Order 1 - Packing -->
         <div class="order-card" data-status="packing">
             <div class="order-header">
                 <div>
@@ -36,10 +36,10 @@
                 <span class="order-repeat">Repeat (2 remaining)</span>
             </div>
             <div class="order-actions">
-                <button class="action-btn email-btn" onclick="emailOrder(this)">
+                <button class="action-btn email-btn">
                     <i class="fas fa-envelope"></i> Email
                 </button>
-                <button class="action-btn collect-btn" onclick="collectOrder(this)">
+                <button class="action-btn collect-btn">
                     <i class="fas fa-check"></i> Collect
                 </button>
             </div>
@@ -89,7 +89,7 @@
                 <span>Date: 2023-05-14</span>
             </div>
             <div class="order-actions">
-                <button class="action-btn email-btn" onclick="emailOrder(this)">
+                <button class="action-btn email-btn">
                     <i class="fas fa-envelope"></i> Email
                 </button>
             </div>
@@ -139,7 +139,7 @@
                 <span>Date: 2023-05-12</span>
             </div>
             <div class="order-actions">
-                <button class="action-btn email-btn" onclick="emailOrder(this)">
+                <button class="action-btn email-btn">
                     <i class="fas fa-envelope"></i> Email
                 </button>
             </div>

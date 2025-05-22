@@ -1,4 +1,4 @@
-﻿// Processed Orders JS - Enhanced Version
+﻿// Processed Orders JS - Fully Fixed Version
 document.addEventListener('DOMContentLoaded', function () {
     // Initialize all event listeners
     initEventListeners();
@@ -16,16 +16,24 @@ function initEventListeners() {
         });
     });
 
-    // Filter buttons
+    // Filter buttons - Add data-filter attribute to each button
     document.querySelectorAll('.filter-btn').forEach(btn => {
+        // Set data-filter attribute based on button text
+        const filterValue = btn.textContent.trim().toLowerCase()
+            .replace(' ', '-')
+            .replace('for-', ''); // Remove "for-" from "ready-for-collection"
+
+        btn.dataset.filter = filterValue.includes('all-orders') ? 'all' :
+            filterValue.includes('ready-collection') ? 'ready' :
+                filterValue;
+
         btn.addEventListener('click', function () {
-            const status = this.dataset.filter || 'all';
-            filterOrders(status, this);
+            filterOrders(this.dataset.filter);
         });
     });
 
     // Search button
-    document.getElementById('searchButton')?.addEventListener('click', searchOrders);
+    document.querySelector('.search-container button')?.addEventListener('click', searchOrders);
 
     // Search on Enter key
     document.getElementById('searchInput')?.addEventListener('keyup', function (e) {
@@ -34,10 +42,6 @@ function initEventListeners() {
 
     // Event delegation for dynamic buttons
     document.addEventListener('click', function (e) {
-        // Pack order button
-        if (e.target.closest('.pack-btn')) {
-            packOrder(e.target.closest('.pack-btn'));
-        }
         // Collect order button
         if (e.target.closest('.collect-btn')) {
             collectOrder(e.target.closest('.collect-btn'));
@@ -50,52 +54,26 @@ function initEventListeners() {
 }
 
 // Filter orders by status
-function filterOrders(status, activeButton = null) {
+function filterOrders(status) {
     try {
         // Update active filter button
         document.querySelectorAll('.filter-btn').forEach(btn => {
-            btn.classList.remove('active');
+            btn.classList.toggle('active', btn.dataset.filter === status);
         });
-        if (activeButton) activeButton.classList.add('active');
 
         // Filter cards
         const cards = document.querySelectorAll('.order-card');
         cards.forEach(card => {
-            card.style.display = (status === 'all' || card.dataset.status === status)
-                ? 'block'
-                : 'none';
+            if (status === 'all') {
+                card.style.display = 'block';
+            } else {
+                card.style.display = card.dataset.status === status ? 'block' : 'none';
+            }
         });
 
         console.log(`Filtered orders by status: ${status}`);
     } catch (error) {
         console.error('Error in filterOrders:', error);
-    }
-}
-
-// Pack order function
-function packOrder(button) {
-    try {
-        const card = button.closest('.order-card');
-        if (!card) return;
-
-        // Update status
-        card.dataset.status = 'packing';
-        const statusElement = card.querySelector('.order-status');
-        if (statusElement) {
-            statusElement.className = 'order-status status-packing';
-            statusElement.textContent = 'Packing';
-        }
-
-        // Change button to collect button
-        button.outerHTML = `
-            <button class="action-btn collect-btn">
-                <i class="fas fa-check"></i> Collect
-            </button>
-        `;
-
-        console.log('Order marked as packing');
-    } catch (error) {
-        console.error('Error in packOrder:', error);
     }
 }
 
@@ -146,7 +124,10 @@ function searchOrders() {
 
         cards.forEach(card => {
             const patientText = card.querySelector('.order-patient')?.textContent.toLowerCase() || '';
-            card.style.display = patientText.includes(searchTerm) ? 'block' : 'none';
+            const orderNumber = card.querySelector('.order-meta strong')?.textContent.toLowerCase() || '';
+            const searchContent = patientText + ' ' + orderNumber;
+
+            card.style.display = searchContent.includes(searchTerm) ? 'block' : 'none';
         });
 
         console.log(`Searched orders for: ${searchTerm}`);
