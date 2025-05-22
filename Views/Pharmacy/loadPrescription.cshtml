@@ -56,34 +56,29 @@
     <div class="card meds-card">
         <h3><i class="fas fa-pills"></i> Medication</h3>
 
-        <div class="alert alert-danger allergy-alert" style="display: none;">
-            <i class="fas fa-exclamation-triangle"></i> <strong>ALLERGY WARNING:</strong> Patient is allergic to this medication!
-        </div>
-
-        <div class="alert alert-warning stock-alert" style="display: none;">
-            <i class="fas fa-box-open"></i> <strong>LOW STOCK:</strong> This medication is near reorder level!
-        </div>
-
         <table class="medication-table">
             <thead>
                 <tr>
                     <th width="25%">Medication</th>
                     <th width="15%">Dosage Form</th>
                     <th width="10%">Qty</th>
-                    <th width="30%">Instructions</th>
-                    <th width="15%">Details</th>
+                    <th width="25%">Instructions</th>
+                    <th width="10%">Details</th>
+                    <th width="5%">Repeat</th>
+                    <th width="5%">Repeats Left</th>
                     <th width="5%"></th>
                 </tr>
             </thead>
             <tbody id="medsTableBody">
+                <!-- Rows will be added here -->
             </tbody>
         </table>
 
-        <button class="btn btn-add" id="addMedBtn" type="button"><i class="fas fa-plus"></i> Add Medication</button>
+        <button class="btn btn-add" id="addMedBtn"><i class="fas fa-plus"></i> Add Medication</button>
 
-        <div class="form-footer">
-            <button class="btn btn-alert" id="checkInteractionsBtn" type="button"><i class="fas fa-exclamation-triangle"></i> Check Interactions</button>
-            <button class="btn btn-add" id="savePrescriptionBtn" type="button"><i class="fas fa-save"></i> Save Prescription</button>
+        <div class="form-footer" style="margin-top: 25px;">
+            <button class="btn btn-alert"><i class="fas fa-exclamation-triangle"></i> Check Interactions</button>
+            <button class="btn btn-add"><i class="fas fa-save"></i> Save Prescription</button>
         </div>
     </div>
 
