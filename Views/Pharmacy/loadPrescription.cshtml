@@ -15,7 +15,7 @@
                 <option value="2">Amanda Johnson (ID: 8902021234082)</option>
                 <option value="3">Lunga Dlamini (ID: 8803031234083)</option>
             </select>
-            <button class="btn" id="searchPatientBtn"><i class="fas fa-search"></i> Search</button>
+            <button class="btn"><i class="fas fa-search"></i> Search</button>
         </div>
 
         <div class="info-box" id="patientDetails">
@@ -39,15 +39,26 @@
                 <option value="2">Dr. Michael Brown (PR7654321)</option>
                 <option value="3">Dr. Thando Nkosi (PR9876543)</option>
             </select>
+            <button class="btn btn-add" id="addDoctorBtn" style="margin-top: 10px;"><i class="fas fa-user-md"></i> Add New Doctor</button>
         </div>
 
         <div class="form-group">
             <label for="prescriptionDate">Prescription Date</label>
-            <input type="date" id="prescriptionDate" value="@DateTime.Now.ToString("yyyy-MM-dd")">
+            <input type="date" id="prescriptionDate">
         </div>
 
         <div class="form-group">
-            <label for="prescriptionUpload">Upload Prescription</label>
+            <label for="existingPrescriptions">Existing Prescriptions</label>
+            <select id="existingPrescriptions" onchange="loadExistingPrescription(this.value)">
+                <option value="">Select existing prescription...</option>
+                <option value="1">Prescription #1234 (15/06/2023)</option>
+                <option value="2">Prescription #1235 (18/06/2023)</option>
+                <option value="3">Prescription #1236 (20/06/2023)</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="prescriptionUpload">Upload New Prescription</label>
             <input type="file" id="prescriptionUpload" accept=".pdf">
         </div>
     </div>
@@ -78,7 +89,7 @@
 
         <div class="form-footer" style="margin-top: 25px;">
             <button class="btn btn-alert"><i class="fas fa-exclamation-triangle"></i> Check Interactions</button>
-            <button class="btn btn-add"><i class="fas fa-save"></i> Save Prescription</button>
+            <button class="btn btn-add"><i class="fas fa-save"></i> Save Prescription and Dispense</button>
         </div>
     </div>
 
@@ -118,6 +129,40 @@
         <div style="text-align: right; margin-top: 20px;">
             <button class="btn" onclick="closeModal('patientModal')">Cancel</button>
             <button class="btn btn-add" id="savePatientBtn">Save Patient</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="doctorModal">
+    <div class="modal-content">
+        <h3><i class="fas fa-user-md"></i> Add New Doctor</h3>
+        <!-- Doctor form would go here -->
+        <div class="form-group">
+            <label for="doctorName">Doctor Name</label>
+            <input type="text" id="doctorName" placeholder="Enter doctor's full name">
+        </div>
+        <div class="form-group">
+            <label for="practiceNumber">Practice Number</label>
+            <input type="text" id="practiceNumber" placeholder="Enter practice number">
+        </div>
+        <div class="form-group">
+            <label for="doctorContact">Contact Number</label>
+            <input type="tel" id="doctorContact" placeholder="Enter contact number">
+        </div>
+        <div style="text-align: right; margin-top: 20px;">
+            <button class="btn" onclick="closeModal('doctorModal')">Cancel</button>
+            <button class="btn btn-add" onclick="saveNewDoctor()">Save Doctor</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="instructionModal">
+    <div class="modal-content">
+        <h3><i class="fas fa-edit"></i> Custom Instructions</h3>
+        <textarea id="customInstructions" rows="4" style="width: 100%;"></textarea>
+        <div style="text-align: right; margin-top: 20px;">
+            <button class="btn" onclick="closeModal('instructionModal')">Cancel</button>
+            <button class="btn btn-add" onclick="saveCustomInstruction()">Save</button>
         </div>
     </div>
 </div>
