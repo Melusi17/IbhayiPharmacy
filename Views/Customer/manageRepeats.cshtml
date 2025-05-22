@@ -20,7 +20,7 @@
     }
 
     h2 {
-        color: #1f9f77;
+        color: #1f9f77 ;
         margin-bottom: 20px;
     }
 
@@ -28,19 +28,34 @@
         width: 100%;
         border-collapse: collapse;
         margin-top: 20px;
+        background-color: #ffffff;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     }
 
         .prescription-table th, .prescription-table td,
         .modal-table th, .modal-table td {
             padding: 12px;
-            border-bottom: 1px solid #ddd;
-            text-align: left;
+            text-align: center;
+            border: 1px solid #ccc;
         }
 
-        .prescription-table th,
-        .modal-table th {
-            background-color: #e0f0e9;
-            color: #1f4d3f;
+        .prescription-table thead,
+        .modal-table thead {
+            background-color: #1f9f77;
+            color: white;
+        }
+
+        .prescription-table tbody tr:nth-child(even),
+        .modal-table tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .prescription-table tbody tr:hover,
+        .modal-table tbody tr:hover {
+            background-color: #e3f5f0;
         }
 
     .order-row {
@@ -129,6 +144,7 @@
         pointer-events: none;
         opacity: 0.6;
     }
+
 </style>
 
 <div class="upload-prescription-panel">
