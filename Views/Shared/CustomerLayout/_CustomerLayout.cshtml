@@ -25,6 +25,8 @@
                         <a asp-controller="Customer" asp-action="trackOrder" class="sidebar-button">📦 Track Orders</a>
                         <a asp-controller="Customer" asp-action="manageRepeats" class="sidebar-button">🔁 Manage Repeats</a>
                         <a asp-controller="Customer" asp-action="viewReports" class="sidebar-button">📄 View Reports</a>
+                       @*  <a asp-controller="Home" asp-action="Index" class="sidebar-button">🚪 Logout</a> *@
+
                     </div>
                 </nav>
             </div>
@@ -43,8 +45,9 @@
                     <img src="~/css/img/Customer_img/Profile.png" alt="Profile" />
                 </div>
                 <div id="profileMenu" class="profile-menu hidden">
-                    <a href="#">⚙️ Settings</a>
-                    <a href="#" onclick="logout()">🚪 Logout</a>
+                    <a asp-controller="Customer" asp-action="Register" class="sidebar-button">👤 Account</a>
+
+                   <a asp-controller="Home" asp-action="Index" class="sidebar-button">🚪 Logout</a>
                 </div>
             </div>
             <div class="notifications">

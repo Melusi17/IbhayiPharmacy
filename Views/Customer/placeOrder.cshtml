@@ -1,8 +1,83 @@
-﻿@{
+﻿@* @{
     ViewData["Title"] = "Place Order";
     Layout = "~/Views/Shared/CustomerLayout/_CustomerLayout.cshtml";
 }
-<div class="track-order-panel upload-prescription-panel">
+<style>
+    .date-inline {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .date-display {
+        padding: 8px 12px;
+        font-weight: 500;
+    }
+</style>
+
+
+
+<h2>Place Medication Order</h2>
+
+<div class="form-group date-inline">
+    <label for="orderDate">Date:</label>
+    <div id="displayDate" class="date-display"></div>
+    <input type="hidden" id="orderDate" name="orderDate">
+</div>
+
+<div class="form-group">
+    <label for="doctorSelect">Select Doctor:</label>
+    <select id="doctorSelect">
+        <option value="">-- Choose a Doctor --</option>
+        <option value="1">Dr. Smith</option>
+        <option value="2">Dr. Johnson</option>
+    </select>
+    <button onclick="addMedications()">Add Medications</button>
+</div>
+
+<table id="medicationTable" style="display:none">
+    <thead>
+        <tr>
+            <th>Select</th>
+            <th>Doctor</th>
+            <th>Medication</th>
+            <th>Qty</th>
+            <th>Repeats</th>
+            <th>Instructions</th>
+            <th>Price</th>
+        </tr>
+    </thead>
+    <tbody id="medicationBody"></tbody>
+</table>
+
+<div class="order-summary-container">
+    <div class="summary">
+        Subtotal: R<span id="subtotal">0.00</span><br>
+        Tax (15%): R<span id="tax">0.00</span><br>
+        Total Due: R<span id="total">0.00</span>
+    </div>
+
+    <!-- Place Order Button -->
+    <div class="form-group">
+        <button class="btn-upload" onclick="placeMedicationOrder()">Place Order</button>
+    </div>
+</div>
+
+
+<script>
+    window.addEventListener('DOMContentLoaded', () => {
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('displayDate').innerText = today;
+        document.getElementById('orderDate').value = today;
+    });
+</script>
+ *@
+
+        ﻿@{
+    ViewData["Title"] = "Place Order";
+    Layout = "~/Views/Shared/CustomerLayout/_CustomerLayout.cshtml";
+}
+
 <h2>Place Medication Order</h2>
 
 <div class="form-group">
@@ -35,13 +110,15 @@
     <tbody id="medicationBody"></tbody>
 </table>
 
-<div class="summary">
-    Subtotal: R<span id="subtotal">0.00</span><br>
-    Tax (15%): R<span id="tax">0.00</span><br>
-    Total Due: R<span id="total">0.00</span>
+<div class="order-summary-container">
+    <div class="summary">
+        Subtotal: R<span id="subtotal">0.00</span><br>
+        Tax (15%): R<span id="tax">0.00</span><br>
+        Total Due: R<span id="total">0.00</span>
+    </div>
+
+    <!-- Place Order Button -->
+    <div class="form-group">
+        <button class="btn-upload" onclick="placeMedicationOrder()">Place Order</button>
+    </div>
 </div>
-
-</div>
-
-
-
