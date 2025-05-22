@@ -69,9 +69,10 @@
                         <th width="10%">Dosage</th>
                         <th width="10%">Qty</th>
                         <th width="10%">Price (ZAR)</th>
-                        <th width="25%">Instructions</th>
+                        <th width="20%">Instructions</th>
+                        <th width="10%">Repeats Left</th>
                         <th width="10%">Status</th>
-                        <th width="10%">Actions</th>
+                        <th width="5%">Actions</th>
                     </tr>
                 </thead>
                 <tbody id="medsTableBody">
@@ -89,6 +90,9 @@
                         <td>14</td>
                         <td>R 85.50</td>
                         <td>Take 1 capsule twice daily for 7 days</td>
+                        <td>
+                            <input type="number" class="repeats-input" min="0" value="2" readonly>
+                        </td>
                         <td><span class="badge bg-warning">Pending</span></td>
                         <td>
                             <button class="action-btn reject-btn" onclick="showRejectionModal(this)"><i class="fas fa-ban"></i></button>
@@ -110,6 +114,9 @@
                         <td>30</td>
                         <td>R 120.00</td>
                         <td>Take 1 tablet daily</td>
+                        <td>
+                            <!-- Empty for no repeats -->
+                        </td>
                         <td><span class="badge bg-warning">Pending</span></td>
                         <td>
                             <button class="action-btn reject-btn" onclick="showRejectionModal(this)"><i class="fas fa-ban"></i></button>
@@ -131,6 +138,9 @@
                         <td>20</td>
                         <td>R 45.75</td>
                         <td>Take 2 tablets every 6 hours as needed</td>
+                        <td>
+                            <input type="number" class="repeats-input" min="0" value="3" readonly>
+                        </td>
                         <td><span class="badge bg-warning">Pending</span></td>
                         <td>
                             <button class="action-btn reject-btn" onclick="showRejectionModal(this)"><i class="fas fa-ban"></i></button>
@@ -152,6 +162,9 @@
                         <td>10</td>
                         <td>R 32.50</td>
                         <td>Take 1 tablet every 8 hours</td>
+                        <td>
+                            <!-- Empty for no repeats -->
+                        </td>
                         <td><span class="badge bg-danger">Rejected</span></td>
                         <td>
                             <button class="action-btn remove-btn" onclick="removeMedication(this)"><i class="fas fa-trash"></i></button>
@@ -172,48 +185,14 @@
                         <td>30</td>
                         <td>R 95.00</td>
                         <td>Take 1 tablet at bedtime</td>
+                        <td>
+                            <!-- Empty for no repeats -->
+                        </td>
                         <td><span class="badge bg-success">Dispensed</span></td>
                         <td></td>
                     </tr>
                 </tbody>
             </table>
-
-            <!-- Add Medication Section -->
-            <div class="add-medication-section">
-                <h4><i class="fas fa-plus-circle"></i> Add Medication</h4>
-                <div class="add-medication-form">
-                    <div class="form-group">
-                        <label>Medication</label>
-                        <select>
-                            <option value="">Select medication...</option>
-                            <option value="1">Amoxicillin 500mg</option>
-                            <option value="2">Lisinopril 10mg</option>
-                            <option value="3">Panado Extra</option>
-                            <option value="4">Simvastatin 20mg</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Quantity</label>
-                        <input type="number" min="1" value="1">
-                    </div>
-                    <div class="form-group">
-                        <label>Price (ZAR)</label>
-                        <input type="number" min="0" step="0.01" placeholder="0.00">
-                    </div>
-                    <div class="form-group">
-                        <label>Instructions</label>
-                        <select>
-                            <option value="1">Take 1 daily</option>
-                            <option value="2">Take 1 twice daily</option>
-                            <option value="3">Take 2 daily</option>
-                            <option value="4">Other...</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <button class="btn btn-add" onclick="addNewMedication()"><i class="fas fa-plus"></i> Add</button>
-                    </div>
-                </div>
-            </div>
 
             <div class="form-footer">
                 <button class="btn btn-alert"><i class="fas fa-exclamation-triangle"></i> Check Interactions</button>
@@ -265,7 +244,6 @@
         </div>
     </div>
 </div>
-
 @section Scripts {
     <script src="~/js/PrescriptionReview.js"></script>
 }

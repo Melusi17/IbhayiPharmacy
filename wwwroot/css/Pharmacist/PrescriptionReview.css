@@ -1,5 +1,4 @@
-﻿
-/* ===== MAIN CONTENT ===== */
+﻿/* ===== MAIN CONTENT ===== */
 .main-content {
     margin-left: 220px;
     margin-top: 60px;
@@ -303,25 +302,15 @@ h3 {
     margin-right: 8px;
 }
 
-/* ===== ADD MEDICATION SECTION ===== */
-.add-medication-section {
-    margin-top: 20px;
-    padding: 15px;
+/* ===== REPEATS INPUT STYLE ===== */
+.repeats-input {
+    width: 50px;
+    text-align: center;
     background-color: #f8f9fa;
-    border-radius: 5px;
-    border-left: 3px solid #3498db;
+    border: 1px solid #ddd;
+    padding: 5px;
+    border-radius: 4px;
 }
-
-.add-medication-form {
-    display: grid;
-    grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
-    gap: 10px;
-    align-items: flex-end;
-}
-
-    .add-medication-form .form-group {
-        margin-bottom: 0;
-    }
 
 /* ===== RESPONSIVE ===== */
 @media (max-width: 992px) {
@@ -338,9 +327,5 @@ h3 {
 
     #pdfViewer {
         height: 400px;
-    }
-
-    .add-medication-form {
-        grid-template-columns: 1fr;
     }
 }
