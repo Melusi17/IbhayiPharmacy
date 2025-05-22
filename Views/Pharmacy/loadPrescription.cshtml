@@ -89,7 +89,9 @@
 
         <div class="form-footer" style="margin-top: 25px;">
             <button class="btn btn-alert"><i class="fas fa-exclamation-triangle"></i> Check Interactions</button>
-            <button class="btn btn-add"><i class="fas fa-save"></i> Save Prescription and Dispense</button>
+            <a asp-controller="Pharmacy" asp-action="Dispensary" class="btn btn-add" style="text-decoration: none;">
+                <i class="fas fa-save"></i> Save Prescription and Dispense
+            </a>
         </div>
     </div>
 

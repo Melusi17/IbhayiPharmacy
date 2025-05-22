@@ -19,6 +19,11 @@ namespace IbhayiPharmacy.Controllers
             return View();
         }
 
+        public IActionResult NewDispensary()
+        {
+            return View();
+        }
+
         public IActionResult UnprocessedScripts()
         {
             return View();

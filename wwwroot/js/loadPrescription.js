@@ -384,4 +384,4 @@
 
             // Add medication button
             document.getElementById('addMedBtn').addEventListener('click', addMedicationRow);
-        
+
