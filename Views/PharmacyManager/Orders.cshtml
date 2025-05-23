@@ -1,6 +1,140 @@
 ﻿@{
     ViewData["Title"] = "Medication Orders";
     Layout = "~/Views/Shared/_ManagerLayout.cshtml";
+}
+
+<div class="container mt-2">
+
+    <div class="alert alert-warning " style="display: block;">
+        <i class="fas fa-box-open"></i> <strong>LOW STOCK:</strong> This medication is near reorder level!
+    </div>
+    <!-- Medication Table -->
+    <div class="card p-3">
+        <h5 class="title-underline">Order Medication</h5>
+
+        <div class="card-body">
+            <table class="table table-borderless table-hover">
+                <thead class=" table-light" style=" color: #2c3e50;">
+                    <tr>
+                       
+                        <th>Medication</th>
+                        <th>Form</th>
+                        <th>Supplier</th>
+                        <th>Qty On Hand</th>
+                        <th>Re-order Level</th>
+                        <th>Order</th>
+                    </tr>
+                </thead>
+                <tbody>
+               
+                    <tr>
+                    
+                        <td>Panado</td>
+                        <td>Tablet</td>
+                        <td>MedLife Distributors</td>
+                        <td>12</td>
+                        <td>20</td>
+                        <td>
+                            <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#orderModal" onclick="setMedication('Panado')">Order</button>
+                        </td>
+                    </tr>
+                    <tr>
+                    
+                        <td>Myprodol</td>
+                        <td>Capsule</td>
+                        <td>PharmaDirect</td>
+                        <td>18</td>
+                        <td>25</td>
+                        <td>
+                            <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#orderModal" onclick="setMedication('Myprodol')">Order</button>
+                        </td>
+                    </tr>
+                    <tr>
+                  
+                        <td>Allergex</td>
+                        <td>Syrup</td>
+
+                        <td>MedLife Distributors</td>
+                        <td>35</td>
+                        <td>10</td>
+                        <td>
+                            <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#orderModal" onclick="setMedication('Allergex')">Order</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="orderModal" tabindex="-1" aria-labelledby="orderModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Order Medication</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="orderForm">
+                    <div class="mb-3">
+                        <label class="form-label">Medication</label>
+                        <p><b>Panado > Tablet</b></p>
+                    </div>
+                    <div class="mb-3">
+                        <label for="orderQty" class="form-label">Quantity to Order</label>
+                        <input type="number" class="form-control" id="orderQty" placeholder="e.g. 50">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button class="btn btn-success" onclick="submitOrder()">Confirm Order</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // function setMedication(name) {
+        //     document.getElementById("selectedMedication").value = name;
+        // }
+
+        function submitOrder() {
+            const med = document.getElementById("selectedMedication").value;
+            const qty = document.getElementById("orderQty").value;
+
+            if (qty && qty > 0) {
+                alert(`Order placed: ${qty} units of ${med}`);
+                document.getElementById("orderForm").reset();
+                var modal = bootstrap.Modal.getInstance(document.getElementById('orderModal'));
+                modal.hide();
+            } else {
+                alert("Please enter a valid quantity.");
+            }
+        }
+    </script>
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@* @{
+    ViewData["Title"] = "Medication Orders";
+    Layout = "~/Views/Shared/_ManagerLayout.cshtml";
 
 }
 
@@ -110,21 +244,10 @@
                     <td>
 
 
-                       @*  <div class="medication-select-container">
-                            <select class="medication-select" id="med-select-1747813573508" onchange="updateMedDetails(this, 1747813573508)">
-                                <option value="">Select medication...</option>
-                                <option value="1" data-forms="Capsule">Amoxicillin 500mg (S4)</option>
-                                <option value="2" data-forms="Tablet">Lisinopril 10mg (S2)</option>
-                                <option value="3" data-forms="Tablet,Capsule">Panado Extra (S0)</option>
-                                <option value="4" data-forms="Inhaler">Ventolin Inhaler (S3)</option>
-                            </select>
-                            <div class="medication-options" id="med-options-1747813573508"><div class="medication-option" data-id="1">Amoxicillin 500mg (S4)</div><div class="medication-option" data-id="2">Lisinopril 10mg (S2)</div><div class="medication-option" data-id="3">Panado Extra (S0)</div><div class="medication-option" data-id="4">Ventolin Inhaler (S3)</div></div>
-                        </div> *@
+                  
                     </td>
                     <td>
-                        @* <select class="dosage-form-select" id="form-1747813573508">
-                            <option value="">Select form</option>
-                        </select> *@
+                       
                     </td>
                     <td> </td>
                     <td> </td>
@@ -193,3 +316,4 @@
         </div>
     </div>
 </div>
+ *@
