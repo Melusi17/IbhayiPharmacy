@@ -1,5 +1,5 @@
-﻿@{
-    ViewData["Title"] = "Place Order";
+﻿@* @{
+    ViewData["Title"] = "Manage Repeats";
     Layout = "~/Views/Shared/CustomerLayout/_CustomerLayout.cshtml";
 }
 <style>
@@ -360,4 +360,336 @@
         initializeHistory();
         renderOrders();
     };
+</script>
+ *@
+@{
+    ViewData["Title"] = "Manage Repeats";
+    Layout = "~/Views/Shared/CustomerLayout/_CustomerLayout.cshtml";
+}
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f7f9fb;
+        color: #333;
+    }
+
+    .upload-prescription-panel {
+        max-width: 1000px;
+        margin: 30px auto;
+        padding: 30px;
+        background-color: #ffffff;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+        color: #1f9f77;
+        margin-bottom: 20px;
+    }
+
+    .prescription-table, .modal-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+        background-color: #ffffff;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+        .prescription-table th, .prescription-table td,
+        .modal-table th, .modal-table td {
+            padding: 12px;
+            text-align: center;
+            border: 1px solid #ccc;
+        }
+
+        .prescription-table thead,
+        .modal-table thead {
+            background-color: #1f9f77;
+            color: white;
+        }
+
+        .prescription-table tbody tr:nth-child(even),
+        .modal-table tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .prescription-table tbody tr:hover,
+        .modal-table tbody tr:hover {
+            background-color: #e3f5f0;
+        }
+
+    .order-row {
+        cursor: pointer;
+        background-color: #d6f5e3;
+        font-weight: bold;
+        color: #0d3d2c;
+    }
+
+        .order-row:hover {
+            background-color: #c0ecd5;
+        }
+
+    .medication-details {
+        display: none;
+        background-color: #f9f9f9;
+    }
+
+        .medication-details tr:hover {
+            background-color: #f0f0f0;
+        }
+
+    .btn-upload {
+        background-color: #1f9f77;
+        color: white;
+        padding: 6px 12px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: background-color 0.3s ease;
+    }
+
+        .btn-upload:hover {
+            background-color: #28bf96;
+        }
+
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 9999;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background: rgba(0, 0, 0, 0.5);
+    }
+
+    .modal-content {
+        background-color: #ffffff;
+        margin: 10% auto;
+        padding: 25px;
+        border-radius: 10px;
+        width: 600px;
+        position: relative;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        color: #333;
+    }
+
+        .modal-content h3 {
+            color: #1f9f77;
+            margin-bottom: 15px;
+        }
+
+    .close {
+        position: absolute;
+        right: 15px;
+        top: 10px;
+        color: #999;
+        font-size: 24px;
+        cursor: pointer;
+        font-weight: bold;
+    }
+
+        .close:hover {
+            color: red;
+        }
+
+    tr:hover {
+        background-color: #f5f5f5;
+    }
+
+    .blurred {
+        color: #aaa;
+        pointer-events: none;
+        opacity: 0.6;
+    }
+</style>
+
+<div class="upload-prescription-panel">
+    <h2>Prescription Orders</h2>
+
+    <table class="prescription-table" id="orders-table">
+        <thead>
+            <tr>
+                <th>Doctor</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Example order row -->
+            <tr class="order-row" data-order-id="1">
+                <td>Dr. Smith</td>
+                <td>2025-05-10</td>
+            </tr>
+            <!-- Prescription details row, initially hidden -->
+            <tr class="medication-details" data-parent-id="1">
+                <td colspan="2">
+                    <table class="modal-table">
+                        <thead>
+                            <tr>
+                                <th>Medication</th>
+                                <th>Instruction</th>
+                                <th>Qty</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="prescription-row" data-order-id="1" data-med-id="101">
+                                <td>Amoxicillin 500mg</td>
+                                <td>Take one capsule thrice daily</td>
+                                <td>21</td>
+                            </tr>
+                            <tr class="prescription-row" data-order-id="1" data-med-id="102">
+                                <td>Paracetamol 500mg</td>
+                                <td>Take two tablets every 6 hours</td>
+                                <td>24</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+
+            <!-- Another order example -->
+            <tr class="order-row" data-order-id="2">
+                <td>Dr. Johnson</td>
+                <td>2025-05-08</td>
+            </tr>
+            <tr class="medication-details" data-parent-id="2">
+                <td colspan="2">
+                    <table class="modal-table">
+                        <thead>
+                            <tr>
+                                <th>Medication</th>
+                                <th>Instruction</th>
+                                <th>Qty</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="prescription-row" data-order-id="2" data-med-id="201">
+                                <td>Ibuprofen 400mg</td>
+                                <td>Take one tablet every 8 hours</td>
+                                <td>15</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- Modal for refill history -->
+<div class="modal" id="refill-modal">
+    <div class="modal-content">
+        <span class="close" id="modal-close">&times;</span>
+        <h3>Refill History & Request</h3>
+        <table class="modal-table" id="refill-history-table">
+            <thead>
+                <tr>
+                    <th>Date of Refill Request</th>
+                    <th>Order No.</th>
+                    <th>Repeats Left</th>
+                    <th>Request Refill</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Filled dynamically -->
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Toggle prescription details when clicking an order row
+        document.querySelectorAll('.order-row').forEach(orderRow => {
+            orderRow.addEventListener('click', () => {
+                const orderId = orderRow.getAttribute('data-order-id');
+                const detailsRow = document.querySelector(`.medication-details[data-parent-id='${orderId}']`);
+                if (detailsRow.style.display === 'table-row') {
+                    detailsRow.style.display = 'none';
+                } else {
+                    // Hide any other open details first
+                    document.querySelectorAll('.medication-details').forEach(row => row.style.display = 'none');
+                    detailsRow.style.display = 'table-row';
+                }
+            });
+        });
+
+        // Modal elements
+        const modal = document.getElementById('refill-modal');
+        const modalClose = document.getElementById('modal-close');
+        const refillTableBody = document.querySelector('#refill-history-table tbody');
+
+        // Sample refill history data per medication id
+        // Replace with actual dynamic data in production
+        const refillData = {
+            "101": [
+                { date: "2025-05-15", orderNo: "ORD001", repeatsLeft: 2 },
+                { date: "2025-06-01", orderNo: "ORD001", repeatsLeft: 1 }
+            ],
+            "102": [
+                { date: "2025-05-12", orderNo: "ORD001", repeatsLeft: 0 }
+            ],
+            "201": [
+                { date: "2025-05-10", orderNo: "ORD002", repeatsLeft: 3 }
+            ]
+        };
+
+        // When clicking a prescription row, open modal with refill history
+        document.querySelectorAll('.prescription-row').forEach(presRow => {
+            presRow.addEventListener('click', () => {
+                const medId = presRow.getAttribute('data-med-id');
+                const data = refillData[medId] || [];
+                refillTableBody.innerHTML = ''; // clear previous data
+
+                if (data.length === 0) {
+                    refillTableBody.innerHTML = `<tr><td colspan="4" style="color:#999;">No refill history found.</td></tr>`;
+                } else {
+                    data.forEach(entry => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td>${entry.date}</td>
+                            <td>${entry.orderNo}</td>
+                            <td>${entry.repeatsLeft}</td>
+                            <td>
+                                ${entry.repeatsLeft > 0 ?
+                                    `<button class="btn-upload" data-order-no="${entry.orderNo}" data-med-id="${medId}">Request Refill</button>`
+                                    : '<span style="color:#aaa;">No repeats left</span>'
+                                }
+                            </td>
+                        `;
+                        refillTableBody.appendChild(tr);
+                    });
+                }
+
+                modal.style.display = 'block';
+            });
+        });
+
+        // Close modal
+        modalClose.addEventListener('click', () => {
+            modal.style.display = 'none';
+        });
+
+        window.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
+
+        // Handle refill request button click inside modal
+        refillTableBody.addEventListener('click', e => {
+            if (e.target.tagName === 'BUTTON' && e.target.classList.contains('btn-upload')) {
+                const orderNo = e.target.getAttribute('data-order-no');
+                const medId = e.target.getAttribute('data-med-id');
+                alert(`Refill requested for medication ID ${medId} from order ${orderNo}.`);
+                // Here you can add your AJAX call to actually submit refill request
+            }
+        });
+    });
 </script>

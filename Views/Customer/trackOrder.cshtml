@@ -106,10 +106,12 @@
         <thead>
             <tr>
                 <th>Order No.</th>
-                <th>Date</th>
+                <th>Date</th>              
                 <th>Status</th>
+                <th>Total Due (R)</th>
             </tr>
         </thead>
+
         <tbody id="orderBody">
             <!-- Rendered by JavaScript -->
         </tbody>
@@ -169,15 +171,19 @@
         const tbody = document.getElementById("orderBody");
         tbody.innerHTML = "";
 
-        orders.forEach((order, index) => {
-            const summaryRow = document.createElement("tr");
-            summaryRow.className = "order-summary-row";
-            summaryRow.innerHTML = `
-                <td>${order.orderNumber}</td>
-                <td>${order.date}</td>
-                <td><span class="status">${order.status}</span></td>
-            `;
-            summaryRow.addEventListener("click", () => toggleDetails(index));
+    orders.forEach((order, index) => {
+        const totalDue = order.medications.reduce((sum, med) => sum + parseFloat(med.price), 0).toFixed(2);
+
+        const summaryRow = document.createElement("tr");
+        summaryRow.className = "order-summary-row";
+        summaryRow.innerHTML = `
+            <td>${order.orderNumber}</td>
+            <td>${order.date}</td>
+            <td><span class="status">${order.status}</span></td>
+            <td>R ${totalDue}</td>
+        `;
+        summaryRow.addEventListener("click", () => toggleDetails(index));
+
 
             const detailsRow = document.createElement("tr");
             detailsRow.className = "details-row";
