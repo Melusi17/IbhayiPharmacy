@@ -19,7 +19,7 @@ namespace IbhayiPharmacy.Models
         public int PharmacistID { get; set; }
 
         
-        public Blob Script { get; set; }
+        public byte Script { get; set; }
 
         [ForeignKey("DoctorID")]
         public int DoctorID { get; set; }
