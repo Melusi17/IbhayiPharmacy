@@ -6,25 +6,25 @@
     <title>@ViewData["Title"] - Ibhayi Pharmacy</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <link rel="stylesheet" href="~/css/Pharmacist/ProcessedOrders.css" />
-    <link rel="stylesheet" href="~/css/Pharmacist/layout.css" />
+   @*  <link rel="stylesheet" href="~/css/Pharmacist/layout.css" /> *@
     @RenderSection("Styles", required: false)
 </head>
 <body>
     <!-- SIDEBAR -->
+
     <div class="sidebar">
         <div class="sidebar-header">
-            <img style="height:160px;width:220px;" src="~/css/img/ibhayi2.png" />
+            <img style="height:160px;width:200px;" src="~/css/img/ibhayi2.png" />
         </div>
-
         <nav class="sidebar-nav">
-            <a asp-controller="Pharmacy" asp-action="Index"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
-            <a asp-controller="Pharmacy" asp-action="loadPrescription"><i class="fas fa-tachometer-alt"></i> Walk-In Prescription</a>
-            <a asp-controller="Pharmacy" asp-action="NewDispensary"><i class="fas fa-clipboard-list"></i> Dispensary</a>
-            <a asp-controller="Pharmacy" asp-action="UnprocessedScripts"><i class="fas fa-file-prescription"></i> Ordered Unprocessed Scripts</a>
-            <a asp-controller="Pharmacy" asp-action="processedOrders"><i class="fas fa-boxes"></i> Processed Orders</a>
-            <a asp-controller="Home" asp-action="Index"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            <a href="#"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <a href="LoadPrescriptions.html"><i class="fas fa-tachometer-alt"></i> Walk In Prescription</a>
+            <a href="Orders.html"><i class="fas fa-clipboard-list"></i> Orders</a>
+            <a href="unprocessedScripts.html"><i class="fas fa-file-prescription"></i> Unprocessed Scritps</a>
+            <a href="processedScripts.html"><i class="fas fa-boxes"></i> Processed Scripts</a>
+            <a href="TrackOrders.html"><i class="fas fa-boxes"></i> Track Orders</a>
+            <a href="#"><i class="fas fa-sign-out-alt"></i> Logout</a>
         </nav>
-
         <div class="sidebar-footer">
             <p>Ibhayi Pharmacy v2.1</p>
         </div>
@@ -32,8 +32,8 @@
 
     <!-- TOPBAR -->
     <div class="topbar">
-        <span>@ViewData["Title"]</span>
-        <div>Welcome, <strong>Name</strong></div>
+        <span>Processed Scripts</span>
+        <div>Welcome, <strong>Pharmacist</strong></div>
     </div>
 
     <!-- MAIN CONTENT -->

@@ -14,10 +14,10 @@ namespace IbhayiPharmacy.Models
         public string Surname { get; set; }
 
         [Required]
-        public int PracticeNo { get; set; }
+        public string HealthCouncilRegistrationNumber { get; set; }
 
         [Required]
-        public string CellphoneNumber { get; set; }
+        public string ContactNumber { get; set; }
 
         [Required]
         public string Email { get; set; }
