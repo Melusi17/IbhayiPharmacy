@@ -1,4 +1,5 @@
-﻿// Sample medication data
+﻿
+        // Sample medication data
     const medications = [
     {
         id: 1,
@@ -67,7 +68,10 @@
             form: "Capsule",
             qty: 14,
             instructions: "Take 1 capsule twice daily for 7 days",
-            repeats: 2
+            repeats: 2,
+            prescription: "prescription_123.pdf",
+            doctor: "Dr. Johnson",
+            dateIssued: "2023-06-15"
         });
 
     addMedicationRowWithData({
@@ -76,12 +80,30 @@
     form: "Tablet",
     qty: 30,
     instructions: "Take 1 tablet daily",
-    repeats: 0
+    repeats: 0,
+    prescription: "prescription_123.pdf",
+    doctor: "Dr. Williams",
+    dateIssued: "2023-06-15"
             });
 
     // Add medication button
     document.getElementById('addMedBtn').addEventListener('click', addMedicationRow);
         });
+
+    // Toggle sidebar collapse
+    function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+    const icon = document.getElementById('sidebarIcon');
+
+    sidebar.classList.toggle('collapsed');
+    if (sidebar.classList.contains('collapsed')) {
+        icon.classList.remove('fa-chevron-left');
+    icon.classList.add('fa-chevron-right');
+            } else {
+        icon.classList.remove('fa-chevron-right');
+    icon.classList.add('fa-chevron-left');
+            }
+        }
 
     // Add new empty medication row
     function addMedicationRow() {
@@ -114,6 +136,7 @@
                 </datalist>
         </div>
         <div class="med-details" id="details-${rowId}"></div>
+        <div class="prescription-info" id="prescription-${rowId}"></div>
     </td>
     <td>
         <select class="form-select" id="form-${rowId}">
@@ -177,276 +200,217 @@
             <small><strong>Active:</strong> ${med?.active || ''}</small><br>
                 <small><strong>Stock:</strong> ${med?.stock || ''}</small>
         </div>
-    </td>
-    <td>
-        <select class="form-select" id="form-${rowId}">
-            <option value="">Select form</option>
-            ${med?.forms.map(form =>
-                `<option value="${form}" ${form === medData.form ? 'selected' : ''}>${form}</option>`
-            ).join('')}
-        </select>
-    </td>
-    <td><input type="number" min="1" value="${medData.qty}" class="qty-input"></td>
-    <td>
-        <select class="inst-select" onchange="handleInstructionSelect(this, ${rowId})">
-            ${commonInstructions.map(inst =>
-                `<option value="${inst}" ${inst === medData.instructions ? 'selected' : ''}>${inst}</option>`
-            ).join('')}
-        </select>
-        <div id="custom-inst-${rowId}" style="display:none; margin-top:5px;">
-            <textarea placeholder="Enter custom instructions..." rows="2"></textarea>
-        </div>
-    </td>
-    <td>
-        <input type="number" class="repeats-input" min="0" value="${medData.repeats}">
-    </td>
-    <td><span class="badge bg-warning">Pending</span></td>
-    <td>
-        <button class="action-btn reject-btn" onclick="showRejectionModal(this)"><i class="fas fa-ban"></i></button>
-        <button class="action-btn remove-btn" onclick="removeMedication(this)"><i class="fas fa-trash"></i></button>
-    </td>
-    `;
+        <div class="prescription-info">
+            <small><strong>Prescription:</strong> ${medData.prescription}</small><br>
+                <small><strong>Doctor:</strong> ${medData.doctor || 'Dr. Smith'}</small><br>
+                    <small><strong>Date Issued:</strong> ${medData.dateIssued}</small>
+                </div>
+            </td>
+            <td>
+                <select class="form-select" id="form-${rowId}">
+                    <option value="">Select form</option>
+                    ${med?.forms.map(form =>
+                        `<option value="${form}" ${form === medData.form ? 'selected' : ''}>${form}</option>`
+                    ).join('')}
+                </select>
+            </td>
+            <td><input type="number" min="1" value="${medData.qty}" class="qty-input"></td>
+            <td>
+                <select class="inst-select" onchange="handleInstructionSelect(this, ${rowId})">
+                    ${commonInstructions.map(inst =>
+                        `<option value="${inst}" ${inst === medData.instructions ? 'selected' : ''}>${inst}</option>`
+                    ).join('')}
+                </select>
+                <div id="custom-inst-${rowId}" style="display:none; margin-top:5px;">
+                    <textarea placeholder="Enter custom instructions..." rows="2"></textarea>
+                </div>
+            </td>
+            <td>
+                <input type="number" class="repeats-input" min="0" value="${medData.repeats}">
+            </td>
+            <td><span class="badge bg-warning">Pending</span></td>
+            <td>
+                <button class="action-btn reject-btn" onclick="showRejectionModal(this)"><i class="fas fa-ban"></i></button>
+                <button class="action-btn remove-btn" onclick="removeMedication(this)"><i class="fas fa-trash"></i></button>
+            </td>
+            `;
 
-    tbody.appendChild(row);
+            tbody.appendChild(row);
 
-    // Add allergy class if needed
-    if (medData.name.includes("Amoxicillin")) {
-        row.classList.add('has-allergy');
-    document.querySelector('.allergy-alert').style.display = 'block';
+            // Add allergy class if needed
+            if (medData.name.includes("Amoxicillin")) {
+                row.classList.add('has-allergy');
+            document.querySelector('.allergy-alert').style.display = 'block';
             }
 
-    // Add low stock class if needed
-    if (med?.stock < med?.reorder) {
-        row.classList.add('low-stock');
-    document.querySelector('.stock-alert').style.display = 'block';
+            // Add low stock class if needed
+            if (med?.stock < med?.reorder) {
+                row.classList.add('low-stock');
+            document.querySelector('.stock-alert').style.display = 'block';
             }
         }
 
-    // Filter medications as user types
-    function filterMeds(input, rowId) {
+            // Filter medications as user types
+            function filterMeds(input, rowId) {
             const searchTerm = input.value.toLowerCase();
-    const options = document.querySelectorAll(`#meds-list-${rowId} option`);
+            const options = document.querySelectorAll(`#meds-list-${rowId} option`);
             
             options.forEach(option => {
                 const text = option.value.toLowerCase();
-    option.style.display = text.includes(searchTerm) ? 'block' : 'none';
+            option.style.display = text.includes(searchTerm) ? 'block' : 'none';
             });
         }
 
-    // Update medication details when selected
-    function updateMedDetails(medId, rowId) {
+            // Update medication details when selected
+            function updateMedDetails(medId, rowId) {
             const detailsDiv = document.querySelector(`#row-${rowId} .med-details`);
-    const formSelect = document.getElementById(`form-${rowId}`);
-    const row = document.getElementById(`row-${rowId}`);
+            const prescriptionDiv = document.querySelector(`#row-${rowId} .prescription-info`);
+            const formSelect = document.getElementById(`form-${rowId}`);
+            const row = document.getElementById(`row-${rowId}`);
             
             const med = medications.find(m => m.id == medId);
-    if (med) {
-        detailsDiv.innerHTML = `
+            if (med) {
+                detailsDiv.innerHTML = `
                     <small><strong>Active:</strong> ${med.active}</small><br>
                     <small><strong>Stock:</strong> ${med.stock}</small>
                 `;
 
-    formSelect.innerHTML = '<option value="">Select form</option>';
+            // Add prescription info (sample data)
+            prescriptionDiv.innerHTML = `
+            <small><strong>Prescription:</strong> prescription_${Math.floor(Math.random() * 1000)}.pdf</small><br>
+                <small><strong>Doctor:</strong> Dr. ${['Smith', 'Johnson', 'Williams', 'Brown', 'Jones'][Math.floor(Math.random() * 5)]}</small><br>
+                    <small><strong>Date Issued:</strong> ${new Date().toISOString().split('T')[0]}</small>
+                    `;
+
+                    formSelect.innerHTML = '<option value="">Select form</option>';
                 med.forms.forEach(form => {
-        formSelect.innerHTML += `<option value="${form}">${form}</option>`;
+                        formSelect.innerHTML += `<option value="${form}">${form}</option>`;
                 });
 
-    // Check for allergies
-    if (med.name.includes("Amoxicillin")) {
-        row.classList.add('has-allergy');
-    document.querySelector('.allergy-alert').style.display = 'block';
+                    // Check for allergies
+                    if (med.name.includes("Amoxicillin")) {
+                        row.classList.add('has-allergy');
+                    document.querySelector('.allergy-alert').style.display = 'block';
                 } else {
-        row.classList.remove('has-allergy');
+                        row.classList.remove('has-allergy');
                 }
 
-    // Check for low stock
-    if (med.stock < med.reorder) {
-        row.classList.add('low-stock');
-    document.querySelector('.stock-alert').style.display = 'block';
+                    // Check for low stock
+                    if (med.stock < med.reorder) {
+                        row.classList.add('low-stock');
+                    document.querySelector('.stock-alert').style.display = 'block';
                 } else {
-        row.classList.remove('low-stock');
+                        row.classList.remove('low-stock');
                 }
             }
         }
 
-    // Handle instruction selection
-    function handleInstructionSelect(select, rowId) {
+                    // Handle instruction selection
+                    function handleInstructionSelect(select, rowId) {
             const customDiv = document.getElementById(`custom-inst-${rowId}`);
-    customDiv.style.display = select.value === "Other (specify)" ? 'block' : 'none';
+                    customDiv.style.display = select.value === "Other (specify)" ? 'block' : 'none';
         }
 
-    // Show rejection modal
-    function showRejectionModal(button) {
-        currentRejectionRow = button.closest('tr');
-    document.getElementById('rejectionModal').style.display = 'flex';
+                    // Show rejection modal
+                    function showRejectionModal(button) {
+                        currentRejectionRow = button.closest('tr');
+                    document.getElementById('rejectionModal').style.display = 'flex';
         }
 
-    // Close modal
-    function closeModal() {
-        document.getElementById('rejectionModal').style.display = 'none';
+                    // Close modal
+                    function closeModal() {
+                        document.getElementById('rejectionModal').style.display = 'none';
             document.querySelectorAll('input[name="rejectionReason"]').forEach(radio => {
-        radio.checked = false;
+                        radio.checked = false;
             });
         }
 
-    // Confirm rejection
-    function confirmRejection() {
+                    // Confirm rejection
+                    function confirmRejection() {
             const selectedReason = document.querySelector('input[name="rejectionReason"]:checked');
 
-    if (!selectedReason) {
-        alert('Please select a rejection reason');
-    return;
+                    if (!selectedReason) {
+                        alert('Please select a rejection reason');
+                    return;
             }
 
-    // Update the row
-    currentRejectionRow.classList.add('rejected-row');
+                    // Update the row
+                    currentRejectionRow.classList.add('rejected-row');
 
-    // Change status badge
-    const statusCell = currentRejectionRow.querySelector('td:nth-child(7)');
-    statusCell.innerHTML = '<span class="badge bg-danger">Rejected</span>';
+                    // Change status badge
+                    const statusCell = currentRejectionRow.querySelector('td:nth-child(7)');
+                    statusCell.innerHTML = '<span class="badge bg-danger">Rejected</span>';
 
-    // Hide checkbox and reject button
-    const checkbox = currentRejectionRow.querySelector('.dispense-checkbox');
-    const rejectBtn = currentRejectionRow.querySelector('.reject-btn');
-    if (checkbox) checkbox.style.display = 'none';
-    if (rejectBtn) rejectBtn.style.display = 'none';
+                    // Hide checkbox and reject button
+                    const checkbox = currentRejectionRow.querySelector('.dispense-checkbox');
+                    const rejectBtn = currentRejectionRow.querySelector('.reject-btn');
+                    if (checkbox) checkbox.style.display = 'none';
+                    if (rejectBtn) rejectBtn.style.display = 'none';
 
-    closeModal();
+                    closeModal();
         }
 
-    // Remove medication row
-    function removeMedication(button) {
+                    // Remove medication row
+                    function removeMedication(button) {
             if (confirm('Are you sure you want to remove this medication?')) {
                 const row = button.closest('tr');
-    const hadAllergy = row.classList.contains('has-allergy');
-    const hadLowStock = row.classList.contains('low-stock');
+                    const hadAllergy = row.classList.contains('has-allergy');
+                    const hadLowStock = row.classList.contains('low-stock');
 
-    row.remove();
+                    row.remove();
 
-    // Update alerts if needed
-    if (hadAllergy && !document.querySelector('.has-allergy')) {
-        document.querySelector('.allergy-alert').style.display = 'none';
+                    // Update alerts if needed
+                    if (hadAllergy && !document.querySelector('.has-allergy')) {
+                        document.querySelector('.allergy-alert').style.display = 'none';
                 }
 
-    if (hadLowStock && !document.querySelector('.low-stock')) {
-        document.querySelector('.stock-alert').style.display = 'none';
+                    if (hadLowStock && !document.querySelector('.low-stock')) {
+                        document.querySelector('.stock-alert').style.display = 'none';
                 }
             }
         }
 
-    // Mark checked medications as dispensed
-    function markAsDispensed() {
+                    // Mark checked medications as dispensed
+                    function markAsDispensed() {
             const checkboxes = document.querySelectorAll('.dispense-checkbox:checked');
 
-    if (checkboxes.length === 0) {
-        alert('Please select at least one medication to mark as dispensed');
-    return;
+                    if (checkboxes.length === 0) {
+                        alert('Please select at least one medication to mark as dispensed');
+                    return;
             }
 
-    if (confirm(`Mark ${checkboxes.length} medication(s) as dispensed?`)) {
-        checkboxes.forEach(checkbox => {
-            const row = checkbox.closest('tr');
-            const repeatsInput = row.querySelector('.repeats-input');
+                    if (confirm(`Mark ${checkboxes.length} medication(s) as dispensed?`)) {
+                        checkboxes.forEach(checkbox => {
+                            const row = checkbox.closest('tr');
+                            const repeatsInput = row.querySelector('.repeats-input');
 
-            if (repeatsInput) {
-                let repeatsLeft = parseInt(repeatsInput.value);
+                            if (repeatsInput) {
+                                let repeatsLeft = parseInt(repeatsInput.value);
 
-                if (repeatsLeft > 0) {
-                    // Decrease repeats if available
-                    repeatsLeft--;
-                    repeatsInput.value = repeatsLeft;
+                                if (repeatsLeft > 0) {
+                                    // Decrease repeats if available
+                                    repeatsLeft--;
+                                    repeatsInput.value = repeatsLeft;
 
-                    // Keep the row active if there are repeats left
-                    if (repeatsLeft > 0) {
-                        return;
-                    }
-                }
+                                    // Keep the row active if there are repeats left
+                                    if (repeatsLeft > 0) {
+                                        return;
+                                    }
+                                }
+                            }
+
+                            // If no repeats left, mark as dispensed
+                            row.classList.add('dispensed-row');
+
+                            // Update status
+                            const statusCell = row.querySelector('td:nth-child(7)');
+                            statusCell.innerHTML = '<span class="badge bg-success">Dispensed</span>';
+
+                            // Remove checkbox and action buttons
+                            checkbox.remove();
+                            const actionButtons = row.querySelectorAll('.action-btn');
+                            actionButtons.forEach(btn => btn.remove());
+                        });
             }
-
-            // If no repeats left, mark as dispensed
-            row.classList.add('dispensed-row');
-
-            // Update status
-            const statusCell = row.querySelector('td:nth-child(7)');
-            statusCell.innerHTML = '<span class="badge bg-success">Dispensed</span>';
-
-            // Remove checkbox and action buttons
-            checkbox.remove();
-            const actionButtons = row.querySelectorAll('.action-btn');
-            actionButtons.forEach(btn => btn.remove());
-        });
-            }
         }
-
-    // Sample doctor data
-    const doctors = [
-    {id: 1, name: "Dr. Sarah Smith", practiceNumber: "PR1234567" },
-    {id: 2, name: "Dr. Michael Brown", practiceNumber: "PR7654321" },
-    {id: 3, name: "Dr. Thando Nkosi", practiceNumber: "PR9876543" }
-    ];
-
-    // Initialize doctor dropdown
-    function initDoctorDropdown() {
-            const select = document.getElementById('doctorSelect');
-    select.innerHTML = '<option value="">Select doctor...</option>';
-            doctors.forEach(doctor => {
-        select.innerHTML += `<option value="${doctor.id}">${doctor.name} (${doctor.practiceNumber})</option>`;
-            });
-        }
-
-    // Show add doctor modal
-    document.getElementById('addDoctorBtn').addEventListener('click', function() {
-        document.getElementById('doctorModal').style.display = 'flex';
-        });
-
-    // Close doctor modal
-    function closeDoctorModal() {
-        document.getElementById('doctorModal').style.display = 'none';
-    // Clear fields
-    document.getElementById('newDoctorName').value = '';
-    document.getElementById('newPracticeNumber').value = '';
-    document.getElementById('newDoctorContact').value = '';
-        }
-
-    // Save new doctor
-    function saveNewDoctor() {
-            const name = document.getElementById('newDoctorName').value.trim();
-    const practiceNumber = document.getElementById('newPracticeNumber').value.trim();
-
-    if (!name || !practiceNumber) {
-        alert('Please enter both doctor name and practice number');
-    return;
-            }
-
-            // Create new doctor ID
-            const newId = doctors.length > 0 ? Math.max(...doctors.map(d => d.id)) + 1 : 1;
-
-    // Add to doctors array
-    const newDoctor = {
-        id: newId,
-    name: name,
-    practiceNumber: practiceNumber
-            };
-    doctors.push(newDoctor);
-
-    // Update dropdown
-    const select = document.getElementById('doctorSelect');
-    const newOption = document.createElement('option');
-    newOption.value = newId;
-    newOption.textContent = `${name} (${practiceNumber})`;
-    select.appendChild(newOption);
-
-    // Select the new doctor
-    select.value = newId;
-
-    closeDoctorModal();
-        }
-
-    // Initialize on load
-    document.addEventListener('DOMContentLoaded', function() {
-        initDoctorDropdown();
-
-            // Rest of your existing initialization code...
-        });
-
-// Keep all your existing functions...
+              

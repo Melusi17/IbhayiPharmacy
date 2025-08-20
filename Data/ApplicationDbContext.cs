@@ -96,7 +96,7 @@ namespace IbhayiPharmacy.Data
                 new DosageForm { DosageFormID = 12, DosageFormName = "Powder" }
             );
 
-            //// Seed Suppliers
+            // Seed Suppliers
             //modelBuilder.Entity<Supplier>().HasData(
             //    new Supplier { SupplierID = 1, SupplierName = "NovaCure", ContactName = "Davie", ContactSurname = "Jones", EmailAddress = "davie@example.com" },
             //    new Supplier { SupplierID = 2, SupplierName = "HelixMed", ContactName = "Nicky", ContactSurname = "Mostert", EmailAddress = "nmostert@mandela.ac.za" },
@@ -104,6 +104,50 @@ namespace IbhayiPharmacy.Data
             //    new Supplier { SupplierID = 4, SupplierName = "Apex Biomed", ContactName = "Lulu", ContactSurname = "Ndhambi", EmailAddress = "lulu@example.com" },
             //    new Supplier { SupplierID = 5, SupplierName = "CuraNova", ContactName = "Pharmacy Manager Group Member Name", ContactSurname = "Pharmacy Manager Group Member Surname", EmailAddress = "Pharmacy Manager Group Member E-mail" }
             //);
+
+            // Seed Users
+            modelBuilder.Entity<User>().HasData(
+                // Pharmacists
+                new User { UserId = 1, Name = "Lindile", Surname = "Hadebe", IDNumber = 123456, CellphoneNumber = 612345678, Email = "lindile@example.com", Password = "password1", Role = "Pharmacist" },
+                new User { UserId = 2, Name = "Lindile Dorothy", Surname = "Daniels", IDNumber = 234567, CellphoneNumber = 622345678, Email = "dorothy@example.com", Password = "password2", Role = "Pharmacist" },
+                new User { UserId = 3, Name = "Marcel", Surname = "Van Niekerk", IDNumber = 345678, CellphoneNumber = 632345678, Email = "marcel@example.com", Password = "password3", Role = "Pharmacist" },
+                new User { UserId = 4, Name = "Nicky", Surname = "Mostert", IDNumber = 190406, CellphoneNumber = 721234567, Email = "nicky.mostert@mandela.ac.za", Password = "password4", Role = "Pharmacist" },
+
+                // Pharmacy Manager
+                new User { UserId = 5, Name = "Pharmacy Manager Group Member Name", Surname = "Pharmacy Manager Group Member Surname", IDNumber = 134679, CellphoneNumber = 123456789, Email = "Pharmacy Manager Group Member E-mail", Password = "managerpass", Role = "PharmacyManager" },
+
+                // Sample Customers
+                new User { UserId = 6, Name = "John", Surname = "Doe", IDNumber = 500101, CellphoneNumber = 831234567, Email = "john@example.com", Password = "customer1", Role = "Customer" },
+                new User { UserId = 7, Name = "Jane", Surname = "Smith", IDNumber = 600202, CellphoneNumber = 841234567, Email = "jane@example.com", Password = "customer2", Role = "Customer" },
+                new User { UserId = 8, Name = "Bob", Surname = "Johnson", IDNumber = 700303, CellphoneNumber = 851234567, Email = "bob@example.com", Password = "customer3", Role = "Customer" }
+            );
+
+            // Seed Pharmacy Manager
+            modelBuilder.Entity<PharmacyManager>().HasData(
+                new PharmacyManager { PharmacyManagerID = 1, UserId = 5, HealthCouncilRegNo = "134679" }
+            );
+
+            // Seed Pharmacists
+            modelBuilder.Entity<Pharmacist>().HasData(
+                new Pharmacist { PharmacistID = 1, UserId = 1, HealthCouncilRegNo = "123456" },
+                new Pharmacist { PharmacistID = 2, UserId = 2, HealthCouncilRegNo = "234567" },
+                new Pharmacist { PharmacistID = 3, UserId = 3, HealthCouncilRegNo = "345678" },
+                new Pharmacist { PharmacistID = 4, UserId = 4, HealthCouncilRegNo = "190406" }
+            );
+
+
+            // Seed Customers
+            modelBuilder.Entity<Customer>().HasData(
+                new Customer { CustormerID = 1, UserId = 6, Allergy = "None" },
+                new Customer { CustormerID = 2, UserId = 7, Allergy = "Pollen" },
+                new Customer { CustormerID = 3, UserId = 8, Allergy = "Dust" }
+            );
+
+            // Seed Customer Allergies
+            modelBuilder.Entity<Custormer_Allergy>().HasData(
+                new Custormer_Allergy { Custormer_AllergyID = 1, CustormerID = 2, Active_IngredientID = 4 }, // Jane allergic to Histarelin
+                new Custormer_Allergy { Custormer_AllergyID = 2, CustormerID = 3, Active_IngredientID = 7 }  // Bob allergic to Bronchomid
+            );
 
             // Seed Medications
             modelBuilder.Entity<Medication>().HasData(
@@ -160,14 +204,6 @@ namespace IbhayiPharmacy.Data
                 new Doctor { DoctorID = 6, Name = "Errol", Surname = "Pieterse", ContactNumber = "078 234 5678", Email = "errol@example.com", HealthCouncilRegistrationNumber = "852456" },
                 new Doctor { DoctorID = 7, Name = "Alyce", Surname = "Morapedi", ContactNumber = "079 234 5678", Email = "alyce@example.com", HealthCouncilRegistrationNumber = "654852" }
             );
-
-            // Seed Pharmacists
-            //modelBuilder.Entity<Pharmacist>().HasData(
-            //    new Pharmacist { PharmacistID = 1, Name = "Lindile", Surname = "Hadebe", ContactNumber = "061 2345 678", EmailAddress = "lindile@example.com", HealthCouncilRegistrationNumber = "123456" },
-            //    new Pharmacist { PharmacistID = 2, Name = "Lindile Dorothy", Surname = "Daniels", ContactNumber = "062 2345 678", EmailAddress = "dorothy@example.com", HealthCouncilRegistrationNumber = "234567" },
-            //    new Pharmacist { PharmacistID = 3, Name = "Marcel", Surname = "Van Niekerk", ContactNumber = "063 2345 678", EmailAddress = "marcel@example.com", HealthCouncilRegistrationNumber = "345678" },
-            //    new Pharmacist { PharmacistID = 4, Name = "Nicky", Surname = "Mostert", ContactNumber = "072 1234 567", EmailAddress = "nicky.mostert@mandela.ac.za", HealthCouncilRegistrationNumber = "190406" }
-            //);
         }
     }
 }
