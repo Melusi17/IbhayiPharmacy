@@ -1095,7 +1095,7 @@ namespace IbhayiPharmacy.Data.Migrations
                     b.ToTable("UnprocessedScripts");
                 });
 
-            modelBuilder.Entity("IbhayiPharmacy.Models.User", b =>
+            modelBuilder.Entity("IbhayiPharmacy.Models.ApplicationUser", b =>
                 {
                     b.Property<int>("UserId")
                         .ValueGeneratedOnAdd()

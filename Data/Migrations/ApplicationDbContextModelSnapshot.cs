@@ -203,32 +203,15 @@ namespace IbhayiPharmacy.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
+                    b.Property<string>("ApplicationUserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("CustormerID");
 
-                    b.ToTable("Customers");
+                    b.HasIndex("ApplicationUserId");
 
-                    b.HasData(
-                        new
-                        {
-                            CustormerID = 1,
-                            Allergy = "None",
-                            UserId = 6
-                        },
-                        new
-                        {
-                            CustormerID = 2,
-                            Allergy = "Pollen",
-                            UserId = 7
-                        },
-                        new
-                        {
-                            CustormerID = 3,
-                            Allergy = "Dust",
-                            UserId = 8
-                        });
+                    b.ToTable("Customers");
                 });
 
             modelBuilder.Entity("IbhayiPharmacy.Models.Custormer_Allergy", b =>
@@ -892,42 +875,19 @@ namespace IbhayiPharmacy.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PharmacistID"));
 
+                    b.Property<string>("ApplicationUserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<string>("HealthCouncilRegNo")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
                     b.HasKey("PharmacistID");
 
-                    b.ToTable("Pharmacists");
+                    b.HasIndex("ApplicationUserId");
 
-                    b.HasData(
-                        new
-                        {
-                            PharmacistID = 1,
-                            HealthCouncilRegNo = "123456",
-                            UserId = 1
-                        },
-                        new
-                        {
-                            PharmacistID = 2,
-                            HealthCouncilRegNo = "234567",
-                            UserId = 2
-                        },
-                        new
-                        {
-                            PharmacistID = 3,
-                            HealthCouncilRegNo = "345678",
-                            UserId = 3
-                        },
-                        new
-                        {
-                            PharmacistID = 4,
-                            HealthCouncilRegNo = "190406",
-                            UserId = 4
-                        });
+                    b.ToTable("Pharmacists");
                 });
 
             modelBuilder.Entity("IbhayiPharmacy.Models.Pharmacy", b =>
@@ -981,24 +941,19 @@ namespace IbhayiPharmacy.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PharmacyManagerID"));
 
+                    b.Property<string>("ApplicationUserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<string>("HealthCouncilRegNo")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
                     b.HasKey("PharmacyManagerID");
 
-                    b.ToTable("PharmacyManagers");
+                    b.HasIndex("ApplicationUserId");
 
-                    b.HasData(
-                        new
-                        {
-                            PharmacyManagerID = 1,
-                            HealthCouncilRegNo = "134679",
-                            UserId = 5
-                        });
+                    b.ToTable("PharmacyManagers");
                 });
 
             modelBuilder.Entity("IbhayiPharmacy.Models.Prescription", b =>
@@ -1014,12 +969,6 @@ namespace IbhayiPharmacy.Data.Migrations
 
                     b.Property<DateTime>("DateIssued")
                         .HasColumnType("datetime2");
-
-                    b.Property<int>("DoctorID")
-                        .HasColumnType("int");
-
-                    b.Property<int>("PharmacistID")
-                        .HasColumnType("int");
 
                     b.Property<byte>("Script")
                         .HasColumnType("tinyint");
@@ -1160,135 +1109,6 @@ namespace IbhayiPharmacy.Data.Migrations
                     b.ToTable("UnprocessedScripts");
                 });
 
-            modelBuilder.Entity("IbhayiPharmacy.Models.User", b =>
-                {
-                    b.Property<int>("UserId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserId"));
-
-                    b.Property<int>("CellphoneNumber")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("IDNumber")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Password")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Role")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Surname")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("UserId");
-
-                    b.ToTable("Users");
-
-                    b.HasData(
-                        new
-                        {
-                            UserId = 1,
-                            CellphoneNumber = 612345678,
-                            Email = "lindile@example.com",
-                            IDNumber = 123456,
-                            Name = "Lindile",
-                            Password = "password1",
-                            Role = "Pharmacist",
-                            Surname = "Hadebe"
-                        },
-                        new
-                        {
-                            UserId = 2,
-                            CellphoneNumber = 622345678,
-                            Email = "dorothy@example.com",
-                            IDNumber = 234567,
-                            Name = "Lindile Dorothy",
-                            Password = "password2",
-                            Role = "Pharmacist",
-                            Surname = "Daniels"
-                        },
-                        new
-                        {
-                            UserId = 3,
-                            CellphoneNumber = 632345678,
-                            Email = "marcel@example.com",
-                            IDNumber = 345678,
-                            Name = "Marcel",
-                            Password = "password3",
-                            Role = "Pharmacist",
-                            Surname = "Van Niekerk"
-                        },
-                        new
-                        {
-                            UserId = 4,
-                            CellphoneNumber = 721234567,
-                            Email = "nicky.mostert@mandela.ac.za",
-                            IDNumber = 190406,
-                            Name = "Nicky",
-                            Password = "password4",
-                            Role = "Pharmacist",
-                            Surname = "Mostert"
-                        },
-                        new
-                        {
-                            UserId = 5,
-                            CellphoneNumber = 123456789,
-                            Email = "Pharmacy Manager Group Member E-mail",
-                            IDNumber = 134679,
-                            Name = "Pharmacy Manager Group Member Name",
-                            Password = "managerpass",
-                            Role = "PharmacyManager",
-                            Surname = "Pharmacy Manager Group Member Surname"
-                        },
-                        new
-                        {
-                            UserId = 6,
-                            CellphoneNumber = 831234567,
-                            Email = "john@example.com",
-                            IDNumber = 500101,
-                            Name = "John",
-                            Password = "customer1",
-                            Role = "Customer",
-                            Surname = "Doe"
-                        },
-                        new
-                        {
-                            UserId = 7,
-                            CellphoneNumber = 841234567,
-                            Email = "jane@example.com",
-                            IDNumber = 600202,
-                            Name = "Jane",
-                            Password = "customer2",
-                            Role = "Customer",
-                            Surname = "Smith"
-                        },
-                        new
-                        {
-                            UserId = 8,
-                            CellphoneNumber = 851234567,
-                            Email = "bob@example.com",
-                            IDNumber = 700303,
-                            Name = "Bob",
-                            Password = "customer3",
-                            Role = "Customer",
-                            Surname = "Johnson"
-                        });
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
                     b.Property<string>("Id")
@@ -1353,6 +1173,11 @@ namespace IbhayiPharmacy.Data.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Discriminator")
+                        .IsRequired()
+                        .HasMaxLength(21)
+                        .HasColumnType("nvarchar(21)");
+
                     b.Property<string>("Email")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
@@ -1404,6 +1229,10 @@ namespace IbhayiPharmacy.Data.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
+
+                    b.HasDiscriminator().HasValue("IdentityUser");
+
+                    b.UseTphMappingStrategy();
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
@@ -1434,12 +1263,10 @@ namespace IbhayiPharmacy.Data.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
                     b.Property<string>("LoginProvider")
-                        .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("ProviderKey")
-                        .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("ProviderDisplayName")
                         .HasColumnType("nvarchar(max)");
@@ -1476,12 +1303,10 @@ namespace IbhayiPharmacy.Data.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("LoginProvider")
-                        .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Name")
-                        .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Value")
                         .HasColumnType("nvarchar(max)");
@@ -1489,6 +1314,61 @@ namespace IbhayiPharmacy.Data.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
+                });
+
+            modelBuilder.Entity("IbhayiPharmacy.Models.ApplicationUser", b =>
+                {
+                    b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityUser");
+
+                    b.Property<string>("CellphoneNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("IDNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Surname")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasDiscriminator().HasValue("ApplicationUser");
+                });
+
+            modelBuilder.Entity("IbhayiPharmacy.Models.Customer", b =>
+                {
+                    b.HasOne("IbhayiPharmacy.Models.ApplicationUser", "ApplicationUser")
+                        .WithMany()
+                        .HasForeignKey("ApplicationUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ApplicationUser");
+                });
+
+            modelBuilder.Entity("IbhayiPharmacy.Models.Pharmacist", b =>
+                {
+                    b.HasOne("IbhayiPharmacy.Models.ApplicationUser", "ApplicationUser")
+                        .WithMany()
+                        .HasForeignKey("ApplicationUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ApplicationUser");
+                });
+
+            modelBuilder.Entity("IbhayiPharmacy.Models.PharmacyManager", b =>
+                {
+                    b.HasOne("IbhayiPharmacy.Models.ApplicationUser", "ApplicationUser")
+                        .WithMany()
+                        .HasForeignKey("ApplicationUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ApplicationUser");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

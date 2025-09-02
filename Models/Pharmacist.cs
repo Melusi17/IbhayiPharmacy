@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace IbhayiPharmacy.Models
@@ -7,8 +8,14 @@ namespace IbhayiPharmacy.Models
     {
         [Key]
         public int PharmacistID { get; set; }
-        [ForeignKey("UserID")]
-        public int UserId { get; set; }
+
+
+
+        [ForeignKey("ApplicationUserId")]
+        public string ApplicationUserId { get; set; }
+        [ValidateNever]
+        public ApplicationUser ApplicationUser { get; set; }
+
         [Required]
         public string HealthCouncilRegNo { get; set; }
         
