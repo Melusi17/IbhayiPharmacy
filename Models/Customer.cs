@@ -14,7 +14,7 @@ namespace IbhayiPharmacy.Models
         [ValidateNever]
         public ApplicationUser ApplicationUser { get; set; }
 
-        [Required]
-        public string Allergy { get; set; }
+        //[Required]
+        //public string Allergy { get; set; }
     }
 }

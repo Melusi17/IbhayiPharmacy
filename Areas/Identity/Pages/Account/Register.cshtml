@@ -1,339 +1,214 @@
 ﻿@page
 @model RegisterModel
-@{
-    ViewData["Title"] = "Register";
-}
-
-<h1>@ViewData["Title"]</h1>
 
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root {
-            --primary-color: #4e73df;
-            --secondary-color: #6f42c1;
-            --accent-color: #36b9cc;
-            --light-bg: #f8f9fc;
-            --dark-text: #5a5c69;
-        }
-
         body {
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            padding: 20px 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
         }
-
-        .register-container {
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             overflow: hidden;
-            margin: 0 auto;
-            width: 95%;
-            max-width: 1200px;
         }
-
-        .register-header {
-            background: linear-gradient(120deg, var(--primary-color), var(--secondary-color));
-            color: white;
-            padding: 25px;
-            text-align: center;
+        .card-header {
+            background: linear-gradient(135deg, #00aaff 0%, #0088cc 100%);
+            border: none;
         }
-
-            .register-header h1 {
-                font-weight: 700;
-                font-size: 28px;
-                margin: 0;
-            }
-
-            .register-header p {
-                margin: 10px 0 0;
-                opacity: 0.9;
-            }
-
-        .register-form {
-            padding: 30px;
-        }
-
-        .form-floating {
-            position: relative;
-            margin-bottom: 1.5rem;
-        }
-
-            .form-floating label {
-                padding-left: 12px;
-                color: var(--dark-text);
-            }
-
-        .form-control {
-            border-radius: 8px;
-            padding: 16px;
-            border: 2px solid #e1e5eb;
+        .form-control, .form-select {
+            border-radius: 5px;
+            padding: 12px;
+            border: 1px solid #ced4da;
             transition: all 0.3s;
         }
-
-            .form-control:focus {
-                border-color: var(--primary-color);
-                box-shadow: 0 0 0 3px rgba(78, 115, 223, 0.15);
-            }
-
-        .input-icon {
-            position: absolute;
-            right: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #b4b4b4;
-            z-index: 5;
+        .form-control:focus, .form-select:focus {
+            box-shadow: 0 0 0 3px rgba(0, 170, 255, 0.2);
+            border-color: #00aaff;
         }
-
-        .btn-register {
-            background: linear-gradient(120deg, var(--primary-color), var(--secondary-color));
+        .btn-primary {
+            background: linear-gradient(135deg, #00aaff 0%, #0088cc 100%);
             border: none;
             padding: 12px;
-            font-weight: 600;
-            font-size: 18px;
-            border-radius: 8px;
-            transition: all 0.3s;
-            box-shadow: 0 4px 15px rgba(78, 115, 223, 0.2);
-        }
-
-            .btn-register:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 8px 20px rgba(78, 115, 223, 0.3);
-            }
-
-        .external-auth {
-            background-color: var(--light-bg);
-            padding: 30px;
-            text-align: center;
-        }
-
-        .external-btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 10px;
+            border-radius: 5px;
             font-weight: 600;
             transition: all 0.3s;
         }
-
-            .external-btn i {
-                margin-right: 10px;
-                font-size: 20px;
-            }
-
-        .btn-google {
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 170, 255, 0.3);
+        }
+        .allergy-section {
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            padding: 15px;
+            border: 1px solid #e9ecef;
+        }
+        .allergy-checkboxes {
+            max-height: 150px;
+            overflow-y: auto;
+            padding: 10px;
             background: white;
-            color: #DB4437;
-            border: 1px solid #ddd;
+            border-radius: 5px;
+            border: 1px solid #ced4da;
         }
-
-            .btn-google:hover {
-                background: #f8f9fa;
-                border-color: #ccc;
-            }
-
-        .btn-facebook {
-            background: #3b5998;
-            color: white;
+        .form-check-input:checked {
+            background-color: #00aaff;
+            border-color: #00aaff;
         }
-
-            .btn-facebook:hover {
-                background: #344e86;
-            }
-
-        .divider {
-            display: flex;
-            align-items: center;
-            margin: 25px 0;
-        }
-
-            .divider::before, .divider::after {
-                content: "";
-                flex: 1;
-                border-bottom: 1px solid #e1e5eb;
-            }
-
-            .divider span {
-                padding: 0 15px;
-                color: var(--dark-text);
-                font-weight: 500;
-            }
-
-        .terms-text {
-            font-size: 14px;
-            color: var(--dark-text);
-            text-align: center;
-            margin-top: 20px;
-        }
-
-            .terms-text a {
-                color: var(--primary-color);
-                text-decoration: none;
-            }
-
-                .terms-text a:hover {
-                    text-decoration: underline;
-                }
-
-       
-
-        {
-            width: 100%;
-            border-radius: 0;
-        }
-
-        body {
-            padding: 0;
-        }
-
+        .section-title {
+            color: #495057;
+            font-weight: 600;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #00aaff;
         }
     </style>
-</head>
+
 <body>
-    <div class="register-container">
-        <div class="register-header">
-            <h1><i class="fas fa-user-plus me-2"></i>Create Your Account</h1>
-            <p>Join our community today and access exclusive features</p>
-        </div>
-
-        <div class="row g-0">
-            <div class="col-lg-7">
-                <div class="register-form">
-                    <form id="registerForm" method="post">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-floating">
-                                    <input asp-for="Input.Name" class="form-control" aria-required="true" placeholder="Your name" />
-                                    <label asp-for="Input.Name"><i class="fas fa-user me-2"></i>Name</label>
-                                    <span asp-validation-for="Input.Name" class="text-danger"></span>
-                                    <div class="input-icon">
-                                        <i class="fas fa-user"></i>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-floating">
-                                    <input asp-for="Input.Surname" class="form-control" aria-required="true" placeholder="Your surname" />
-                                    <label asp-for="Input.Surname"><i class="fas fa-users me-2"></i>Surname</label>
-                                    <span asp-validation-for="Input.Surname" class="text-danger"></span>
-                                    <div class="input-icon">
-                                        <i class="fas fa-users"></i>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-floating">
-                            <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
-                            <label asp-for="Input.Email"><i class="fas fa-envelope me-2"></i>Email</label>
-                            <span asp-validation-for="Input.Email" class="text-danger"></span>
-                            <div class="input-icon">
-                                <i class="fas fa-envelope"></i>
-                            </div>
-                        </div>
-
-                        <div class="form-floating">
-                            <input asp-for="Input.IDNumber" class="form-control" aria-required="true" placeholder="Your ID number" />
-                            <label asp-for="Input.IDNumber"><i class="fas fa-id-card me-2"></i>ID Number</label>
-                            <span asp-validation-for="Input.IDNumber" class="text-danger"></span>
-                            <div class="input-icon">
-                                <i class="fas fa-id-card"></i>
-                            </div>
-                        </div>
-
-                        <div class="form-floating">
-                            <input asp-for="Input.CellphoneNumber" class="form-control" aria-required="true" placeholder="Your cellphone number" />
-                            <label asp-for="Input.CellphoneNumber"><i class="fas fa-mobile-alt me-2"></i>Cellphone Number</label>
-                            <span asp-validation-for="Input.CellphoneNumber" class="text-danger"></span>
-                            <div class="input-icon">
-                                <i class="fas fa-mobile-alt"></i>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-floating">
-                                    <input asp-for="Input.Password" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
-                                    <label asp-for="Input.Password"><i class="fas fa-lock me-2"></i>Password</label>
-                                    <span asp-validation-for="Input.Password" class="text-danger"></span>
-                                    <div class="input-icon">
-                                        <i class="fas fa-lock"></i>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-floating">
-                                    <input asp-for="Input.ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
-                                    <label asp-for="Input.ConfirmPassword"><i class="fas fa-lock me-2"></i>Confirm Password</label>
-                                    <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
-                                    <div class="input-icon">
-                                        <i class="fas fa-lock"></i>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-check mb-4">
-                            <input class="form-check-input" type="checkbox" id="termsCheck">
-                            <label class="form-check-label" for="termsCheck">
-                                I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
-                            </label>
-                        </div>
-
-                        <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary btn-register">
-                            <i class="fas fa-user-plus me-2"></i>Register Now
-                        </button>
-
-                        <div class="terms-text">
-                            Already have an account? <a href="#">Sign in here</a>
-                        </div>
-                    </form>
+    <div class="container my-5">
+        <div class="card shadow border-0">
+            <div class="card-header w-100 py-3">
+                <div class="row">
+                    <div class="col-12 text-center">
+                        <h2 class="text-white py-2 pb-1">@ViewData["Title"]</h2>
+                        <p class="text-white mb-0">Create a new account to get started</p>
+                    </div>
                 </div>
             </div>
+            
+            <div class="card-body p-4">
+                <form id="registerForm" class="row" asp-route-returnUrl="@Model.ReturnUrl" method="post">
+                    <h3 class="section-title text-center">Account Information</h3>
+                    
+                    <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
 
-            <div class="col-lg-5">
-                <div class="external-auth">
-                    <h3>Use another service to register</h3>
-                    <div class="divider">
-                        <span>OR</span>
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input asp-for="Input.Name" class="form-control" aria-required="true" placeholder="John" />
+                                <label asp-for="Input.Name" class="ms-2 text-muted">First Name</label>
+                                <span asp-validation-for="Input.Name" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input asp-for="Input.Surname" class="form-control" aria-required="true" placeholder="Doe" />
+                                <label asp-for="Input.Surname" class="ms-2 text-muted">Last Name</label>
+                                <span asp-validation-for="Input.Surname" class="text-danger"></span>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
+                                <label asp-for="Input.Email" class="ms-2 text-muted">Email Address</label>
+                                <span asp-validation-for="Input.Email" class="text-danger"></span>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input asp-for="Input.IDNumber" class="form-control" placeholder="123456789" />
+                                <label asp-for="Input.IDNumber" class="ms-2 text-muted">Identity Number</label>
+                                <span asp-validation-for="Input.IDNumber" class="text-danger"></span>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input asp-for="Input.Password" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
+                                <label asp-for="Input.Password" class="ms-2 text-muted">Password</label>
+                                <span asp-validation-for="Input.Password" class="text-danger"></span>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input asp-for="Input.ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
+                                <label asp-for="Input.ConfirmPassword" class="ms-2 text-muted">Confirm Password</label>
+                                <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input asp-for="Input.CellphoneNumber" class="form-control" placeholder="+1234567890" />
+                                <label asp-for="Input.CellphoneNumber" class="ms-2 text-muted">Cell Phone Number</label>
+                                <span asp-validation-for="Input.CellphoneNumber" class="text-danger"></span>
+                            </div>
+                        </div>
                     </div>
 
-                    <a href="#" class="btn external-btn btn-google">
-                        <i class="fab fa-google"></i> Register with Google
-                    </a>
-
-                    <a href="#" class="btn external-btn btn-facebook">
-                        <i class="fab fa-facebook-f"></i> Register with Facebook
-                    </a>
-
-                    <a href="#" class="btn external-btn" style="background: #000; color: white;">
-                        <i class="fab fa-apple"></i> Register with Apple
-                    </a>
-
-                    <div class="mt-4">
-                        <p class="text-muted">
-                            By registering, you agree to our <a href="#">Terms of Service</a> and acknowledge our <a href="#">Privacy Policy</a>.
-                        </p>
+                    <h3 class="section-title text-center mt-4">Additional Information</h3>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <select asp-for="Input.Role" asp-items="@Model.Input.Rolelist" class="form-select">
+                                    <option disabled selected>-Select Role-</option>
+                                </select>
+                                <label asp-for="Input.Role" class="ms-2 text-muted">User Role</label>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="allergy-section">
+                                <label class="form-label mb-2 fw-semibold">Allergies (Select all that apply)</label>
+                                <div class="allergy-checkboxes">
+                                    <!-- This would be dynamically generated from Model.Input.AlergyList -->
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="1" id="allergy1" name="Input.Active_IngredientID">
+                                        <label class="form-check-label" for="allergy1">Pollen</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="2" id="allergy2" name="Input.Active_IngredientID">
+                                        <label class="form-check-label" for="allergy2">Dust</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="3" id="allergy3" name="Input.Active_IngredientID">
+                                        <label class="form-check-label" for="allergy3">Peanuts</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="4" id="allergy4" name="Input.Active_IngredientID">
+                                        <label class="form-check-label" for="allergy4">Shellfish</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="5" id="allergy5" name="Input.Active_IngredientID">
+                                        <label class="form-check-label" for="allergy5">Latex</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="6" id="allergy6" name="Input.Active_IngredientID">
+                                        <label class="form-check-label" for="allergy6">Penicillin</label>
+                                    </div>
+                                </div>
+                                <span asp-validation-for="Input.Active_IngredientID" class="text-danger"></span>
+                            </div>
+                        </div>
                     </div>
-                </div>
+
+                    <div class="col-12 mt-4">
+                        <button id="registerSubmit" type="submit" class="btn btn-primary btn-lg w-100">
+                            <i class="bi bi-person-plus me-2"></i>Register Account
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Script to handle role selection changes (if needed)
+        document.addEventListener('DOMContentLoaded', function () {
+            const roleSelect = document.querySelector('#Input_Role');
+            
+            if (roleSelect) {
+                roleSelect.addEventListener('change', function() {
+                    const selection = this.options[this.selectedIndex].text;
+                    // Add any specific logic for role selection here
+                    console.log('Role selected:', selection);
+                });
+            }
+        });
+    </script>
 </body>
-</html>
