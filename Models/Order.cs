@@ -11,8 +11,10 @@ namespace IbhayiPharmacy.Models
 
         [ForeignKey("CustomerID")]
         public int CustomerID { get; set; }
+        //public Customer Customer { get; set; }
         [ForeignKey("PharmacistID")]
         public int PharmacistID { get; set; }
+        //public Pharmacist Pharmacist { get; set; }
 
         public DateTime OrderDate { get; set; }
 

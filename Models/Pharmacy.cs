@@ -13,6 +13,7 @@ namespace IbhayiPharmacy.Models
 
         [ForeignKey("PharmacyManagerID")]
         public int PharmacyManagerID { get; set; }
+        //public PharmacyManager PharmacyManager { get; set; }
 
         [Required]
         public string Name { get; set; }

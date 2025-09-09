@@ -4,30 +4,14 @@
 
 #pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
 
-namespace IbhayiPharmacy.Data.Migrations
+namespace IbhayiPharmacy.Migrations
 {
     /// <inheritdoc />
-    public partial class replacetables : Migration
+    public partial class NewSeed : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "PracticeNo",
-                table: "Doctors");
-
-            migrationBuilder.RenameColumn(
-                name: "CellphoneNumber",
-                table: "Doctors",
-                newName: "HealthCouncilRegistrationNumber");
-
-            migrationBuilder.AddColumn<string>(
-                name: "ContactNumber",
-                table: "Doctors",
-                type: "nvarchar(max)",
-                nullable: false,
-                defaultValue: "");
-
             migrationBuilder.InsertData(
                 table: "Active_Ingredients",
                 columns: new[] { "Active_IngredientID", "Name" },
@@ -66,6 +50,15 @@ namespace IbhayiPharmacy.Data.Migrations
                 });
 
             migrationBuilder.InsertData(
+                table: "Custormer_Allergies",
+                columns: new[] { "Custormer_AllergyID", "Active_IngredientID", "CustomerID" },
+                values: new object[,]
+                {
+                    { 1, 4, 2 },
+                    { 2, 7, 3 }
+                });
+
+            migrationBuilder.InsertData(
                 table: "Doctors",
                 columns: new[] { "DoctorID", "ContactNumber", "Email", "HealthCouncilRegistrationNumber", "Name", "Surname" },
                 values: new object[,]
@@ -99,6 +92,40 @@ namespace IbhayiPharmacy.Data.Migrations
                 });
 
             migrationBuilder.InsertData(
+                table: "Suppliers",
+                columns: new[] { "SupplierID", "ContactName", "ContactSurname", "EmailAddress", "SupplierName" },
+                values: new object[,]
+                {
+                    { 1, "Davie", "Jones", "davie@example.com", "NovaCure" },
+                    { 2, "Nicky", "Mostert", "nmostert@mandela.ac.za", "HelixMed" },
+                    { 3, "Matimu", "Vuqa", "matimu@example.com", "VitaGenix" },
+                    { 4, "Lulu", "Ndhambi", "lulu@example.com", "Apex Biomed" },
+                    { 5, "Pharmacy Manager Group Member Name", "Pharmacy Manager Group Member Surname", "Pharmacy Manager Group Member E-mail", "CuraNova" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Medications",
+                columns: new[] { "MedcationID", "CurrentPrice", "DosageFormID", "MedicationName", "QuantityOnHand", "ReOrderLevel", "Schedule", "SupplierID" },
+                values: new object[,]
+                {
+                    { 1, 150, 1, "CardioVex", 90, 100, "6", 1 },
+                    { 2, 200, 1, "Neurocalm", 100, 110, "2", 2 },
+                    { 3, 180, 12, "Allerfree Duo", 100, 150, "0", 3 },
+                    { 4, 95, 1, "GastroEase", 470, 400, "3", 4 },
+                    { 5, 120, 1, "Respivent", 490, 300, "3", 5 },
+                    { 6, 85, 1, "Dermagard", 790, 600, "3", 2 },
+                    { 7, 210, 1, "Metaborex", 250, 200, "4", 2 },
+                    { 8, 175, 1, "Sleeptraze", 110, 100, "2", 2 },
+                    { 9, 300, 3, "OsteoFlex", 210, 200, "3", 2 },
+                    { 10, 450, 9, "Immunexin", 190, 200, "6", 2 },
+                    { 11, 600, 11, "CardioPlus", 600, 500, "6", 2 },
+                    { 12, 350, 11, "AllerCalm", 410, 400, "6", 2 },
+                    { 13, 280, 9, "RespirAid", 100, 100, "6", 2 },
+                    { 14, 125, 5, "DermaClear", 200, 100, "6", 2 },
+                    { 15, 190, 2, "OsteoPrime", 400, 100, "6", 2 }
+                });
+
+            migrationBuilder.InsertData(
                 table: "Medication_Ingredients",
                 columns: new[] { "Medication_IngredientID", "Active_IngredientID", "MedicationID", "Strength" },
                 values: new object[,]
@@ -126,113 +153,11 @@ namespace IbhayiPharmacy.Data.Migrations
                     { 21, 9, 14, "20mg" },
                     { 22, 13, 15, "20mg" }
                 });
-
-            migrationBuilder.InsertData(
-                table: "Medications",
-                columns: new[] { "MedcationID", "CurrentPrice", "DosageFormID", "MedicationName", "QuantityOnHand", "ReOrderLevel", "Schedule", "SupplierID" },
-                values: new object[,]
-                {
-                    { 1, 150, 1, "CardioVex", 90, 100, "6", 1 },
-                    { 2, 200, 1, "Neurocalm", 100, 110, "2", 2 },
-                    { 3, 180, 12, "Allerfree Duo", 100, 150, "0", 3 },
-                    { 4, 95, 1, "GastroEase", 470, 400, "3", 4 },
-                    { 5, 120, 1, "Respivent", 490, 300, "3", 5 },
-                    { 6, 85, 1, "Dermagard", 790, 600, "3", 2 },
-                    { 7, 210, 1, "Metaborex", 250, 200, "4", 2 },
-                    { 8, 175, 1, "Sleeptraze", 110, 100, "2", 2 },
-                    { 9, 300, 3, "OsteoFlex", 210, 200, "3", 2 },
-                    { 10, 450, 9, "Immunexin", 190, 200, "6", 2 },
-                    { 11, 600, 11, "CardioPlus", 600, 500, "6", 2 },
-                    { 12, 350, 11, "AllerCalm", 410, 400, "6", 2 },
-                    { 13, 280, 9, "RespirAid", 100, 100, "6", 2 },
-                    { 14, 125, 5, "DermaClear", 200, 100, "6", 2 },
-                    { 15, 190, 2, "OsteoPrime", 400, 100, "6", 2 }
-                });
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DeleteData(
-                table: "Active_Ingredients",
-                keyColumn: "Active_IngredientID",
-                keyValue: 1);
-
-            migrationBuilder.DeleteData(
-                table: "Active_Ingredients",
-                keyColumn: "Active_IngredientID",
-                keyValue: 2);
-
-            migrationBuilder.DeleteData(
-                table: "Active_Ingredients",
-                keyColumn: "Active_IngredientID",
-                keyValue: 3);
-
-            migrationBuilder.DeleteData(
-                table: "Active_Ingredients",
-                keyColumn: "Active_IngredientID",
-                keyValue: 4);
-
-            migrationBuilder.DeleteData(
-                table: "Active_Ingredients",
-                keyColumn: "Active_IngredientID",
-                keyValue: 5);
-
-            migrationBuilder.DeleteData(
-                table: "Active_Ingredients",
-                keyColumn: "Active_IngredientID",
-                keyValue: 6);
-
-            migrationBuilder.DeleteData(
-                table: "Active_Ingredients",
-                keyColumn: "Active_IngredientID",
-                keyValue: 7);
-
-            migrationBuilder.DeleteData(
-                table: "Active_Ingredients",
-                keyColumn: "Active_IngredientID",
-                keyValue: 8);
-
-            migrationBuilder.DeleteData(
-                table: "Active_Ingredients",
-                keyColumn: "Active_IngredientID",
-                keyValue: 9);
-
-            migrationBuilder.DeleteData(
-                table: "Active_Ingredients",
-                keyColumn: "Active_IngredientID",
-                keyValue: 10);
-
-            migrationBuilder.DeleteData(
-                table: "Active_Ingredients",
-                keyColumn: "Active_IngredientID",
-                keyValue: 11);
-
-            migrationBuilder.DeleteData(
-                table: "Active_Ingredients",
-                keyColumn: "Active_IngredientID",
-                keyValue: 12);
-
-            migrationBuilder.DeleteData(
-                table: "Active_Ingredients",
-                keyColumn: "Active_IngredientID",
-                keyValue: 13);
-
-            migrationBuilder.DeleteData(
-                table: "Active_Ingredients",
-                keyColumn: "Active_IngredientID",
-                keyValue: 14);
-
-            migrationBuilder.DeleteData(
-                table: "Active_Ingredients",
-                keyColumn: "Active_IngredientID",
-                keyValue: 15);
-
-            migrationBuilder.DeleteData(
-                table: "Active_Ingredients",
-                keyColumn: "Active_IngredientID",
-                keyValue: 16);
-
             migrationBuilder.DeleteData(
                 table: "Active_Ingredients",
                 keyColumn: "Active_IngredientID",
@@ -304,6 +229,16 @@ namespace IbhayiPharmacy.Data.Migrations
                 keyValue: 30);
 
             migrationBuilder.DeleteData(
+                table: "Custormer_Allergies",
+                keyColumn: "Custormer_AllergyID",
+                keyValue: 1);
+
+            migrationBuilder.DeleteData(
+                table: "Custormer_Allergies",
+                keyColumn: "Custormer_AllergyID",
+                keyValue: 2);
+
+            migrationBuilder.DeleteData(
                 table: "Doctors",
                 keyColumn: "DoctorID",
                 keyValue: 1);
@@ -341,27 +276,7 @@ namespace IbhayiPharmacy.Data.Migrations
             migrationBuilder.DeleteData(
                 table: "DosageForms",
                 keyColumn: "DosageFormID",
-                keyValue: 1);
-
-            migrationBuilder.DeleteData(
-                table: "DosageForms",
-                keyColumn: "DosageFormID",
-                keyValue: 2);
-
-            migrationBuilder.DeleteData(
-                table: "DosageForms",
-                keyColumn: "DosageFormID",
-                keyValue: 3);
-
-            migrationBuilder.DeleteData(
-                table: "DosageForms",
-                keyColumn: "DosageFormID",
                 keyValue: 4);
-
-            migrationBuilder.DeleteData(
-                table: "DosageForms",
-                keyColumn: "DosageFormID",
-                keyValue: 5);
 
             migrationBuilder.DeleteData(
                 table: "DosageForms",
@@ -381,22 +296,7 @@ namespace IbhayiPharmacy.Data.Migrations
             migrationBuilder.DeleteData(
                 table: "DosageForms",
                 keyColumn: "DosageFormID",
-                keyValue: 9);
-
-            migrationBuilder.DeleteData(
-                table: "DosageForms",
-                keyColumn: "DosageFormID",
                 keyValue: 10);
-
-            migrationBuilder.DeleteData(
-                table: "DosageForms",
-                keyColumn: "DosageFormID",
-                keyValue: 11);
-
-            migrationBuilder.DeleteData(
-                table: "DosageForms",
-                keyColumn: "DosageFormID",
-                keyValue: 12);
 
             migrationBuilder.DeleteData(
                 table: "Medication_Ingredients",
@@ -509,6 +409,86 @@ namespace IbhayiPharmacy.Data.Migrations
                 keyValue: 22);
 
             migrationBuilder.DeleteData(
+                table: "Active_Ingredients",
+                keyColumn: "Active_IngredientID",
+                keyValue: 1);
+
+            migrationBuilder.DeleteData(
+                table: "Active_Ingredients",
+                keyColumn: "Active_IngredientID",
+                keyValue: 2);
+
+            migrationBuilder.DeleteData(
+                table: "Active_Ingredients",
+                keyColumn: "Active_IngredientID",
+                keyValue: 3);
+
+            migrationBuilder.DeleteData(
+                table: "Active_Ingredients",
+                keyColumn: "Active_IngredientID",
+                keyValue: 4);
+
+            migrationBuilder.DeleteData(
+                table: "Active_Ingredients",
+                keyColumn: "Active_IngredientID",
+                keyValue: 5);
+
+            migrationBuilder.DeleteData(
+                table: "Active_Ingredients",
+                keyColumn: "Active_IngredientID",
+                keyValue: 6);
+
+            migrationBuilder.DeleteData(
+                table: "Active_Ingredients",
+                keyColumn: "Active_IngredientID",
+                keyValue: 7);
+
+            migrationBuilder.DeleteData(
+                table: "Active_Ingredients",
+                keyColumn: "Active_IngredientID",
+                keyValue: 8);
+
+            migrationBuilder.DeleteData(
+                table: "Active_Ingredients",
+                keyColumn: "Active_IngredientID",
+                keyValue: 9);
+
+            migrationBuilder.DeleteData(
+                table: "Active_Ingredients",
+                keyColumn: "Active_IngredientID",
+                keyValue: 10);
+
+            migrationBuilder.DeleteData(
+                table: "Active_Ingredients",
+                keyColumn: "Active_IngredientID",
+                keyValue: 11);
+
+            migrationBuilder.DeleteData(
+                table: "Active_Ingredients",
+                keyColumn: "Active_IngredientID",
+                keyValue: 12);
+
+            migrationBuilder.DeleteData(
+                table: "Active_Ingredients",
+                keyColumn: "Active_IngredientID",
+                keyValue: 13);
+
+            migrationBuilder.DeleteData(
+                table: "Active_Ingredients",
+                keyColumn: "Active_IngredientID",
+                keyValue: 14);
+
+            migrationBuilder.DeleteData(
+                table: "Active_Ingredients",
+                keyColumn: "Active_IngredientID",
+                keyValue: 15);
+
+            migrationBuilder.DeleteData(
+                table: "Active_Ingredients",
+                keyColumn: "Active_IngredientID",
+                keyValue: 16);
+
+            migrationBuilder.DeleteData(
                 table: "Medications",
                 keyColumn: "MedcationID",
                 keyValue: 1);
@@ -583,21 +563,65 @@ namespace IbhayiPharmacy.Data.Migrations
                 keyColumn: "MedcationID",
                 keyValue: 15);
 
-            migrationBuilder.DropColumn(
-                name: "ContactNumber",
-                table: "Doctors");
+            migrationBuilder.DeleteData(
+                table: "DosageForms",
+                keyColumn: "DosageFormID",
+                keyValue: 1);
 
-            migrationBuilder.RenameColumn(
-                name: "HealthCouncilRegistrationNumber",
-                table: "Doctors",
-                newName: "CellphoneNumber");
+            migrationBuilder.DeleteData(
+                table: "DosageForms",
+                keyColumn: "DosageFormID",
+                keyValue: 2);
 
-            migrationBuilder.AddColumn<int>(
-                name: "PracticeNo",
-                table: "Doctors",
-                type: "int",
-                nullable: false,
-                defaultValue: 0);
+            migrationBuilder.DeleteData(
+                table: "DosageForms",
+                keyColumn: "DosageFormID",
+                keyValue: 3);
+
+            migrationBuilder.DeleteData(
+                table: "DosageForms",
+                keyColumn: "DosageFormID",
+                keyValue: 5);
+
+            migrationBuilder.DeleteData(
+                table: "DosageForms",
+                keyColumn: "DosageFormID",
+                keyValue: 9);
+
+            migrationBuilder.DeleteData(
+                table: "DosageForms",
+                keyColumn: "DosageFormID",
+                keyValue: 11);
+
+            migrationBuilder.DeleteData(
+                table: "DosageForms",
+                keyColumn: "DosageFormID",
+                keyValue: 12);
+
+            migrationBuilder.DeleteData(
+                table: "Suppliers",
+                keyColumn: "SupplierID",
+                keyValue: 1);
+
+            migrationBuilder.DeleteData(
+                table: "Suppliers",
+                keyColumn: "SupplierID",
+                keyValue: 2);
+
+            migrationBuilder.DeleteData(
+                table: "Suppliers",
+                keyColumn: "SupplierID",
+                keyValue: 3);
+
+            migrationBuilder.DeleteData(
+                table: "Suppliers",
+                keyColumn: "SupplierID",
+                keyValue: 4);
+
+            migrationBuilder.DeleteData(
+                table: "Suppliers",
+                keyColumn: "SupplierID",
+                keyValue: 5);
         }
     }
 }

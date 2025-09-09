@@ -5,7 +5,7 @@ using System.Reflection.Metadata;
 
 namespace IbhayiPharmacy.Models
 {
-    public class Prescription
+    public class NewScript
     {
         [Key]
         public int PrescriptionID { get; set; }
@@ -21,8 +21,9 @@ namespace IbhayiPharmacy.Models
         public byte[] Script { get; set; }
 
         public bool DispenseUponApproval { get; set; }
+
         public string? Status { get; set; } = "Unprocessed";
-        public List<ScriptLine>? scriptLines { get; set; } = new List<ScriptLine>();
+        public List<PresScriptLine>? scriptLines { get; set; } = new List<PresScriptLine>();
 
 
     }

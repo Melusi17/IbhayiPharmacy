@@ -19,6 +19,7 @@
 
   <ItemGroup>
     <Folder Include="wwwroot\css\img\Customer_img\" />
+    <Folder Include="wwwroot\Documents\Scripts\" />
   </ItemGroup>
 
 </Project>

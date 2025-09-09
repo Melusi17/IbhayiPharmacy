@@ -8,11 +8,11 @@ namespace IbhayiPharmacy.Models
         [Key]
         public int Custormer_AllergyID { get; set; }
 
-        [ForeignKey("CustormerID")]
-        public int CustormerID { get; set; }
+        [ForeignKey("CustomerID")]
+        public int CustomerID { get; set; }
 
         [ForeignKey("Active_IngredientID")]
         public int Active_IngredientID { get; set; }
-        
+       
     }
 }
