@@ -3,172 +3,43 @@
     Layout = "~/Views/Shared/PharmacistLayouts/_ProcessedOrdersLayout.cshtml";
 }
 
-<div>
-    <h2>Order Status Tracking</h2>
-
-    <div class="filter-container">
-        <button class="filter-btn active" data-filter="all">All Orders</button>
-        <button class="filter-btn" data-filter="packing">Packing</button>
-        <button class="filter-btn" data-filter="ready">Ready for Collection</button>
-        <button class="filter-btn" data-filter="rejected">Rejected</button>
-    </div>
-
-    <div class="search-container">
-        <div class="search-bar">
-            <input type="text" placeholder="Search by patient name or ID..." id="searchInput">
-            <button><i class="fas fa-search"></i> Search</button>
+<!-- MAIN CONTENT -->
+<div class="main-content">
+    <!-- SEARCH SECTION -->
+    <div class="search-section">
+        <div class="search-container">
+            <input type="text" class="search-input" placeholder="Search by patient name or ID number..." id="patientSearch">
+            <button class="search-btn" onclick="searchPatients()"><i class="fas fa-search"></i> Search</button>
         </div>
     </div>
 
-    <div class="orders-list" id="ordersList">
-        <!-- Order 1 - Packing -->
-        <div class="order-card" data-status="packing">
-            <div class="order-header">
-                <div>
-                    <span class="order-patient">Patient: John Doe (ID: 9001011234081)</span>
-                </div>
-                <span class="order-status status-packing">Packing</span>
-            </div>
-            <div class="order-meta">
-                <span>Doctor: Dr. Sarah Smith (PR1234567)</span>
-                <span>Date: 2023-05-15</span>
-                <strong>Order No: Jhn316</strong>
-                <span class="order-repeat">Repeat (2 remaining)</span>
-            </div>
-            <div class="order-actions">
-                <button class="action-btn email-btn">
-                    <i class="fas fa-envelope"></i> Email
-                </button>
-                <button class="action-btn collect-btn">
-                    <i class="fas fa-check"></i> Collect
-                </button>
-            </div>
-            <div class="order-details">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Medication</th>
-                            <th>Dosage Form</th>
-                            <th>Qty</th>
-                            <th>Schedule</th>
-                            <th>Price (ZAR)</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Amoxicillin 500mg</td>
-                            <td>Capsule</td>
-                            <td>14</td>
-                            <td><span class="med-badge badge-s4">S4</span></td>
-                            <td>R 85.50</td>
-                        </tr>
-                        <tr>
-                            <td>Panado Extra</td>
-                            <td>Tablet</td>
-                            <td>20</td>
-                            <td><span class="med-badge badge-s0">S0</span></td>
-                            <td>R 45.75</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            <div style="clear:both"></div>
-        </div>
+    <!-- PATIENT CARDS -->
+    <div class="patient-cards" id="patientCards">
+        <!-- Patient cards will be dynamically inserted here -->
+    </div>
 
-        <!-- Order 2 - Ready for Collection -->
-        <div class="order-card" data-status="ready">
-            <div class="order-header">
-                <div>
-                    <span class="order-patient">Patient: Amanda Johnson (ID: 8902021234082)</span>
-                </div>
-                <span class="order-status status-ready">Ready for Collection</span>
-            </div>
-            <div class="order-meta">
-                <span>Doctor: Dr. Michael Brown (PR7654321)</span>
-                <strong>Order No: Jhn1010-11</strong>
-                <span>Date: 2023-05-14</span>
-            </div>
-            <div class="order-actions">
-                <button class="action-btn email-btn">
-                    <i class="fas fa-envelope"></i> Email
-                </button>
-            </div>
-            <div class="order-details">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Medication</th>
-                            <th>Dosage Form</th>
-                            <th>Qty</th>
-                            <th>Schedule</th>
-                            <th>Price (ZAR)</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Lisinopril 10mg</td>
-                            <td>Tablet</td>
-                            <td>30</td>
-                            <td><span class="med-badge badge-s2">S2</span></td>
-                            <td>R 120.00</td>
-                        </tr>
-                        <tr>
-                            <td>Simvastatin 20mg</td>
-                            <td>Tablet</td>
-                            <td>30</td>
-                            <td><span class="med-badge badge-s3">S3</span></td>
-                            <td>R 95.00</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            <div style="clear:both"></div>
-        </div>
+    <!-- PRESCRIPTION TABLE (HIDDEN BY DEFAULT) -->
+    <div id="prescriptionTableContainer" style="display: none;">
+        <h3 id="selectedPatientName"></h3>
+        <table class="prescription-table">
+            <thead>
+                <tr>
+                    <th width="20%">Date</th>
+                    <th width="40%">Script</th>
+                    <th width="20%">Processed Date</th>
+                    <th width="20%">Status</th>
+                </tr>
+            </thead>
+            <tbody id="prescriptionTableBody">
+                <!-- Prescription rows will be dynamically inserted here -->
+            </tbody>
+        </table>
+    </div>
 
-        <!-- Order 3 - Rejected -->
-        <div class="order-card" data-status="rejected">
-            <div class="order-header">
-                <div>
-                    <span class="order-patient">Patient: Lunga Dlamini (ID: 8803031234083)</span>
-                </div>
-                <span class="order-status status-rejected">Rejected</span>
-            </div>
-            <div class="order-meta">
-                <span>Doctor: Dr. Thando Nkosi (PR9876543)</span>
-                <strong>Order No: Ish4011</strong>
-                <span>Date: 2023-05-12</span>
-            </div>
-            <div class="order-actions">
-                <button class="action-btn email-btn">
-                    <i class="fas fa-envelope"></i> Email
-                </button>
-            </div>
-            <div class="order-details">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Medication</th>
-                            <th>Dosage Form</th>
-                            <th>Qty</th>
-                            <th>Schedule</th>
-                            <th>Price (ZAR)</th>
-                            <th>Rejection Reason</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Ibuprofen 200mg</td>
-                            <td>Tablet</td>
-                            <td>10</td>
-                            <td><span class="med-badge badge-s1">S1</span></td>
-                            <td>R 32.50</td>
-                            <td>Patient allergic</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            <div style="clear:both"></div>
-        </div>
+    <!-- NO RESULTS MESSAGE (HIDDEN BY DEFAULT) -->
+    <div class="no-results" id="noResults" style="display: none;">
+        <i class="fas fa-search" style="font-size: 24px; margin-bottom: 10px;"></i>
+        <p>No processed scripts found</p>
     </div>
 </div>
 

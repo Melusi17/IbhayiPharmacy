@@ -1,137 +1,150 @@
-﻿// Processed Orders JS - Fully Fixed Version
-document.addEventListener('DOMContentLoaded', function () {
-    // Initialize all event listeners
-    initEventListeners();
+﻿// Sample patient data - all prescriptions are processed in this version
+const patients = [
+    {
+        id: "9001011234081",
+        name: "John Doe",
+        prescriptions: [
+            { date: "2025-01-15", file: "prescription_001.pdf", processed: true, processedDate: "2025-01-16" },
+            { date: "2025-02-22", file: "prescription_002.pdf", processed: true, processedDate: "2025-02-23" }
+        ]
+    },
+    {
+        id: "8902021234082",
+        name: "Jane Smith",
+        prescriptions: [
+            { date: "2025-03-10", file: "prescription_003.pdf", processed: true, processedDate: "2025-03-11" }
+        ]
+    },
+    {
+        id: "9103031234083",
+        name: "Robert Johnson",
+        prescriptions: [
+            { date: "2025-04-05", file: "prescription_004.pdf", processed: true, processedDate: "2025-04-06" },
+            { date: "2025-05-12", file: "prescription_005.pdf", processed: true, processedDate: "2025-05-13" }
+        ]
+    },
+    {
+        id: "9204041234084",
+        name: "Sarah Williams",
+        prescriptions: []
+    }
+];
 
-    console.log('Processed Orders JS initialized successfully');
+// Initialize with all patients
+document.addEventListener('DOMContentLoaded', function () {
+    displayPatients(patients);
 });
 
-function initEventListeners() {
-    // Toggle order details on card click (excluding buttons)
-    document.querySelectorAll('.order-card').forEach(card => {
-        card.addEventListener('click', function (e) {
-            if (!e.target.closest('.action-btn')) {
-                this.classList.toggle('expanded');
-            }
-        });
-    });
+// Toggle sidebar
+function toggleSidebar() {
+    const sidebar = document.querySelector('.sidebar');
+    sidebar.classList.toggle('collapsed');
 
-    // Filter buttons - Add data-filter attribute to each button
-    document.querySelectorAll('.filter-btn').forEach(btn => {
-        // Set data-filter attribute based on button text
-        const filterValue = btn.textContent.trim().toLowerCase()
-            .replace(' ', '-')
-            .replace('for-', ''); // Remove "for-" from "ready-for-collection"
-
-        btn.dataset.filter = filterValue.includes('all-orders') ? 'all' :
-            filterValue.includes('ready-collection') ? 'ready' :
-                filterValue;
-
-        btn.addEventListener('click', function () {
-            filterOrders(this.dataset.filter);
-        });
-    });
-
-    // Search button
-    document.querySelector('.search-container button')?.addEventListener('click', searchOrders);
-
-    // Search on Enter key
-    document.getElementById('searchInput')?.addEventListener('keyup', function (e) {
-        if (e.key === 'Enter') searchOrders();
-    });
-
-    // Event delegation for dynamic buttons
-    document.addEventListener('click', function (e) {
-        // Collect order button
-        if (e.target.closest('.collect-btn')) {
-            collectOrder(e.target.closest('.collect-btn'));
-        }
-        // Email order button
-        if (e.target.closest('.email-btn')) {
-            emailOrder(e.target.closest('.email-btn'));
-        }
-    });
-}
-
-// Filter orders by status
-function filterOrders(status) {
-    try {
-        // Update active filter button
-        document.querySelectorAll('.filter-btn').forEach(btn => {
-            btn.classList.toggle('active', btn.dataset.filter === status);
-        });
-
-        // Filter cards
-        const cards = document.querySelectorAll('.order-card');
-        cards.forEach(card => {
-            if (status === 'all') {
-                card.style.display = 'block';
-            } else {
-                card.style.display = card.dataset.status === status ? 'block' : 'none';
-            }
-        });
-
-        console.log(`Filtered orders by status: ${status}`);
-    } catch (error) {
-        console.error('Error in filterOrders:', error);
+    const toggleBtn = document.querySelector('.toggle-sidebar i');
+    if (sidebar.classList.contains('collapsed')) {
+        toggleBtn.classList.remove('fa-chevron-left');
+        toggleBtn.classList.add('fa-chevron-right');
+    } else {
+        toggleBtn.classList.remove('fa-chevron-right');
+        toggleBtn.classList.add('fa-chevron-left');
     }
 }
 
-// Collect order function
-function collectOrder(button) {
-    try {
-        const card = button.closest('.order-card');
-        if (!card) return;
-
-        // Update status
-        card.dataset.status = 'ready';
-        const statusElement = card.querySelector('.order-status');
-        if (statusElement) {
-            statusElement.className = 'order-status status-ready';
-            statusElement.textContent = 'Ready for Collection';
-        }
-
-        // Remove the collect button
-        button.remove();
-
-        console.log('Order marked as ready for collection');
-    } catch (error) {
-        console.error('Error in collectOrder:', error);
+// Search patients by name or ID
+function searchPatients() {
+    const searchTerm = document.getElementById('patientSearch').value.toLowerCase();
+    if (searchTerm.trim() === '') {
+        displayPatients(patients);
+        return;
     }
+
+    const filteredPatients = patients.filter(patient =>
+        patient.name.toLowerCase().includes(searchTerm) ||
+        patient.id.includes(searchTerm)
+    );
+
+    displayPatients(filteredPatients);
 }
 
-// Email order function
-function emailOrder(button) {
-    try {
-        const card = button.closest('.order-card');
-        if (!card) return;
+// Display patients in cards
+function displayPatients(patientList) {
+    const container = document.getElementById('patientCards');
+    container.innerHTML = '';
 
-        const patient = card.querySelector('.order-patient')?.textContent || 'patient';
-        alert(`Email sent to ${patient}`);
-        console.log(`Email triggered for ${patient}`);
-
-        // In a real app, this would trigger an email API
-    } catch (error) {
-        console.error('Error in emailOrder:', error);
+    if (patientList.length === 0) {
+        document.getElementById('noResults').style.display = 'block';
+        document.getElementById('prescriptionTableContainer').style.display = 'none';
+        return;
     }
-}
 
-// Search orders
-function searchOrders() {
-    try {
-        const searchTerm = document.getElementById('searchInput')?.value.toLowerCase() || '';
-        const cards = document.querySelectorAll('.order-card');
+    document.getElementById('noResults').style.display = 'none';
 
-        cards.forEach(card => {
-            const patientText = card.querySelector('.order-patient')?.textContent.toLowerCase() || '';
-            const orderNumber = card.querySelector('.order-meta strong')?.textContent.toLowerCase() || '';
-            const searchContent = patientText + ' ' + orderNumber;
+    patientList.forEach(patient => {
+        const card = document.createElement('div');
+        card.className = 'patient-card';
+        card.innerHTML = `
+                    <div class="patient-name">${patient.name}</div>
+                    <div class="patient-id">ID: ${patient.id}</div>
+                `;
 
-            card.style.display = searchContent.includes(searchTerm) ? 'block' : 'none';
+        card.addEventListener('click', function () {
+            // Remove active class from all cards
+            document.querySelectorAll('.patient-card').forEach(c => {
+                c.classList.remove('active');
+            });
+
+            // Add active class to clicked card
+            this.classList.add('active');
+
+            // Show prescriptions for this patient
+            showPrescriptions(patient);
         });
 
-        console.log(`Searched orders for: ${searchTerm}`);
-    } catch (error) {
-        console.error('Error in searchOrders:', error);
+        container.appendChild(card);
+    });
+}
+
+// Show prescriptions for selected patient
+function showPrescriptions(patient) {
+    document.getElementById('selectedPatientName').textContent = `Prescriptions for ${patient.name}`;
+    const tableBody = document.getElementById('prescriptionTableBody');
+    tableBody.innerHTML = '';
+
+    if (patient.prescriptions.length === 0) {
+        tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="4" style="text-align: center; color: #95a5a6; font-style: italic;">
+                            No prescriptions found for this patient
+                        </td>
+                    </tr>
+                `;
+    } else {
+        patient.prescriptions.forEach(prescription => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                        <td>${formatDate(prescription.date)}</td>
+                        <td class="prescription-file">
+                            <i class="fas fa-file-pdf"></i> ${prescription.file}
+                        </td>
+                        <td>${formatDate(prescription.processedDate)}</td>
+                        <td>
+                            <span class="process-status ${prescription.processed ? 'process-yes' : 'process-no'}">
+                                ${prescription.processed ? 'Processed' : 'Pending'}
+                            </span>
+                        </td>
+                    `;
+            tableBody.appendChild(row);
+        });
     }
+
+    document.getElementById('prescriptionTableContainer').style.display = 'block';
+}
+
+// Format date as DD/MM/YYYY
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
 }
