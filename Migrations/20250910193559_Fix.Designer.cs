@@ -4,6 +4,7 @@ using IbhayiPharmacy.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace IbhayiPharmacy.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250910193559_Fix")]
+    partial class Fix
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -36,7 +39,7 @@ namespace IbhayiPharmacy.Migrations
 
                     b.HasKey("Active_IngredientID");
 
-                    b.ToTable("Active_Ingredients", (string)null);
+                    b.ToTable("Active_Ingredients");
 
                     b.HasData(
                         new
@@ -205,7 +208,7 @@ namespace IbhayiPharmacy.Migrations
 
                     b.HasKey("AllergyId");
 
-                    b.ToTable("Allergies", (string)null);
+                    b.ToTable("Allergies");
                 });
 
             modelBuilder.Entity("IbhayiPharmacy.Models.Customer", b =>
@@ -248,7 +251,7 @@ namespace IbhayiPharmacy.Migrations
 
                     b.HasIndex("ApplicationUserId");
 
-                    b.ToTable("Customers", (string)null);
+                    b.ToTable("Customers");
                 });
 
             modelBuilder.Entity("IbhayiPharmacy.Models.CustomerAllergy", b =>
@@ -274,7 +277,7 @@ namespace IbhayiPharmacy.Migrations
 
                     b.HasIndex("CustomerId");
 
-                    b.ToTable("Customer_Allergies", (string)null);
+                    b.ToTable("Customer_Allergies");
                 });
 
             modelBuilder.Entity("IbhayiPharmacy.Models.Doctor", b =>
@@ -307,7 +310,7 @@ namespace IbhayiPharmacy.Migrations
 
                     b.HasKey("DoctorID");
 
-                    b.ToTable("Doctors", (string)null);
+                    b.ToTable("Doctors");
 
                     b.HasData(
                         new
@@ -389,7 +392,7 @@ namespace IbhayiPharmacy.Migrations
 
                     b.HasKey("DosageFormID");
 
-                    b.ToTable("DosageForms", (string)null);
+                    b.ToTable("DosageForms");
 
                     b.HasData(
                         new
@@ -491,7 +494,7 @@ namespace IbhayiPharmacy.Migrations
 
                     b.HasIndex("SupplierID");
 
-                    b.ToTable("Medications", (string)null);
+                    b.ToTable("Medications");
 
                     b.HasData(
                         new
@@ -685,7 +688,7 @@ namespace IbhayiPharmacy.Migrations
 
                     b.HasIndex("MedicationID");
 
-                    b.ToTable("Medication_Ingredients", (string)null);
+                    b.ToTable("Medication_Ingredients");
 
                     b.HasData(
                         new
@@ -867,7 +870,7 @@ namespace IbhayiPharmacy.Migrations
 
                     b.HasKey("PrescriptionID");
 
-                    b.ToTable("NewScripts", (string)null);
+                    b.ToTable("NewScripts");
                 });
 
             modelBuilder.Entity("IbhayiPharmacy.Models.Order", b =>
@@ -900,7 +903,7 @@ namespace IbhayiPharmacy.Migrations
 
                     b.HasKey("OrderID");
 
-                    b.ToTable("Orders", (string)null);
+                    b.ToTable("Orders");
                 });
 
             modelBuilder.Entity("IbhayiPharmacy.Models.OrderLine", b =>
@@ -928,7 +931,7 @@ namespace IbhayiPharmacy.Migrations
 
                     b.HasKey("OrderLineID");
 
-                    b.ToTable("OrderLines", (string)null);
+                    b.ToTable("OrderLines");
                 });
 
             modelBuilder.Entity("IbhayiPharmacy.Models.Pharmacist", b =>
@@ -951,7 +954,7 @@ namespace IbhayiPharmacy.Migrations
 
                     b.HasIndex("ApplicationUserId");
 
-                    b.ToTable("Pharmacists", (string)null);
+                    b.ToTable("Pharmacists");
                 });
 
             modelBuilder.Entity("IbhayiPharmacy.Models.Pharmacy", b =>
@@ -994,7 +997,7 @@ namespace IbhayiPharmacy.Migrations
 
                     b.HasKey("PharmacyID");
 
-                    b.ToTable("Pharmacies", (string)null);
+                    b.ToTable("Pharmacies");
                 });
 
             modelBuilder.Entity("IbhayiPharmacy.Models.PharmacyManager", b =>
@@ -1017,7 +1020,7 @@ namespace IbhayiPharmacy.Migrations
 
                     b.HasIndex("ApplicationUserId");
 
-                    b.ToTable("PharmacyManagers", (string)null);
+                    b.ToTable("PharmacyManagers");
                 });
 
             modelBuilder.Entity("IbhayiPharmacy.Models.PresScriptLine", b =>
@@ -1062,7 +1065,7 @@ namespace IbhayiPharmacy.Migrations
 
                     b.HasIndex("PrescriptionID");
 
-                    b.ToTable("PresScriptLines", (string)null);
+                    b.ToTable("PresScriptLines");
                 });
 
             modelBuilder.Entity("IbhayiPharmacy.Models.Prescription", b =>
@@ -1088,7 +1091,7 @@ namespace IbhayiPharmacy.Migrations
 
                     b.HasKey("PrescriptionID");
 
-                    b.ToTable("Prescriptions", (string)null);
+                    b.ToTable("Prescriptions");
                 });
 
             modelBuilder.Entity("IbhayiPharmacy.Models.ScriptLine", b =>
@@ -1124,7 +1127,7 @@ namespace IbhayiPharmacy.Migrations
 
                     b.HasIndex("PrescriptionID");
 
-                    b.ToTable("ScriptLines", (string)null);
+                    b.ToTable("ScriptLines");
                 });
 
             modelBuilder.Entity("IbhayiPharmacy.Models.StockOrder", b =>
@@ -1147,7 +1150,7 @@ namespace IbhayiPharmacy.Migrations
 
                     b.HasKey("StockOrderID");
 
-                    b.ToTable("StockOrders", (string)null);
+                    b.ToTable("StockOrders");
                 });
 
             modelBuilder.Entity("IbhayiPharmacy.Models.StockOrderDetail", b =>
@@ -1169,7 +1172,7 @@ namespace IbhayiPharmacy.Migrations
 
                     b.HasKey("StockOrderDetail_ID");
 
-                    b.ToTable("StockOrderDetails", (string)null);
+                    b.ToTable("StockOrderDetails");
                 });
 
             modelBuilder.Entity("IbhayiPharmacy.Models.Supplier", b =>
@@ -1198,7 +1201,7 @@ namespace IbhayiPharmacy.Migrations
 
                     b.HasKey("SupplierID");
 
-                    b.ToTable("Suppliers", (string)null);
+                    b.ToTable("Suppliers");
 
                     b.HasData(
                         new
@@ -1267,7 +1270,7 @@ namespace IbhayiPharmacy.Migrations
 
                     b.HasKey("UnprocessedScriptID");
 
-                    b.ToTable("UnprocessedScripts", (string)null);
+                    b.ToTable("UnprocessedScripts");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>

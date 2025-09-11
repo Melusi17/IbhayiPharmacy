@@ -7,14 +7,28 @@ namespace IbhayiPharmacy.Models
     public class Customer
     {
         [Key]
-        public int CustormerID { get; set; }
+        public int CustomerID { get; set; }
+        [Required]
+        public string Name { get; set; }
+        [Required]
+        public string Surname { get; set; }
+        [Required]
+        public string IdNumber { get; set; }
+        [Required]
+        public string Cellphone { get; set; }
+        [Required]
+        public string Email { get; set; }
+
+        [Required]
+        public string PasswordHash { get; set; }  // store hashed password
+
+        public ICollection<CustomerAllergy> CustomerAllergies { get; set; }
+
+
 
         [ForeignKey("ApplicationUserId")]
         public string ApplicationUserId { get; set; }
         [ValidateNever]
         public ApplicationUser ApplicationUser { get; set; }
-
-        //[Required]
-        //public string Allergy { get; set; }
     }
 }

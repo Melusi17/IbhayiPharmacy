@@ -25,9 +25,9 @@ namespace IbhayiPharmacy.Data
         public DbSet<Customer> Customers { get; set; }
         public DbSet<Doctor> Doctors { get; set; }
         public DbSet<Medication> Medications { get; set; }
-        public DbSet<Custormer_Allergy> Custormer_Allergies { get; set; }
+        public DbSet<CustomerAllergy> Customer_Allergies { get; set; }
         public DbSet<DosageForm> DosageForms { get; set; }
-        public DbSet<Supplier> Suppliers { get; set; }
+        public DbSet<Supplier> Suppliers { get; set; } 
         public DbSet<Active_Ingredient> Active_Ingredients { get; set; }
         public DbSet<Medication_Ingredient> Medication_Ingredients { get; set; }
         public DbSet<Order> Orders { get; set; }
@@ -37,10 +37,15 @@ namespace IbhayiPharmacy.Data
         public DbSet<StockOrder> StockOrders { get; set; }
         public DbSet<StockOrderDetail> StockOrderDetails { get; set; }
         public DbSet<ScriptLine> ScriptLines { get; set; }
+        public DbSet<Allergy> Allergies { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+            
+
+
+
 
             // Seed data
             SeedData(modelBuilder);
@@ -97,7 +102,14 @@ namespace IbhayiPharmacy.Data
                 new DosageForm { DosageFormID = 11, DosageFormName = "IV Drip" },
                 new DosageForm { DosageFormID = 12, DosageFormName = "Powder" }
             );
-            
+
+//            modelBuilder.Entity<Allergy>().HasData(
+//    new Allergy { AllergyId = 1, Name = "Penicillin" },
+//    new Allergy { AllergyId = 2, Name = "Peanuts" },
+//    new Allergy { AllergyId = 3, Name = "Shellfish" }
+//);
+
+
             // Seed Suppliers
             modelBuilder.Entity<Supplier>().HasData(
                 new Supplier { SupplierID = 1, SupplierName = "NovaCure", ContactName = "Davie", ContactSurname = "Jones", EmailAddress = "davie@example.com" },
@@ -157,9 +169,9 @@ namespace IbhayiPharmacy.Data
             //);
 
             // Seed Customer Allergies
-            modelBuilder.Entity<Custormer_Allergy>().HasData(
-                new Custormer_Allergy { Custormer_AllergyID = 1, CustomerID = 2, Active_IngredientID = 4 }, // Jane allergic to Histarelin
-                new Custormer_Allergy { Custormer_AllergyID = 2, CustomerID = 3, Active_IngredientID = 7 }  // Bob allergic to Bronchomid
+            modelBuilder.Entity<CustomerAllergy>().HasData(
+                new CustomerAllergy { Customer_AllergyId = 1, CustomerId = 2, Active_IngredientID = 4 }, // Jane allergic to Histarelin
+                new CustomerAllergy { Customer_AllergyId = 2, CustomerId = 3, Active_IngredientID = 7 }  // Bob allergic to Bronchomid
             );
 
             // Seed Medications
