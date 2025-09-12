@@ -22,11 +22,13 @@ namespace IbhayiPharmacy.Areas.Identity.Pages.Account
     {
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly ILogger<LoginModel> _logger;
+        private readonly UserManager<IdentityUser> _userManager;
 
-        public LoginModel(SignInManager<IdentityUser> signInManager, ILogger<LoginModel> logger)
+        public LoginModel(SignInManager<IdentityUser> signInManager, ILogger<LoginModel> logger, UserManager<IdentityUser> userManager)
         {
             _signInManager = signInManager;
             _logger = logger;
+            _userManager = userManager;
         }
 
         /// <summary>
@@ -116,6 +118,22 @@ namespace IbhayiPharmacy.Areas.Identity.Pages.Account
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("ApplicationUser logged in.");
+
+                    var user = await _userManager.FindByEmailAsync(Input.Email);
+                    if (await _userManager.IsInRoleAsync(user, "Customer"))
+                    {
+                        return RedirectToAction("uploadPrescription", "Customer");
+
+                    }
+                    else if (await _userManager.IsInRoleAsync(user, "Phamacist"))
+                    {
+                        return RedirectToAction("Index", "Phamacist");
+                    }
+                    else if (await _userManager.IsInRoleAsync(user, "Phamacy Manager"))
+                    {
+                        return RedirectToAction("Index", "PharmacyManager");
+                    }
+
                     return LocalRedirect(returnUrl);
                 }
                 if (result.RequiresTwoFactor)
