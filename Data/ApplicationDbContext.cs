@@ -42,7 +42,16 @@ namespace IbhayiPharmacy.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            
+
+            modelBuilder.Entity<CustomerAllergy>()
+                .HasOne(ca => ca.Customer)
+                .WithMany(c => c.CustomerAllergies)
+                .HasForeignKey(ca => ca.CustomerId);
+
+            modelBuilder.Entity<CustomerAllergy>()
+                .HasOne(ca => ca.Allergy)
+                .WithMany(a => a.CustomerAllergies)
+                .HasForeignKey(ca => ca.AllergyId);
 
 
 
@@ -103,11 +112,11 @@ namespace IbhayiPharmacy.Data
                 new DosageForm { DosageFormID = 12, DosageFormName = "Powder" }
             );
 
-//            modelBuilder.Entity<Allergy>().HasData(
-//    new Allergy { AllergyId = 1, Name = "Penicillin" },
-//    new Allergy { AllergyId = 2, Name = "Peanuts" },
-//    new Allergy { AllergyId = 3, Name = "Shellfish" }
-//);
+            modelBuilder.Entity<Allergy>().HasData(
+                new Allergy { AllergyId = 1, Name = "Penicillin" },
+                new Allergy { AllergyId = 2, Name = "Peanuts" },
+                new Allergy { AllergyId = 3, Name = "Shellfish" }
+            );
 
 
             // Seed Suppliers
@@ -168,11 +177,11 @@ namespace IbhayiPharmacy.Data
             //    new Customer { CustormerID = 3, UserId = 8, Allergy = "Dust" }
             //);
 
-            // Seed Customer Allergies
-            modelBuilder.Entity<CustomerAllergy>().HasData(
-                new CustomerAllergy { Customer_AllergyId = 1, CustomerId = 2, Active_IngredientID = 4 }, // Jane allergic to Histarelin
-                new CustomerAllergy { Customer_AllergyId = 2, CustomerId = 3, Active_IngredientID = 7 }  // Bob allergic to Bronchomid
-            );
+            //// Seed Customer Allergies
+            //modelBuilder.Entity<CustomerAllergy>().HasData(
+            //    new CustomerAllergy { Customer_AllergyId = 1, CustomerId = 2, Active_IngredientID = 4 }, // Jane allergic to Histarelin
+            //    new CustomerAllergy { Customer_AllergyId = 2, CustomerId = 3, Active_IngredientID = 7 }  // Bob allergic to Bronchomid
+            //);
 
             // Seed Medications
             modelBuilder.Entity<Medication>().HasData(

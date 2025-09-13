@@ -20,7 +20,7 @@ namespace IbhayiPharmacy.Controllers
             _context = context;
         }
 
-        // Register
+        // GET: Register
         [HttpGet]
         public IActionResult Register()
         {
@@ -31,31 +31,36 @@ namespace IbhayiPharmacy.Controllers
                     {
                         Value = a.AllergyId.ToString(),
                         Text = a.Name
-                    })
-                    .ToList()
+                    }).ToList()
             };
 
             return View(viewModel);
         }
 
+        // POST: Register
         [HttpPost]
         public async Task<IActionResult> Register(CustomerRegisterViewModel model)
         {
+            // Debug log: check that POST is triggered
+            Console.WriteLine("POST triggered!");
+            Console.WriteLine($"Name: {model.Name}, Email: {model.Email}, SelectedAllergies: {model.SelectedAllergies}");
+
+            // Check model validation
             if (!ModelState.IsValid)
             {
-                // Re-populate dropdown if validation fails
+                Console.WriteLine("ModelState is invalid:");
+                foreach (var e in ModelState.Values.SelectMany(v => v.Errors))
+                    Console.WriteLine(e.ErrorMessage);
+
+                // Repopulate allergy dropdown
                 model.AllergiesList = _context.Allergies
-                    .Select(a => new SelectListItem
-                    {
-                        Value = a.AllergyId.ToString(),
-                        Text = a.Name
-                    })
+                    .Select(a => new SelectListItem { Value = a.AllergyId.ToString(), Text = a.Name })
                     .ToList();
 
                 return View(model);
             }
 
-            // Create customer
+            // Create the customer
             var customer = new Customer
             {
                 Name = model.Name,
@@ -66,8 +71,11 @@ namespace IbhayiPharmacy.Controllers
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword(model.Password)
             };
 
+            // Add customer to DB
             _context.Customers.Add(customer);
             await _context.SaveChangesAsync();
+
+            Console.WriteLine($"Customer saved with ID: {customer.CustomerID}");
 
             // Save selected allergies
             if (!string.IsNullOrEmpty(model.SelectedAllergies))
@@ -86,8 +94,10 @@ namespace IbhayiPharmacy.Controllers
                 }
 
                 await _context.SaveChangesAsync();
+                Console.WriteLine($"Saved {allergyIds.Count} allergies for customer {customer.CustomerID}");
             }
 
+            // Redirect to Login page
             return RedirectToAction("Login", "Customer");
         }
 
