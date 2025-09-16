@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Reflection.Metadata;
 
@@ -9,15 +10,20 @@ namespace IbhayiPharmacy.Models
         [Key]
         public int PrescriptionID { get; set; }
 
+        //[ForeignKey("ApplicationUserId")]
+        //public string ApplicationUserId { get; set; }
+        //[ValidateNever]
+        //public ApplicationUser ApplicationUser { get; set; }
+
         [Required]
         public DateTime DateIssued { get; set; }
+        [ValidateNever]
+        public byte[] Script { get; set; }
 
-        [ForeignKey("CustomerID")]
-        public int CustomerID { get; set; }
+        public bool DispenseUponApproval { get; set; }
+        public string? Status { get; set; } = "Unprocessed";
+        public List<ScriptLine>? scriptLines { get; set; } = new List<ScriptLine>();
 
-        
-        public byte Script { get; set; }
 
-       
     }
 }

@@ -9,23 +9,25 @@ using Microsoft.Identity.Client;
 
 namespace IbhayiPharmacy.Data
 {
-    public class ApplicationDbContext : IdentityDbContext
+    public class ApplicationDbContext : IdentityDbContext<IdentityUser> 
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
         }
 
+        public DbSet<PresScriptLine> PresScriptLines { get; set; }
         public DbSet<Pharmacist> Pharmacists { get; set; }
+        public DbSet<NewScript> NewScripts { get; set; }
         public DbSet<Pharmacy> Pharmacies { get; set; }
         public DbSet<PharmacyManager> PharmacyManagers { get; set; }
         public DbSet<Prescription> Prescriptions { get; set; }
         public DbSet<Customer> Customers { get; set; }
         public DbSet<Doctor> Doctors { get; set; }
         public DbSet<Medication> Medications { get; set; }
-        public DbSet<Custormer_Allergy> Custormer_Allergies { get; set; }
+        public DbSet<CustomerAllergy> Customer_Allergies { get; set; }
         public DbSet<DosageForm> DosageForms { get; set; }
-        public DbSet<Supplier> Suppliers { get; set; }
+        public DbSet<Supplier> Suppliers { get; set; } 
         public DbSet<Active_Ingredient> Active_Ingredients { get; set; }
         public DbSet<Medication_Ingredient> Medication_Ingredients { get; set; }
         public DbSet<Order> Orders { get; set; }
@@ -35,10 +37,24 @@ namespace IbhayiPharmacy.Data
         public DbSet<StockOrder> StockOrders { get; set; }
         public DbSet<StockOrderDetail> StockOrderDetails { get; set; }
         public DbSet<ScriptLine> ScriptLines { get; set; }
+        public DbSet<Allergy> Allergies { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<CustomerAllergy>()
+                .HasOne(ca => ca.Customer)
+                .WithMany(c => c.CustomerAllergies)
+                .HasForeignKey(ca => ca.CustomerId);
+
+            modelBuilder.Entity<CustomerAllergy>()
+                .HasOne(ca => ca.Allergy)
+                .WithMany(a => a.CustomerAllergies)
+                .HasForeignKey(ca => ca.AllergyId);
+
+
+
 
             // Seed data
             SeedData(modelBuilder);
@@ -96,14 +112,32 @@ namespace IbhayiPharmacy.Data
                 new DosageForm { DosageFormID = 12, DosageFormName = "Powder" }
             );
 
+            modelBuilder.Entity<Allergy>().HasData(
+                new Allergy { AllergyId = 1, Name = "Penicillin" },
+                new Allergy { AllergyId = 2, Name = "Peanuts" },
+                new Allergy { AllergyId = 3, Name = "Shellfish" }
+            );
+
+
             // Seed Suppliers
-            //modelBuilder.Entity<Supplier>().HasData(
-            //    new Supplier { SupplierID = 1, SupplierName = "NovaCure", ContactName = "Davie", ContactSurname = "Jones", EmailAddress = "davie@example.com" },
-            //    new Supplier { SupplierID = 2, SupplierName = "HelixMed", ContactName = "Nicky", ContactSurname = "Mostert", EmailAddress = "nmostert@mandela.ac.za" },
-            //    new Supplier { SupplierID = 3, SupplierName = "VitaGenix", ContactName = "Matimu", ContactSurname = "Vuqa", EmailAddress = "matimu@example.com" },
-            //    new Supplier { SupplierID = 4, SupplierName = "Apex Biomed", ContactName = "Lulu", ContactSurname = "Ndhambi", EmailAddress = "lulu@example.com" },
-            //    new Supplier { SupplierID = 5, SupplierName = "CuraNova", ContactName = "Pharmacy Manager Group Member Name", ContactSurname = "Pharmacy Manager Group Member Surname", EmailAddress = "Pharmacy Manager Group Member E-mail" }
-            //);
+            modelBuilder.Entity<Supplier>().HasData(
+                new Supplier { SupplierID = 1, SupplierName = "NovaCure", ContactName = "Davie", ContactSurname = "Jones", EmailAddress = "davie@example.com" },
+                new Supplier { SupplierID = 2, SupplierName = "HelixMed", ContactName = "Nicky", ContactSurname = "Mostert", EmailAddress = "nmostert@mandela.ac.za" },
+                new Supplier { SupplierID = 3, SupplierName = "VitaGenix", ContactName = "Matimu", ContactSurname = "Vuqa", EmailAddress = "matimu@example.com" },
+                new Supplier { SupplierID = 4, SupplierName = "Apex Biomed", ContactName = "Lulu", ContactSurname = "Ndhambi", EmailAddress = "lulu@example.com" },
+                new Supplier { SupplierID = 5, SupplierName = "CuraNova", ContactName = "Pharmacy Manager Group Member Name", ContactSurname = "Pharmacy Manager Group Member Surname", EmailAddress = "Pharmacy Manager Group Member E-mail" }
+            );
+
+            // Seed Doctors
+            modelBuilder.Entity<Doctor>().HasData(
+                new Doctor { DoctorID = 1, Name = "Charmaine", Surname = "Meintjies", ContactNumber = "071 234 5678", Email = "charmaine@example.com", HealthCouncilRegistrationNumber = "976431" },
+                new Doctor { DoctorID = 2, Name = "Jacob", Surname = "Moloi", ContactNumber = "072 234 5678", Email = "jacob@example.com", HealthCouncilRegistrationNumber = "316497" },
+                new Doctor { DoctorID = 3, Name = "David", Surname = "Greeff", ContactNumber = "073 234 5678", Email = "david@gmail.example", HealthCouncilRegistrationNumber = "718293" },
+                new Doctor { DoctorID = 4, Name = "Karien", Surname = "Momberg", ContactNumber = "075 234 5678", Email = "karien@example.com", HealthCouncilRegistrationNumber = "159753" },
+                new Doctor { DoctorID = 5, Name = "Felicity", Surname = "Daniels", ContactNumber = "076 234 5678", Email = "felicity@example.com", HealthCouncilRegistrationNumber = "951357" },
+                new Doctor { DoctorID = 6, Name = "Errol", Surname = "Pieterse", ContactNumber = "078 234 5678", Email = "errol@example.com", HealthCouncilRegistrationNumber = "852456" },
+                new Doctor { DoctorID = 7, Name = "Alyce", Surname = "Morapedi", ContactNumber = "079 234 5678", Email = "alyce@example.com", HealthCouncilRegistrationNumber = "654852" }
+            );
 
             // Seed Users
             //modelBuilder.Entity<ApplicationUser>().HasData(
@@ -143,11 +177,11 @@ namespace IbhayiPharmacy.Data
             //    new Customer { CustormerID = 3, UserId = 8, Allergy = "Dust" }
             //);
 
-            // Seed Customer Allergies
-            modelBuilder.Entity<Custormer_Allergy>().HasData(
-                new Custormer_Allergy { Custormer_AllergyID = 1, CustormerID = 2, Active_IngredientID = 4 }, // Jane allergic to Histarelin
-                new Custormer_Allergy { Custormer_AllergyID = 2, CustormerID = 3, Active_IngredientID = 7 }  // Bob allergic to Bronchomid
-            );
+            //// Seed Customer Allergies
+            //modelBuilder.Entity<CustomerAllergy>().HasData(
+            //    new CustomerAllergy { Customer_AllergyId = 1, CustomerId = 2, Active_IngredientID = 4 }, // Jane allergic to Histarelin
+            //    new CustomerAllergy { Customer_AllergyId = 2, CustomerId = 3, Active_IngredientID = 7 }  // Bob allergic to Bronchomid
+            //);
 
             // Seed Medications
             modelBuilder.Entity<Medication>().HasData(
@@ -194,16 +228,7 @@ namespace IbhayiPharmacy.Data
                 new Medication_Ingredient { Medication_IngredientID = 22, MedicationID = 15, Active_IngredientID = 13, Strength = "20mg" }
             );
 
-            // Seed Doctors
-            modelBuilder.Entity<Doctor>().HasData(
-                new Doctor { DoctorID = 1, Name = "Charmaine", Surname = "Meintjies", ContactNumber = "071 234 5678", Email = "charmaine@example.com", HealthCouncilRegistrationNumber = "976431" },
-                new Doctor { DoctorID = 2, Name = "Jacob", Surname = "Moloi", ContactNumber = "072 234 5678", Email = "jacob@example.com", HealthCouncilRegistrationNumber = "316497" },
-                new Doctor { DoctorID = 3, Name = "David", Surname = "Greeff", ContactNumber = "073 234 5678", Email = "david@gmail.example", HealthCouncilRegistrationNumber = "718293" },
-                new Doctor { DoctorID = 4, Name = "Karien", Surname = "Momberg", ContactNumber = "075 234 5678", Email = "karien@example.com", HealthCouncilRegistrationNumber = "159753" },
-                new Doctor { DoctorID = 5, Name = "Felicity", Surname = "Daniels", ContactNumber = "076 234 5678", Email = "felicity@example.com", HealthCouncilRegistrationNumber = "951357" },
-                new Doctor { DoctorID = 6, Name = "Errol", Surname = "Pieterse", ContactNumber = "078 234 5678", Email = "errol@example.com", HealthCouncilRegistrationNumber = "852456" },
-                new Doctor { DoctorID = 7, Name = "Alyce", Surname = "Morapedi", ContactNumber = "079 234 5678", Email = "alyce@example.com", HealthCouncilRegistrationNumber = "654852" }
-            );
+            
         }
     }
 }

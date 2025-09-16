@@ -10,10 +10,14 @@ namespace IbhayiPharmacy.Models
         [Required]
         public string SupplierName { get; set; }
 
-        [Required]
-        public string ContactNumber { get; set; }
+        public String ContactName { get; set; }
+
+        public string ContactSurname { get; set; }
+
+        //[Required]
+        //public string ContactNumber { get; set; }
 
         [Required]
-        public string Email { get; set; }
+        public string EmailAddress { get; set; }
     }
 }

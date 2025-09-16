@@ -1,8 +1,8 @@
-﻿@{
-    ViewData["Title"] = "Register";
-    Layout = null; // remove this if you're using a shared layout
-}
+﻿@model IbhayiPharmacy.Models.CustomerVM.CustomerRegisterViewModel
 
+@{
+    ViewData["Title"] = "Register";
+}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -15,73 +15,120 @@
     <div class="register-container">
         <h2>Registration</h2>
         <form asp-action="Register" asp-controller="Customer" method="post" id="registerForm">
-            <input type="text" id="name" name="name" placeholder="Name" />
-            <span class="error-message" id="nameError"></span>
+            <input asp-for="Name" placeholder="Name" />
+            <span asp-validation-for="Name" class="error-message"></span>
 
-            <input type="text" id="surname" name="surname" placeholder="Surname" />
-            <span class="error-message" id="surnameError"></span>
+            <input asp-for="Surname" placeholder="Surname" />
+            <span asp-validation-for="Surname" class="error-message"></span>
 
-            <input type="text" id="idNumber" name="idNumber" placeholder="ID Number" />
-            <span class="error-message" id="idError"></span>
+            <input asp-for="IdNumber" placeholder="ID Number" />
+            <span asp-validation-for="IdNumber" class="error-message"></span>
 
-            <input type="tel" id="cellphone" name="cellphone" placeholder="Cellphone Number" />
-            <span class="error-message" id="cellphoneError"></span>
+            <input asp-for="Cellphone" placeholder="Cellphone" />
+            <span asp-validation-for="Cellphone" class="error-message"></span>
 
-            <input type="email" id="email" name="email" placeholder="Email Address" />
-            <span class="error-message" id="emailError"></span>
-
-            <div class="password-wrapper">
-                <input type="password" id="password" name="password" placeholder="Password" />
-                <span class="toggle-icon" onclick="togglePassword('password', this)">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="feather feather-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"></path>
-                        <circle cx="12" cy="12" r="3"></circle>
-                    </svg>
-                </span>
-            </div>
-            <span class="error-message" id="passwordError"></span>
+            <input asp-for="Email" placeholder="Email" />
+            <span asp-validation-for="Email" class="error-message"></span>
 
             <div class="password-wrapper">
-                <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm Password" />
-                <span class="toggle-icon" onclick="togglePassword('confirmPassword', this)">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="feather feather-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"></path>
-                        <circle cx="12" cy="12" r="3"></circle>
-                    </svg>
-                </span>
+                <input asp-for="Password" type="password" placeholder="Password" id="Password" />
+                <span class="toggle-icon" onclick="togglePassword('Password', this)">👁</span>
             </div>
-            <span class="error-message" id="confirmPasswordError"></span>
+            <span asp-validation-for="Password" class="error-message"></span>
 
-            <!-- Allergy picker -->
+            <div class="password-wrapper">
+                <input asp-for="ConfirmPassword" type="password" placeholder="Confirm Password" id="ConfirmPassword" />
+                <span class="toggle-icon" onclick="togglePassword('ConfirmPassword', this)">👁</span>
+            </div>
+            <span asp-validation-for="ConfirmPassword" class="error-message"></span>
+
+            <!-- Allergy Picker -->
             <div class="allergy-section">
-                <select id="allergySelect">
+                <label for="allergySelect">Select Allergy</label>
+                <select id="allergySelect" class="form-control">
                     <option value="" disabled selected hidden>Select an allergy</option>
-                    <option value="Penicillin">Penicillin</option>
-                    <option value="Aspirin">Aspirin</option>
-                    <option value="Latex">Latex</option>
-                    <option value="Peanuts">Peanuts</option>
-                    <option value="Shellfish">Shellfish</option>
-                    <option value="None">None</option>
+                    @foreach (var allergy in Model.AllergiesList)
+                    {
+                        <option value="@allergy.Value">@allergy.Text</option>
+                    }
                 </select>
-
                 <button type="button" id="addAllergyBtn" class="add-allergy-btn">Add Allergy</button>
 
-                <!-- live “cart” list -->
-                <ul id="allergyCart" class="allergy-cart"></ul>
+                <ul id="allergyCart" class="allergy-cart">
+                    @if (ViewBag.SelectedAllergyNames != null)
+                    {
+                        foreach (var name in (List<string>)ViewBag.SelectedAllergyNames)
+                        {
+                            <li>@name <button type="button" class="remove-btn" onclick="removeAllergyFromServerList(this)">×</button></li>
+                        }
+                    }
+                </ul>
             </div>
+
+            <input type="hidden" asp-for="SelectedAllergies" id="SelectedAllergies" value="@Model.SelectedAllergies" />
 
             <button type="submit">Submit</button>
         </form>
-
-        <div id="confirmationModal" class="modal hidden">
-            <div class="modal-content">
-                <h2>Registration Successful!</h2>
-                <p>Your information has been saved.</p>
-                <a asp-controller="Customer" asp-action="Login" class="login-link">Proceed to Login</a>
-            </div>
-        </div>
     </div>
 
-    <script src="~/js/Customer/Register.js"></script>
+    @section Scripts {
+        <partial name="_ValidationScriptsPartial" />
+        @* <script src="~/js/Customer/Register.js"></script> *@
+    }
+
+    <script>
+        let allergies = [];
+
+        document.addEventListener("DOMContentLoaded", () => {
+            // Initialize from server-rendered JSON
+            const selected = @Html.Raw(ViewBag.SelectedAllergiesJson ?? "[]");
+            allergies = selected; // array of { AllergyId, Name }
+            updateAllergyCart();
+        });
+
+        function updateAllergyCart() {
+            const allergyCart = document.getElementById('allergyCart');
+            const hiddenAllergiesInput = document.getElementById('SelectedAllergies');
+            allergyCart.innerHTML = '';
+
+            allergies.forEach((item, i) => {
+                const li = document.createElement('li');
+                li.textContent = item.Name;
+
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.textContent = '×';
+                btn.className = 'remove-btn';
+                btn.onclick = () => removeAllergy(i);
+
+                li.appendChild(btn);
+                allergyCart.appendChild(li);
+            });
+
+            // Update hidden field with IDs only
+            hiddenAllergiesInput.value = allergies.map(a => a.AllergyId).join(',');
+        }
+
+        function removeAllergy(i) {
+            allergies.splice(i, 1);
+            updateAllergyCart();
+        }
+
+        // Add allergy from dropdown
+        document.getElementById('addAllergyBtn').addEventListener('click', () => {
+            const select = document.getElementById('allergySelect');
+            const chosenOption = select.options[select.selectedIndex];
+            if (!chosenOption || chosenOption.value === "" || allergies.some(a => a.AllergyId == chosenOption.value)) return;
+
+            allergies.push({ AllergyId: chosenOption.value, Name: chosenOption.text });
+            updateAllergyCart();
+        });
+
+        // Password toggle
+        function togglePassword(fieldId, icon) {
+            const field = document.getElementById(fieldId);
+            field.type = field.type === 'password' ? 'text' : 'password';
+        }
+    </script>
 </body>
 </html>

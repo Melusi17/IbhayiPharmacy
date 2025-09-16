@@ -22,6 +22,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using IbhayiPharmacy.Utility;
+using IbhayiPharmacy.Data;
+using IbhayiPharmacy.Models.PharmacistVM;
 
 namespace IbhayiPharmacy.Areas.Identity.Pages.Account
 {
@@ -34,13 +36,16 @@ namespace IbhayiPharmacy.Areas.Identity.Pages.Account
         private readonly IUserEmailStore<IdentityUser> _emailStore;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
+        private readonly ApplicationDbContext _db;
 
         public RegisterModel(
+         
             UserManager<IdentityUser> userManager,
             IUserStore<IdentityUser> userStore,
             SignInManager<IdentityUser> signInManager,
             RoleManager<IdentityRole> roleManager,
             ILogger<RegisterModel> logger,
+            ApplicationDbContext db,
             IEmailSender emailSender)
         {
             _signInManager = signInManager;
@@ -51,6 +56,7 @@ namespace IbhayiPharmacy.Areas.Identity.Pages.Account
             _signInManager = signInManager;
             _logger = logger;
             _emailSender = emailSender;
+            _db = db;
         }
 
         /// <summary>
@@ -119,8 +125,9 @@ namespace IbhayiPharmacy.Areas.Identity.Pages.Account
             public string IDNumber { get; set; }
 
             public string? CellphoneNumber { get; set; }
-
-
+            public int Active_IngredientID { get; set; }
+            [ValidateNever]
+            public IEnumerable<SelectListItem> AlergyList { get; set; }
 
 
         }
@@ -140,8 +147,16 @@ namespace IbhayiPharmacy.Areas.Identity.Pages.Account
                 {
                     Text = n,
                     Value = n
+                }),
+                AlergyList = _db.Active_Ingredients.Select(a => new SelectListItem
+                {
+
+                    Text = a.Name,
+                    Value = a.Active_IngredientID.ToString()
                 })
             };
+          
+
             ReturnUrl = returnUrl;
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
         }
@@ -159,7 +174,11 @@ namespace IbhayiPharmacy.Areas.Identity.Pages.Account
                 user.IDNumber = Input.IDNumber;
                 user.CellphoneNumber = Input.CellphoneNumber;
                 user.Email = Input.Email;
-          
+
+                if (Input.Role == SD.Role_Customer)
+                {
+                    user.Active_IngredientID = Input.Active_IngredientID;
+                }
 
 
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);

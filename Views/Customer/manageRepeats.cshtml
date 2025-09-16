@@ -1,368 +1,4 @@
-﻿@* @{
-    ViewData["Title"] = "Manage Repeats";
-    Layout = "~/Views/Shared/CustomerLayout/_CustomerLayout.cshtml";
-}
-<style>
-    body {
-        font-family: Arial, sans-serif;
-        background-color: #f7f9fb;
-        color: #333;
-    }
-
-    .upload-prescription-panel {
-        max-width: 1000px;
-        margin: 30px auto;
-        padding: 30px;
-        background-color: #ffffff;
-        border: 1px solid #ccc;
-        border-radius: 10px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
-
-    h2 {
-        color: #1f9f77 ;
-        margin-bottom: 20px;
-    }
-
-    .prescription-table, .modal-table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 20px;
-        background-color: #ffffff;
-        border: 1px solid #ccc;
-        border-radius: 8px;
-        overflow: hidden;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    }
-
-        .prescription-table th, .prescription-table td,
-        .modal-table th, .modal-table td {
-            padding: 12px;
-            text-align: center;
-            border: 1px solid #ccc;
-        }
-
-        .prescription-table thead,
-        .modal-table thead {
-            background-color: #1f9f77;
-            color: white;
-        }
-
-        .prescription-table tbody tr:nth-child(even),
-        .modal-table tbody tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
-
-        .prescription-table tbody tr:hover,
-        .modal-table tbody tr:hover {
-            background-color: #e3f5f0;
-        }
-
-    .order-row {
-        cursor: pointer;
-        background-color: #d6f5e3;
-        font-weight: bold;
-        color: #0d3d2c;
-    }
-
-        .order-row:hover {
-            background-color: #c0ecd5;
-        }
-
-    .medication-details {
-        display: none;
-        background-color: #f9f9f9;
-    }
-
-        .medication-details tr:hover {
-            background-color: #f0f0f0;
-        }
-
-    .btn-upload {
-        background-color: #1f9f77;
-        color: white;
-        padding: 6px 12px;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        font-weight: 600;
-        transition: background-color 0.3s ease;
-    }
-
-        .btn-upload:hover {
-            background-color: #28bf96;
-        }
-
-    .modal {
-        display: none;
-        position: fixed;
-        z-index: 9999;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        overflow: auto;
-        background: rgba(0, 0, 0, 0.5);
-    }
-
-    .modal-content {
-        background-color: #ffffff;
-        margin: 10% auto;
-        padding: 25px;
-        border-radius: 10px;
-        width: 600px;
-        position: relative;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-        color: #333;
-    }
-
-        .modal-content h3 {
-            color: #1f9f77;
-            margin-bottom: 15px;
-        }
-
-    .close {
-        position: absolute;
-        right: 15px;
-        top: 10px;
-        color: #999;
-        font-size: 24px;
-        cursor: pointer;
-        font-weight: bold;
-    }
-
-        .close:hover {
-            color: red;
-        }
-
-    tr:hover {
-        background-color: #f5f5f5;
-    }
-
-    .blurred {
-        color: #aaa;
-        pointer-events: none;
-        opacity: 0.6;
-    }
-
-</style>
-
-<div class="upload-prescription-panel">
-    <h2>🔁 Manage Repeats</h2>
-    <table class="prescription-table">
-        <thead>
-            <tr>
-                <th colspan="4">Click an order to see medication details and repeats history</th>
-            </tr>
-        </thead>
-        <tbody id="orderTableBody">
-            <!-- Populated by JS -->
-        </tbody>
-    </table>
-</div>
-
-<!-- Modal -->
-<div id="medicationModal" class="modal">
-    <div class="modal-content">
-        <span class="close" onclick="closeModal()">&times;</span>
-        <h3 id="modalMedicationName">Medication Name</h3>
-        <table class="modal-table">
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Repeats Left</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody id="modalHistoryBody">
-                <!-- JS Injected -->
-            </tbody>
-        </table>
-    </div>
-</div>
-
-<script>
-    const orders = [
-        {
-            orderNo: "ORD1001",
-            medications: [
-                {
-                    name: "Amoxicillin 250mg",
-                    doctor: "Dr. John Smith",
-                    instruction: "1 capsule three times a day",
-                    qty: 20,
-                    history: []
-                },
-                {
-                    name: "Ibuprofen 200mg",
-                    doctor: "Dr. John Smith",
-                    instruction: "Take after meals",
-                    qty: 15,
-                    history: []
-                }
-            ]
-        },
-        {
-            orderNo: "ORD1002",
-            medications: [
-                {
-                    name: "Paracetamol 500mg",
-                    doctor: "Dr. Emily White",
-                    instruction: "1 tablet every 6 hours",
-                    qty: 30,
-                    history: []
-                },
-                {
-                    name: "Cetrizine 10mg",
-                    doctor: "Dr. Emily White",
-                    instruction: "Take one tablet at night",
-                    qty: 10,
-                    history: []
-                }
-            ]
-        }
-    ];
-
-    function initializeHistory() {
-        const today = new Date();
-
-        // Order 1
-        let med1 = orders[0].medications[0];
-        for (let i = 4; i >= 1; i--) {
-            let date = new Date(today.getFullYear(), today.getMonth() - (4 - i), today.getDate());
-            med1.history.push({ date: date.toISOString().split('T')[0], repeatsLeft: i });
-        }
-
-        let med2 = orders[0].medications[1];
-        for (let i = 2; i >= 1; i--) {
-            let date = new Date(today.getFullYear(), today.getMonth() - (2 - i), today.getDate());
-            med2.history.push({ date: date.toISOString().split('T')[0], repeatsLeft: i });
-        }
-
-        // Order 2
-        let med3 = orders[1].medications[0];
-        for (let i = 3; i >= 1; i--) {
-            let date = new Date(today.getFullYear(), today.getMonth() - (3 - i), today.getDate());
-            med3.history.push({ date: date.toISOString().split('T')[0], repeatsLeft: i });
-        }
-
-        let med4 = orders[1].medications[1];
-        for (let i = 1; i >= 1; i--) {
-            let date = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-            med4.history.push({ date: date.toISOString().split('T')[0], repeatsLeft: i });
-        }
-    }
-
-    function renderOrders() {
-        const tbody = document.getElementById("orderTableBody");
-        tbody.innerHTML = "";
-
-        orders.forEach((order, index) => {
-            const orderRow = document.createElement("tr");
-            orderRow.classList.add("order-row");
-            orderRow.innerHTML = `<td colspan="4">${order.orderNo}</td>`;
-            orderRow.addEventListener("click", () => toggleMedication(index));
-            tbody.appendChild(orderRow);
-
-            const medRow = document.createElement("tr");
-            medRow.classList.add("medication-details");
-            medRow.id = `med-details-${index}`;
-            medRow.innerHTML = `
-                <td colspan="4">
-                    <table class="prescription-table">
-                        <thead>
-                            <tr>
-                                <th>Doctor</th>
-                                <th>Medication</th>
-                                <th>Instruction</th>
-                                <th>Qty</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${order.medications.map((med, i) => `
-                                <tr onclick="openModal('${med.name}', ${JSON.stringify(med.history).replace(/"/g, '&quot;')}, ${index}, ${i})" style="cursor:pointer;">
-                                    <td>${med.doctor}</td>
-                                    <td>${med.name}</td>
-                                    <td>${med.instruction}</td>
-                                    <td>${med.qty}</td>
-                                </tr>
-                            `).join("")}
-                        </tbody>
-                    </table>
-                </td>
-            `;
-            tbody.appendChild(medRow);
-        });
-    }
-
-    function toggleMedication(index) {
-        const row = document.getElementById(`med-details-${index}`);
-        row.style.display = row.style.display === "table-row" ? "none" : "table-row";
-    }
-
-    function openModal(medName, history, orderIndex, medIndex) {
-        document.getElementById("modalMedicationName").innerText = medName;
-        const body = document.getElementById("modalHistoryBody");
-        body.innerHTML = "";
-
-        history.forEach(h => {
-            const tr = document.createElement("tr");
-            if (h.repeatsLeft === 1) {
-                tr.innerHTML = `
-                    <td>${h.date}</td>
-                    <td>${h.repeatsLeft}</td>
-                    <td>
-                        <button class="btn-upload" onclick="requestRefill(${orderIndex}, ${medIndex})">Request Refill</button>
-                    </td>
-                `;
-            } else {
-                tr.innerHTML = `
-                    <td style="color:#999;">${h.date}</td>
-                    <td style="color:#999;">${h.repeatsLeft}</td>
-                    <td><span style="color: lightgray;">Refill used</span></td>
-                `;
-            }
-            body.appendChild(tr);
-        });
-
-        document.getElementById("medicationModal").style.display = "block";
-    }
-
-    function closeModal() {
-        document.getElementById("medicationModal").style.display = "none";
-    }
-
-    function requestRefill(orderIndex, medIndex) {
-        const med = orders[orderIndex].medications[medIndex];
-        const last = med.history[med.history.length - 1];
-        if (last.repeatsLeft <= 1) {
-            alert("This is your final repeat.");
-        }
-
-        const newRepeat = last.repeatsLeft - 1;
-
-        if (newRepeat <= 0) {
-            alert("No repeats left.");
-            return;
-        }
-
-        const today = new Date().toISOString().split('T')[0];
-        med.history.push({
-            date: today,
-            repeatsLeft: newRepeat
-        });
-
-        openModal(med.name, med.history, orderIndex, medIndex);
-        alert(`Refill requested for ${med.name}. Repeats left: ${newRepeat}`);
-    }
-
-    window.onload = () => {
-        initializeHistory();
-        renderOrders();
-    };
-</script>
- *@
-@{
+﻿@{
     ViewData["Title"] = "Manage Repeats";
     Layout = "~/Views/Shared/CustomerLayout/_CustomerLayout.cshtml";
 }
@@ -438,10 +74,6 @@
         background-color: #f9f9f9;
     }
 
-        .medication-details tr:hover {
-            background-color: #f0f0f0;
-        }
-
     .btn-upload {
         background-color: #1f9f77;
         color: white;
@@ -483,6 +115,8 @@
         .modal-content h3 {
             color: #1f9f77;
             margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
         }
 
     .close {
@@ -499,14 +133,10 @@
             color: red;
         }
 
-    tr:hover {
-        background-color: #f5f5f5;
-    }
-
-    .blurred {
-        color: #aaa;
-        pointer-events: none;
-        opacity: 0.6;
+    .modal-footer {
+        text-align: right;
+        margin-top: 15px;
+        font-weight: bold;
     }
 </style>
 
@@ -521,12 +151,10 @@
             </tr>
         </thead>
         <tbody>
-            <!-- Example order row -->
             <tr class="order-row" data-order-id="1">
-                <td>Dr. Smith</td>
-                <td>2025-05-10</td>
+                <td data-doctor="Dr. Smith">Dr. Smith</td>
+                <td data-date="2025-05-10">2025-05-10</td>
             </tr>
-            <!-- Prescription details row, initially hidden -->
             <tr class="medication-details" data-parent-id="1">
                 <td colspan="2">
                     <table class="modal-table">
@@ -538,13 +166,13 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr class="prescription-row" data-order-id="1" data-med-id="101">
-                                <td>Amoxicillin 500mg</td>
+                            <tr class="prescription-row" data-order-id="1" data-med-id="101" data-medication="Amoxicillin 500mg" data-price="12.00" data-qty="21">
+                                <td class="medication-name">Amoxicillin 500mg</td>
                                 <td>Take one capsule thrice daily</td>
                                 <td>21</td>
                             </tr>
-                            <tr class="prescription-row" data-order-id="1" data-med-id="102">
-                                <td>Paracetamol 500mg</td>
+                            <tr class="prescription-row" data-order-id="1" data-med-id="102" data-medication="Paracetamol 500mg" data-price="6.00" data-qty="24">
+                                <td class="medication-name">Paracetamol 500mg</td>
                                 <td>Take two tablets every 6 hours</td>
                                 <td>24</td>
                             </tr>
@@ -553,10 +181,9 @@
                 </td>
             </tr>
 
-            <!-- Another order example -->
             <tr class="order-row" data-order-id="2">
-                <td>Dr. Johnson</td>
-                <td>2025-05-08</td>
+                <td data-doctor="Dr. Johnson">Dr. Johnson</td>
+                <td data-date="2025-05-08">2025-05-08</td>
             </tr>
             <tr class="medication-details" data-parent-id="2">
                 <td colspan="2">
@@ -569,8 +196,8 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr class="prescription-row" data-order-id="2" data-med-id="201">
-                                <td>Ibuprofen 400mg</td>
+                            <tr class="prescription-row" data-order-id="2" data-med-id="201" data-medication="Ibuprofen 400mg" data-price="8.50" data-qty="15">
+                                <td class="medication-name">Ibuprofen 400mg</td>
                                 <td>Take one tablet every 8 hours</td>
                                 <td>15</td>
                             </tr>
@@ -582,11 +209,11 @@
     </table>
 </div>
 
-<!-- Modal for refill history -->
+<!-- Refill History Modal -->
 <div class="modal" id="refill-modal">
     <div class="modal-content">
         <span class="close" id="modal-close">&times;</span>
-        <h3>Refill History & Request</h3>
+        <h3 id="modal-medication-title">Refill History & Request</h3>
         <table class="modal-table" id="refill-history-table">
             <thead>
                 <tr>
@@ -597,36 +224,42 @@
                 </tr>
             </thead>
             <tbody>
-                <!-- Filled dynamically -->
+                <!-- Filled by JS -->
             </tbody>
         </table>
     </div>
 </div>
 
+<!-- Order Summary Modal -->
+<div class="modal" id="order-summary-modal">
+    <div class="modal-content">
+        <span class="close" id="order-summary-close">&times;</span>
+        <h3>
+            <span id="summary-order-no">Order No: </span>
+            <span id="summary-order-date" style="float:right;"></span>
+        </h3>
+        <p><strong>Doctor:</strong> <span id="summary-doctor"></span></p>
+        <table class="modal-table">
+            <thead>
+                <tr>
+                    <th>Medication</th>
+                    <th>Qty</th>
+                    <th>Price</th>
+                    <th>Subtotal</th>
+                </tr>
+            </thead>
+            <tbody id="order-summary-body">
+                <!-- JS will populate -->
+            </tbody>
+        </table>
+        <div class="modal-footer">
+            Total: R<span id="order-total">0.00</span>
+        </div>
+    </div>
+</div>
+
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Toggle prescription details when clicking an order row
-        document.querySelectorAll('.order-row').forEach(orderRow => {
-            orderRow.addEventListener('click', () => {
-                const orderId = orderRow.getAttribute('data-order-id');
-                const detailsRow = document.querySelector(`.medication-details[data-parent-id='${orderId}']`);
-                if (detailsRow.style.display === 'table-row') {
-                    detailsRow.style.display = 'none';
-                } else {
-                    // Hide any other open details first
-                    document.querySelectorAll('.medication-details').forEach(row => row.style.display = 'none');
-                    detailsRow.style.display = 'table-row';
-                }
-            });
-        });
-
-        // Modal elements
-        const modal = document.getElementById('refill-modal');
-        const modalClose = document.getElementById('modal-close');
-        const refillTableBody = document.querySelector('#refill-history-table tbody');
-
-        // Sample refill history data per medication id
-        // Replace with actual dynamic data in production
+    document.addEventListener('DOMContentLoaded', () => {
         const refillData = {
             "101": [
                 { date: "2025-05-15", orderNo: "ORD001", repeatsLeft: 2 },
@@ -640,12 +273,27 @@
             ]
         };
 
-        // When clicking a prescription row, open modal with refill history
-        document.querySelectorAll('.prescription-row').forEach(presRow => {
-            presRow.addEventListener('click', () => {
-                const medId = presRow.getAttribute('data-med-id');
+        const modal = document.getElementById('refill-modal');
+        const modalClose = document.getElementById('modal-close');
+        const refillTableBody = document.querySelector('#refill-history-table tbody');
+        const modalTitle = document.getElementById('modal-medication-title');
+
+        document.querySelectorAll('.order-row').forEach(row => {
+            row.addEventListener('click', () => {
+                const id = row.dataset.orderId;
+                document.querySelectorAll('.medication-details').forEach(r => r.style.display = 'none');
+                document.querySelector(`.medication-details[data-parent-id="${id}"]`).style.display = 'table-row';
+            });
+        });
+
+        document.querySelectorAll('.prescription-row').forEach(row => {
+            row.addEventListener('click', () => {
+                const medId = row.dataset.medId;
+                const medName = row.querySelector('.medication-name').textContent;
+                modalTitle.textContent = `${medName} - Refill History & Request`;
+
                 const data = refillData[medId] || [];
-                refillTableBody.innerHTML = ''; // clear previous data
+                refillTableBody.innerHTML = '';
 
                 if (data.length === 0) {
                     refillTableBody.innerHTML = `<tr><td colspan="4" style="color:#999;">No refill history found.</td></tr>`;
@@ -654,42 +302,73 @@
                         const tr = document.createElement('tr');
                         tr.innerHTML = `
                             <td>${entry.date}</td>
-                            <td>${entry.orderNo}</td>
+                            <td><a href="#" class="order-summary-link" data-order-id="${row.dataset.orderId}">${entry.orderNo}</a></td>
                             <td>${entry.repeatsLeft}</td>
                             <td>
-                                ${entry.repeatsLeft > 0 ?
-                                    `<button class="btn-upload" data-order-no="${entry.orderNo}" data-med-id="${medId}">Request Refill</button>`
-                                    : '<span style="color:#aaa;">No repeats left</span>'
-                                }
-                            </td>
-                        `;
+                                ${entry.repeatsLeft > 0
+                                    ? `<button class="btn-upload">Request Refill</button>`
+                                    : `<span style="color:#aaa;">No repeats left</span>`}
+                            </td>`;
                         refillTableBody.appendChild(tr);
                     });
                 }
-
                 modal.style.display = 'block';
             });
         });
 
-        // Close modal
-        modalClose.addEventListener('click', () => {
-            modal.style.display = 'none';
+        modalClose.addEventListener('click', () => modal.style.display = 'none');
+        window.addEventListener('click', e => {
+            if (e.target === modal) modal.style.display = 'none';
         });
 
-        window.addEventListener('click', (e) => {
-            if (e.target === modal) {
-                modal.style.display = 'none';
+        // Order Summary Modal logic
+        const orderSummaryModal = document.getElementById('order-summary-modal');
+        const orderSummaryClose = document.getElementById('order-summary-close');
+        const summaryDoctor = document.getElementById('summary-doctor');
+        const summaryOrderNo = document.getElementById('summary-order-no');
+        const summaryOrderDate = document.getElementById('summary-order-date');
+        const summaryBody = document.getElementById('order-summary-body');
+        const summaryTotal = document.getElementById('order-total');
+
+        document.addEventListener('click', function (e) {
+            if (e.target.classList.contains('order-summary-link')) {
+                e.preventDefault();
+                const orderId = e.target.dataset.orderId;
+
+                const doctor = document.querySelector(`.order-row[data-order-id="${orderId}"] td[data-doctor]`).dataset.doctor;
+                const date = document.querySelector(`.order-row[data-order-id="${orderId}"] td[data-date]`).dataset.date;
+
+                summaryDoctor.textContent = doctor;
+                summaryOrderNo.textContent = `Order No: ${e.target.textContent}`;
+                summaryOrderDate.textContent = date;
+
+                summaryBody.innerHTML = '';
+                let total = 0;
+
+                document.querySelectorAll(`.prescription-row[data-order-id="${orderId}"]`).forEach(row => {
+                    const name = row.dataset.medication;
+                    const qty = parseInt(row.dataset.qty);
+                    const price = parseFloat(row.dataset.price);
+                    const subtotal = qty * price;
+                    total += subtotal;
+
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${name}</td>
+                        <td>${qty}</td>
+                        <td>R${price.toFixed(2)}</td>
+                        <td>R${subtotal.toFixed(2)}</td>`;
+                    summaryBody.appendChild(tr);
+                });
+
+                summaryTotal.textContent = total.toFixed(2);
+                orderSummaryModal.style.display = 'block';
             }
         });
 
-        // Handle refill request button click inside modal
-        refillTableBody.addEventListener('click', e => {
-            if (e.target.tagName === 'BUTTON' && e.target.classList.contains('btn-upload')) {
-                const orderNo = e.target.getAttribute('data-order-no');
-                const medId = e.target.getAttribute('data-med-id');
-                alert(`Refill requested for medication ID ${medId} from order ${orderNo}.`);
-                // Here you can add your AJAX call to actually submit refill request
-            }
+        orderSummaryClose.addEventListener('click', () => orderSummaryModal.style.display = 'none');
+        window.addEventListener('click', e => {
+            if (e.target === orderSummaryModal) orderSummaryModal.style.display = 'none';
         });
     });
 </script>

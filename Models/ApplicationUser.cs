@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace IbhayiPharmacy.Models
 {
@@ -16,6 +17,14 @@ namespace IbhayiPharmacy.Models
         public string IDNumber { get; set; }
 
         public string? CellphoneNumber { get; set; }
-    
+        public int? Active_IngredientID { get; set; }
+
+        [NotMapped]
+        public string? Role { get; internal set; }
+        [NotMapped]
+        public string RoleId { get; set; }
+        [NotMapped]
+        public string UserClaim { get; set; }
+
     }
 }

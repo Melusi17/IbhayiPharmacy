@@ -2,10 +2,10 @@
 
 #nullable disable
 
-namespace IbhayiPharmacy.Data.Migrations
+namespace IbhayiPharmacy.Migrations
 {
     /// <inheritdoc />
-    public partial class newLogin : Migration
+    public partial class Fix2 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
