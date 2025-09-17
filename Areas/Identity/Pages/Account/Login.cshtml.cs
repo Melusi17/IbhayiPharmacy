@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
+using IbhayiPharmacy.Utility;
 
 namespace IbhayiPharmacy.Areas.Identity.Pages.Account
 {
@@ -104,7 +105,21 @@ namespace IbhayiPharmacy.Areas.Identity.Pages.Account
 
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
         {
-            returnUrl ??= Url.Content("~/");
+            if (SD.Role_Customer != null)
+            {
+                returnUrl ??= Url.Content("~/Customer/UploadPrescription");
+
+            }
+            else if (SD.Role_PhamacyManager != null)
+            {
+                returnUrl ??= Url.Content("~/PharmacyManager/Index ");
+
+            }
+            else if (SD.Role_Phamacist != null)
+            {
+                returnUrl ??= Url.Content("~/Pharmacist/Dashboard");
+
+            }
 
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
 

@@ -32,6 +32,8 @@ namespace IbhayiPharmacy.Controllers
                         Value = a.AllergyId.ToString(),
                         Text = a.Name
                     }).ToList()
+
+                
             };
 
             return View(viewModel);

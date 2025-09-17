@@ -7,7 +7,7 @@ namespace IbhayiPharmacy.Models
     public class Medication
     {
         [Key]
-        public int MedcationID { get; set; }
+        public int MedicationID { get; set; }
 
         [ForeignKey("DosageFormID")]
         public int DosageFormID { get; set; }

@@ -134,7 +134,7 @@
                     <label>Medication</label>
                     <select name="ScriptLines[${index}].MedicationID" class="form-control">
                         <option value="">-- Select Medication --</option>
-                        ${`@Html.Raw(string.Join("", Model.AvailableMedications.Select(m => $"<option value='{m.MedcationID}'>{m.MedicationName} (Stock: {m.QuantityOnHand})</option>")))`}
+                        ${`@Html.Raw(string.Join("", Model.AvailableMedications.Select(m => $"<option value='{m.MedicationID}'>{m.MedicationName} (Stock: {m.QuantityOnHand})</option>")))`}
                     </select>
                 </div>
                 <div class="form-group">

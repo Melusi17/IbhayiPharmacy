@@ -18,7 +18,40 @@ namespace IbhayiPharmacy.Models
 
         [Required]
         public string HealthCouncilRegNo { get; set; }
+
+
+
+
+
+
+
+
+
+
+
+
+
         
+
+
         
+        public string Name { get; set; }
+
+       
+        public string Surname { get; set; }
+
+        
+        public string IDNumber { get; set; }
+
+        public int CellphoneNumber { get; set; }
+
+        
+        public string Email { get; set; }
+
+        
+        public string Password { get; set; }
+
     }
+
+   
 }

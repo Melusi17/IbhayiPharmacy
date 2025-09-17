@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using System.ComponentModel.DataAnnotations;
 
 namespace IbhayiPharmacy.Models
 {
@@ -14,8 +15,8 @@ namespace IbhayiPharmacy.Models
 
         public string ContactSurname { get; set; }
 
-        //[Required]
-        //public string ContactNumber { get; set; }
+        [ValidateNever]
+        public string ContactNumber { get; set; }
 
         [Required]
         public string EmailAddress { get; set; }

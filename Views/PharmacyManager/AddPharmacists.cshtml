@@ -1,54 +1,76 @@
-﻿
+﻿@model IbhayiPharmacy.Models.Pharmacist
 @{
     ViewData["Title"] = "AddPharmacists";
     Layout = "~/Views/Shared/_ManagerLayout.cshtml";
 
 }
 
- 
+
 
 <!-- Add New Pharmacist -->
 <div class="card p-3">
     <h5 class="title-underline">Add New Pharmacist</h5>
     <div class="card-body">
-        <form>
+        <form asp-action="AddPharmacists" asp-controller="PharmacyManager" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="row">
                 <div class="col-md-6 mb-3">
-                    <label for="pharmName" class="form-label">First Name</label>
-                    <input type="text" class="form-control" id="pharmName" placeholder="e.g. Thuli">
+                    <label asp-for="Name" class="form-label">First Name</label>
+                    <input asp-for="Name" type="text" class="form-control" id="pharmName" placeholder="e.g. Thuli">
+                    <span asp-validation-for="Name" class="text-danger"></span>
                 </div>
                 <div class="col-md-6 mb-3">
-                    <label for="pharmSurname" class="form-label">Surname</label>
-                    <input type="text" class="form-control" id="pharmSurname" placeholder="e.g. Mthembu">
+                    <label asp-for="Surname" class="form-label">Surname</label>
+                    <input asp-for="Surname" type="text" class="form-control" id="pharmSurname" placeholder="e.g. Mthembu">
+                    <span asp-validation-for="Surname" class="text-danger"></span>
+
                 </div>
             </div>
 
             <div class="mb-3">
-                <label for="pharmId" class="form-label">ID Number</label>
-                <input type="text" class="form-control" id="pharmId" placeholder="e.g. 9001234567890">
+                <label asp-for="IDNumber" class="form-label">ID Number</label>
+                <input asp-for="IDNumber" type="number" class="form-control" id="pharmId" placeholder="e.g. 9001234567890">
+                <span asp-validation-for="IDNumber" class="text-danger"></span>
+
             </div>
 
             <div class="mb-3">
-                <label for="cellNumber" class="form-label">Cellphone Number</label>
-                <input type="tel" class="form-control" id="cellNumber" placeholder="e.g. 082 123 4567">
+                <label asp-for="CellphoneNumber" class="form-label">Cellphone Number</label>
+                <input asp-for="CellphoneNumber" type="tel" class="form-control" id="cellNumber" placeholder="e.g. 082 123 4567">
+                <span asp-validation-for="CellphoneNumber" class="text-danger"></span>
+
             </div>
 
             <div class="mb-3">
-                <label for="hcrNumber" class="form-label">Health Council Reg. Number</label>
-                <input type="text" class="form-control" id="hcrNumber" placeholder="e.g. HCR-000123">
+                <label asp-for="HealthCouncilRegNo" class="form-label">Health Council Reg. Number</label>
+                <input asp-for="HealthCouncilRegNo" type="text" class="form-control" id="hcrNumber" placeholder="e.g. HCR-000123">
+                <span asp-validation-for="HealthCouncilRegNo" class="text-danger"></span>
+
             </div>
 
             <div class="mb-3">
-                <label for="email" class="form-label">Email Address</label>
-                <input type="email" class="form-control" id="email" placeholder="e.g. thuli.m@pharmacy.co.za">
-            </div>
+                <label asp-for="Email" class="form-label">Email Address</label>
+                <input asp-for="Email" type="email" class="form-control" id="email" placeholder="e.g. thuli.m@pharmacy.co.za">
+                <span asp-validation-for="Email" class="text-danger"></span>
 
-            <div class="mb-3">
-                <label class="form-label">Initial Password</label>
-                <input type="text" class="form-control" value="Auto-generated & emailed" disabled>
             </div>
+            <div class="mb-3">
+                <label asp-for="Password" class="form-label">Initial Password</label>
+                <div class="input-group">
+                    <input asp-for="Password" id="Password" name="Password" type="text" class="form-control" readonly>
+                    <button type="button" class="btn btn-outline-secondary" onclick="generatePassword()">Generate</button>
+                </div>
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+            @*  <div class="mb-3">
+                <label asp-for="Password" class="form-label">Initial Password</label>
+                <input asp-for="Password" type="text" class="form-control" value="Auto-generated & emailed" disabled>
+                <span asp-validation-for="Password" class="text-danger"></span>
+
+            </div> *@
 
             <button type="submit" class="btn btn-primary">Add Pharmacist</button>
         </form>
     </div>
 </div>
+<script src="~/js/site.js"></script>

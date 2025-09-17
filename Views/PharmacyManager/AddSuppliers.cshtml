@@ -1,0 +1,39 @@
+﻿@model IbhayiPharmacy.Models.Supplier;
+@{
+    ViewData["Title"] = "Medication Suppliers";
+    Layout = "~/Views/Shared/_ManagerLayout.cshtml";
+}
+
+<div class="contain mt-4">
+
+
+    <!-- Add New Supplier Form -->
+    <div class="card p-3">
+        <h5 class="title-underline">Add New Supplier</h5>
+        <div class="card-body">
+            <form asp-action="AddSuppliers" asp-controller="PharmacyManager" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <div class="mb-3">
+                    <label asp-for="SupplierName" class="form-label">Supplier Name</label>
+                    <input asp-for="SupplierName" type="text" class="form-control" id="supplierName" placeholder="e.g. MedLife Distributors">
+                    <span asp-validation-for="SupplierName" class="text-danger"></span>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="ContactNumber" class="form-label">Contact Person</label>
+                    <input asp-for="ContactNumber" type="text" class="form-control" id="contactPerson" placeholder="e.g. Jane Doe">
+                    <span asp-validation-for="ContactNumber" class="text-danger"></span>
+
+                </div>
+                <div class="mb-3">
+                    <label asp-for="EmailAddress" for="contactEmail" class="form-label">Contact Email</label>
+                    <input asp-for="EmailAddress" type="email" class="form-control" id="contactEmail" placeholder="e.g. jane.doe@medlife.co.za">
+                    <span asp-validation-for="EmailAddress" class="text-danger"></span>
+
+                </div>
+                <button type="submit" class="btn btn-primary">Add Supplier</button>
+            </form>
+        </div>
+    </div>
+
+</div>

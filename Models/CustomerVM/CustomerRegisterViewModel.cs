@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
@@ -36,7 +37,9 @@ namespace IbhayiPharmacy.Models.CustomerVM
 
         // Allergies
         // Hidden field for storing selected allergy IDs as CSV
+        [ValidateNever]
         public string SelectedAllergies { get; set; }
+        [ValidateNever]
 
         // Dropdown source
         public List<SelectListItem> AllergiesList { get; set; }
