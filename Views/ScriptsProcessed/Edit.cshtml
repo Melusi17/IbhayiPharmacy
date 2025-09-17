@@ -1,0 +1,79 @@
+﻿@model IbhayiPharmacy.Models.PharmacistVM.CustomerScriptsVM
+
+@{
+    ViewData["Title"] = "Process Prescription";
+}
+
+<div class="container py-4">
+    <h2>Process Prescription</h2>
+    <hr />
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["Success"]
+        </div>
+    }
+
+<div class="card shadow-sm mb-4 position-relative">
+    <div class="card-body">
+     
+        <span class="badge bg-info text-dark position-absolute" style="top: 15px; right: 15px;">
+            @Model.ScriptList.FirstOrDefault()?.Status
+        </span>
+
+        <h4>Customer Details</h4>
+        <p><strong>Name:</strong> @Model.Name</p>
+        <p><strong>Surname:</strong> @Model.Surname</p>
+        <p><strong>Identity Number:</strong> @Model.IDNumber</p>
+    </div>
+</div>
+
+
+ 
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <h4>Prescription Details</h4>
+
+            @if (Model.ScriptList != null && Model.ScriptList.Any())
+            {
+                
+              
+                <div class="card shadow-sm mb-4">
+                    <div class="card-body">
+                        <h4>Prescription PDF</h4>
+                        @{
+                            var scriptPdf = Model.ScriptList.FirstOrDefault();
+                            if (scriptPdf != null && scriptPdf.Script != null)
+                            {
+                                var base64 = Convert.ToBase64String(scriptPdf.Script);
+                                <iframe src="data:application/pdf;base64,@base64" width="100%" height="600px"></iframe>
+                            }
+                            else
+                            {
+                                <p>No prescription file uploaded.</p>
+                            }
+                        }
+                    </div>
+                </div>
+            }
+            else
+            {
+                <p>No prescription details found.</p>
+            }
+        </div>
+    </div>
+
+   
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <form asp-action="Edit" method="post">
+                <input type="hidden" asp-for="Prescr" />
+
+                <p>Click below to mark this prescription as processed:</p>
+                <button type="submit" class="btn btn-success">Process Prescription</button>
+                <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+            </form>
+        </div>
+    </div>
+</div>

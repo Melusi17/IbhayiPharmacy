@@ -14,7 +14,22 @@ options.UseSqlServer(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddScoped<IEmailSender, EmailSender>();
 builder.Services.AddIdentity<IdentityUser,IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = $"/Identity/Account/Login";
+    options.LogoutPath = $"/Identity/Account/Logout";
+    options.AccessDeniedPath = $"/Identity/Account/AccessDenied";
+});
 builder.Services.AddControllersWithViews();
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("Customer", policy =>
+        policy.RequireRole(SD.Role_Customer));
+    options.AddPolicy("Phamacist", policy =>
+        policy.RequireRole(SD.Role_Phamacist));
+    options.AddPolicy("Phamacy Manager", policy =>
+        policy.RequireRole(SD.Role_PhamacyManager));
+});
 
 
 
@@ -32,6 +47,8 @@ else
     app.UseHsts();
 }
 
+
+
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
@@ -41,7 +58,7 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=ScriptsProcessed}/{action=Index}/{id?}");
 app.MapRazorPages();
 
 app.Run();

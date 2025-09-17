@@ -1,102 +1,109 @@
 ﻿using IbhayiPharmacy.Data;
 using IbhayiPharmacy.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace IbhayiPharmacy.Controllers
 {
-    
+    [Authorize(Policy = "Customer")]
     public class PrescriptionController : Controller
     {
         private readonly ApplicationDbContext _db;
         private readonly IWebHostEnvironment _hostEnvironment;
-        public PrescriptionController(ApplicationDbContext db,IWebHostEnvironment webHostEnvironment)
+
+        public PrescriptionController(ApplicationDbContext db, IWebHostEnvironment hostEnvironment)
         {
             _db = db;
-           _hostEnvironment = webHostEnvironment;
-
-
+            _hostEnvironment = hostEnvironment;
         }
-
 
         public IActionResult Index()
         {
-            var objScript = _db.NewScripts.ToList();
-            return View(objScript);
+           
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var prescriptions = _db.Prescriptions
+                .Include(p => p.ApplicationUser)
+                .ToList();
+
+            return View(prescriptions);
         }
 
-        
         public IActionResult Upsert(int? id)
         {
-            if(id==0||id==null)
-            {   //create
-                return View(new NewScript());
-            }
-            else
+            if (id == null || id == 0)
             {
-                //update
-                var obj = _db.NewScripts.FirstOrDefault(u => u.PrescriptionID == id);
-                if (obj == null)
-                {
-                    return NotFound();
-                }
-                return View(obj);
+               
+                return View(new Prescription());
             }
 
-            
+          
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var prescription = _db.Prescriptions
+                .FirstOrDefault(p => p.PrescriptionID == id && p.ApplicationUserId == userId);
+
+            if (prescription == null)
+                return NotFound();
+
+            return View(prescription);
         }
-        
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Upsert(NewScript obj, IFormFile? file)
+        public IActionResult Upsert(Prescription prescription, IFormFile? file)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
+                return View(prescription);
+
+           
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            prescription.ApplicationUserId = userId;
+
+           
+            if (file != null && file.Length > 0)
             {
-                if (file != null)
+                if (Path.GetExtension(file.FileName).ToLower() != ".pdf")
+                    return BadRequest("Only PDF files are allowed.");
+
+                string uploadPath = Path.Combine(_hostEnvironment.WebRootPath, "Documents/Scripts");
+                if (!Directory.Exists(uploadPath))
+                    Directory.CreateDirectory(uploadPath);
+
+                string filePath = Path.Combine(uploadPath, file.FileName);
+
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
                 {
-                    string extension = Path.GetExtension(file.FileName).ToLower();
-
-                    if (extension != ".pdf")
-                    {
-                        return BadRequest("Only PDF files are allowed.");
-                    }
-
-                    string filename = Path.GetFileName(file.FileName);
-
-                    string uploadPath = Path.Combine(_hostEnvironment.WebRootPath, @"Documents/Scripts");
-
-                    if (!Directory.Exists(uploadPath))
-                    {
-                        Directory.CreateDirectory(uploadPath);
-                    }
-                    string filePath = Path.Combine(uploadPath, filename);
-
-                    using (var fileStream = new FileStream(filePath, FileMode.Create))
-                    {
-                        file.CopyTo(fileStream);
-                    }
-
-                    using (var ms = new MemoryStream())
-                    {
-                        file.CopyTo(ms);
-                        obj.Script = ms.ToArray();
-                    }
+                    file.CopyTo(fileStream);
                 }
 
-                if (obj.PrescriptionID == 0)
+                using (var ms = new MemoryStream())
                 {
-                    _db.NewScripts.Add(obj);
+                    file.CopyTo(ms);
+                    prescription.Script = ms.ToArray();
                 }
-                else
-                {
-                    _db.NewScripts.Update(obj);
-                }
-                _db.SaveChanges();
-                return RedirectToAction("Index");
             }
-            return View(obj);
+
+            if (prescription.PrescriptionID == 0)
+            {
+                
+
+                _db.Prescriptions.Add(prescription);
+            }
+            else
+            {
+               
+                var existing = _db.Prescriptions
+                    .FirstOrDefault(p => p.PrescriptionID == prescription.PrescriptionID && p.ApplicationUserId == userId);
+
+                if (existing == null)
+                    return NotFound();
+
+                _db.Entry(existing).CurrentValues.SetValues(prescription);
+            }
+
+            _db.SaveChanges();
+            return RedirectToAction("Index");
         }
-
-
     }
 }
