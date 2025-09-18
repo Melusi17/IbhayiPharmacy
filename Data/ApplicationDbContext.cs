@@ -43,16 +43,36 @@ namespace IbhayiPharmacy.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<CustomerAllergy>()
-                .HasOne(ca => ca.Customer)
-                .WithMany(c => c.CustomerAllergies)
-                .HasForeignKey(ca => ca.CustomerId);
+            //modelBuilder.Entity<CustomerAllergy>()
+            //    .HasOne(ca => ca.Customer)
+            //    .WithMany(c => c.CustomerAllergies)
+            //    .HasForeignKey(ca => ca.CustomerId);
 
-            modelBuilder.Entity<CustomerAllergy>()
-                .HasOne(ca => ca.Allergy)
-                .WithMany(a => a.CustomerAllergies)
-                .HasForeignKey(ca => ca.AllergyId);
+            //modelBuilder.Entity<CustomerAllergy>()
+            //    .HasOne(ca => ca.Allergy)
+            //    .WithMany(a => a.CustomerAllergies)
+            //    .HasForeignKey(ca => ca.AllergyId);
 
+            // Customer → Prescription
+            modelBuilder.Entity<Prescription>()
+                .HasOne(p => p.Customer)
+                .WithMany(c => c.Prescriptions)
+                .HasForeignKey(p => p.CustomerID)
+                .OnDelete(DeleteBehavior.Restrict); // NO CASCADE
+
+            // Doctor → Prescription
+            modelBuilder.Entity<Prescription>()
+                .HasOne(p => p.Doctor)
+                .WithMany(d => d.Prescriptions)
+                .HasForeignKey(p => p.DoctorID)
+                .OnDelete(DeleteBehavior.Restrict); // NO CASCADE
+
+            // Pharmacist → Prescription
+            modelBuilder.Entity<Prescription>()
+                .HasOne(p => p.Pharmacist)
+                .WithMany(ph => ph.Prescriptions)
+                .HasForeignKey(p => p.PharmacistID)
+                .OnDelete(DeleteBehavior.Restrict); // NO CASCADE
 
 
 
@@ -62,39 +82,39 @@ namespace IbhayiPharmacy.Data
 
         private void SeedData(ModelBuilder modelBuilder)
         {
-            // Seed Active Ingredients
-            modelBuilder.Entity<Active_Ingredient>().HasData(
-                new Active_Ingredient { Active_IngredientID = 1, Name = "Pylorazine" },
-                new Active_Ingredient { Active_IngredientID = 2, Name = "Vaspril" },
-                new Active_Ingredient { Active_IngredientID = 3, Name = "Zentropine" },
-                new Active_Ingredient { Active_IngredientID = 4, Name = "Histarelin" },
-                new Active_Ingredient { Active_IngredientID = 5, Name = "Lorvexamine" },
-                new Active_Ingredient { Active_IngredientID = 6, Name = "Aterolazine" },
-                new Active_Ingredient { Active_IngredientID = 7, Name = "Bronchomid" },
-                new Active_Ingredient { Active_IngredientID = 8, Name = "Alveclear" },
-                new Active_Ingredient { Active_IngredientID = 9, Name = "Epidraxol" },
-                new Active_Ingredient { Active_IngredientID = 10, Name = "Cortizane" },
-                new Active_Ingredient { Active_IngredientID = 11, Name = "Glycerrol" },
-                new Active_Ingredient { Active_IngredientID = 12, Name = "Sonnexil" },
-                new Active_Ingredient { Active_IngredientID = 13, Name = "Calcitrine" },
-                new Active_Ingredient { Active_IngredientID = 14, Name = "Phospholax" },
-                new Active_Ingredient { Active_IngredientID = 15, Name = "Virocelin" },
-                new Active_Ingredient { Active_IngredientID = 16, Name = "Immubrine" },
-                new Active_Ingredient { Active_IngredientID = 17, Name = "Trosamine" },
-                new Active_Ingredient { Active_IngredientID = 18, Name = "Velocidine" },
-                new Active_Ingredient { Active_IngredientID = 19, Name = "Nexorin" },
-                new Active_Ingredient { Active_IngredientID = 20, Name = "Zyphralex" },
-                new Active_Ingredient { Active_IngredientID = 21, Name = "Cardionol" },
-                new Active_Ingredient { Active_IngredientID = 22, Name = "Alveretol" },
-                new Active_Ingredient { Active_IngredientID = 23, Name = "Xylogran" },
-                new Active_Ingredient { Active_IngredientID = 24, Name = "Fematrix" },
-                new Active_Ingredient { Active_IngredientID = 25, Name = "Plastorin" },
-                new Active_Ingredient { Active_IngredientID = 26, Name = "Seralox" },
-                new Active_Ingredient { Active_IngredientID = 27, Name = "Quantrel" },
-                new Active_Ingredient { Active_IngredientID = 28, Name = "Myvetrin" },
-                new Active_Ingredient { Active_IngredientID = 29, Name = "Draxolene" },
-                new Active_Ingredient { Active_IngredientID = 30, Name = "Veltraxin" }
-            );
+            //// Seed Active Ingredients
+            //modelBuilder.Entity<Active_Ingredient>().HasData(
+            //    new Active_Ingredient { Active_IngredientID = 1, Name = "Pylorazine" },
+            //    new Active_Ingredient { Active_IngredientID = 2, Name = "Vaspril" },
+            //    new Active_Ingredient { Active_IngredientID = 3, Name = "Zentropine" },
+            //    new Active_Ingredient { Active_IngredientID = 4, Name = "Histarelin" },
+            //    new Active_Ingredient { Active_IngredientID = 5, Name = "Lorvexamine" },
+            //    new Active_Ingredient { Active_IngredientID = 6, Name = "Aterolazine" },
+            //    new Active_Ingredient { Active_IngredientID = 7, Name = "Bronchomid" },
+            //    new Active_Ingredient { Active_IngredientID = 8, Name = "Alveclear" },
+            //    new Active_Ingredient { Active_IngredientID = 9, Name = "Epidraxol" },
+            //    new Active_Ingredient { Active_IngredientID = 10, Name = "Cortizane" },
+            //    new Active_Ingredient { Active_IngredientID = 11, Name = "Glycerrol" },
+            //    new Active_Ingredient { Active_IngredientID = 12, Name = "Sonnexil" },
+            //    new Active_Ingredient { Active_IngredientID = 13, Name = "Calcitrine" },
+            //    new Active_Ingredient { Active_IngredientID = 14, Name = "Phospholax" },
+            //    new Active_Ingredient { Active_IngredientID = 15, Name = "Virocelin" },
+            //    new Active_Ingredient { Active_IngredientID = 16, Name = "Immubrine" },
+            //    new Active_Ingredient { Active_IngredientID = 17, Name = "Trosamine" },
+            //    new Active_Ingredient { Active_IngredientID = 18, Name = "Velocidine" },
+            //    new Active_Ingredient { Active_IngredientID = 19, Name = "Nexorin" },
+            //    new Active_Ingredient { Active_IngredientID = 20, Name = "Zyphralex" },
+            //    new Active_Ingredient { Active_IngredientID = 21, Name = "Cardionol" },
+            //    new Active_Ingredient { Active_IngredientID = 22, Name = "Alveretol" },
+            //    new Active_Ingredient { Active_IngredientID = 23, Name = "Xylogran" },
+            //    new Active_Ingredient { Active_IngredientID = 24, Name = "Fematrix" },
+            //    new Active_Ingredient { Active_IngredientID = 25, Name = "Plastorin" },
+            //    new Active_Ingredient { Active_IngredientID = 26, Name = "Seralox" },
+            //    new Active_Ingredient { Active_IngredientID = 27, Name = "Quantrel" },
+            //    new Active_Ingredient { Active_IngredientID = 28, Name = "Myvetrin" },
+            //    new Active_Ingredient { Active_IngredientID = 29, Name = "Draxolene" },
+            //    new Active_Ingredient { Active_IngredientID = 30, Name = "Veltraxin" }
+            //);
 
             // Seed Dosage Forms
             modelBuilder.Entity<DosageForm>().HasData(
@@ -112,32 +132,32 @@ namespace IbhayiPharmacy.Data
                 new DosageForm { DosageFormID = 12, DosageFormName = "Powder" }
             );
 
-            modelBuilder.Entity<Allergy>().HasData(
-                new Allergy { AllergyId = 1, Name = "Penicillin" },
-                new Allergy { AllergyId = 2, Name = "Peanuts" },
-                new Allergy { AllergyId = 3, Name = "Shellfish" }
-            );
+            //modelBuilder.Entity<Allergy>().HasData(
+            //    new Allergy { AllergyId = 1, Name = "Penicillin" },
+            //    new Allergy { AllergyId = 2, Name = "Peanuts" },
+            //    new Allergy { AllergyId = 3, Name = "Shellfish" }
+            //);
 
 
-            // Seed Suppliers
-            modelBuilder.Entity<Supplier>().HasData(
-                new Supplier { SupplierID = 1, SupplierName = "NovaCure", ContactName = "Davie", ContactSurname = "Jones", EmailAddress = "davie@example.com" },
-                new Supplier { SupplierID = 2, SupplierName = "HelixMed", ContactName = "Nicky", ContactSurname = "Mostert", EmailAddress = "nmostert@mandela.ac.za" },
-                new Supplier { SupplierID = 3, SupplierName = "VitaGenix", ContactName = "Matimu", ContactSurname = "Vuqa", EmailAddress = "matimu@example.com" },
-                new Supplier { SupplierID = 4, SupplierName = "Apex Biomed", ContactName = "Lulu", ContactSurname = "Ndhambi", EmailAddress = "lulu@example.com" },
-                new Supplier { SupplierID = 5, SupplierName = "CuraNova", ContactName = "Pharmacy Manager Group Member Name", ContactSurname = "Pharmacy Manager Group Member Surname", EmailAddress = "Pharmacy Manager Group Member E-mail" }
-            );
+            //// Seed Suppliers
+            //modelBuilder.Entity<Supplier>().HasData(
+            //    new Supplier { SupplierID = 1, SupplierName = "NovaCure", ContactName = "Davie", ContactSurname = "Jones", EmailAddress = "davie@example.com" },
+            //    new Supplier { SupplierID = 2, SupplierName = "HelixMed", ContactName = "Nicky", ContactSurname = "Mostert", EmailAddress = "nmostert@mandela.ac.za" },
+            //    new Supplier { SupplierID = 3, SupplierName = "VitaGenix", ContactName = "Matimu", ContactSurname = "Vuqa", EmailAddress = "matimu@example.com" },
+            //    new Supplier { SupplierID = 4, SupplierName = "Apex Biomed", ContactName = "Lulu", ContactSurname = "Ndhambi", EmailAddress = "lulu@example.com" },
+            //    new Supplier { SupplierID = 5, SupplierName = "CuraNova", ContactName = "Pharmacy Manager Group Member Name", ContactSurname = "Pharmacy Manager Group Member Surname", EmailAddress = "Pharmacy Manager Group Member E-mail" }
+            //);
 
-            // Seed Doctors
-            modelBuilder.Entity<Doctor>().HasData(
-                new Doctor { DoctorID = 1, Name = "Charmaine", Surname = "Meintjies", ContactNumber = "071 234 5678", Email = "charmaine@example.com", HealthCouncilRegistrationNumber = "976431" },
-                new Doctor { DoctorID = 2, Name = "Jacob", Surname = "Moloi", ContactNumber = "072 234 5678", Email = "jacob@example.com", HealthCouncilRegistrationNumber = "316497" },
-                new Doctor { DoctorID = 3, Name = "David", Surname = "Greeff", ContactNumber = "073 234 5678", Email = "david@gmail.example", HealthCouncilRegistrationNumber = "718293" },
-                new Doctor { DoctorID = 4, Name = "Karien", Surname = "Momberg", ContactNumber = "075 234 5678", Email = "karien@example.com", HealthCouncilRegistrationNumber = "159753" },
-                new Doctor { DoctorID = 5, Name = "Felicity", Surname = "Daniels", ContactNumber = "076 234 5678", Email = "felicity@example.com", HealthCouncilRegistrationNumber = "951357" },
-                new Doctor { DoctorID = 6, Name = "Errol", Surname = "Pieterse", ContactNumber = "078 234 5678", Email = "errol@example.com", HealthCouncilRegistrationNumber = "852456" },
-                new Doctor { DoctorID = 7, Name = "Alyce", Surname = "Morapedi", ContactNumber = "079 234 5678", Email = "alyce@example.com", HealthCouncilRegistrationNumber = "654852" }
-            );
+            //// Seed Doctors
+            //modelBuilder.Entity<Doctor>().HasData(
+            //    new Doctor { DoctorID = 1, Name = "Charmaine", Surname = "Meintjies", ContactNumber = "071 234 5678", Email = "charmaine@example.com", HealthCouncilRegistrationNumber = "976431" },
+            //    new Doctor { DoctorID = 2, Name = "Jacob", Surname = "Moloi", ContactNumber = "072 234 5678", Email = "jacob@example.com", HealthCouncilRegistrationNumber = "316497" },
+            //    new Doctor { DoctorID = 3, Name = "David", Surname = "Greeff", ContactNumber = "073 234 5678", Email = "david@gmail.example", HealthCouncilRegistrationNumber = "718293" },
+            //    new Doctor { DoctorID = 4, Name = "Karien", Surname = "Momberg", ContactNumber = "075 234 5678", Email = "karien@example.com", HealthCouncilRegistrationNumber = "159753" },
+            //    new Doctor { DoctorID = 5, Name = "Felicity", Surname = "Daniels", ContactNumber = "076 234 5678", Email = "felicity@example.com", HealthCouncilRegistrationNumber = "951357" },
+            //    new Doctor { DoctorID = 6, Name = "Errol", Surname = "Pieterse", ContactNumber = "078 234 5678", Email = "errol@example.com", HealthCouncilRegistrationNumber = "852456" },
+            //    new Doctor { DoctorID = 7, Name = "Alyce", Surname = "Morapedi", ContactNumber = "079 234 5678", Email = "alyce@example.com", HealthCouncilRegistrationNumber = "654852" }
+            //);
 
             // Seed Users
             //modelBuilder.Entity<ApplicationUser>().HasData(
@@ -172,9 +192,9 @@ namespace IbhayiPharmacy.Data
 
             //// Seed Customers
             //modelBuilder.Entity<Customer>().HasData(
-            //    new Customer { CustormerID = 1, UserId = 6, Allergy = "None" },
-            //    new Customer { CustormerID = 2, UserId = 7, Allergy = "Pollen" },
-            //    new Customer { CustormerID = 3, UserId = 8, Allergy = "Dust" }
+            //    new Customer { CustomerID = 1, ApplicationUserId = "6", CustomerAllergies = "None" },
+            //    new Customer { CustomerID = 2, ApplicationUserId = "7", CustomerAllergies = "Pollen" },
+            //    new Customer { CustomerID = 3, ApplicationUserId = "8", CustomerAllergies = "Dust" }
             //);
 
             //// Seed Customer Allergies
@@ -183,52 +203,52 @@ namespace IbhayiPharmacy.Data
             //    new CustomerAllergy { Customer_AllergyId = 2, CustomerId = 3, Active_IngredientID = 7 }  // Bob allergic to Bronchomid
             //);
 
-            // Seed Medications
-            modelBuilder.Entity<Medication>().HasData(
-                new Medication { MedcationID = 1, MedicationName = "CardioVex", Schedule = "6", CurrentPrice = 150, DosageFormID = 1, SupplierID = 1, ReOrderLevel = 100, QuantityOnHand = 90 },
-                new Medication { MedcationID = 2, MedicationName = "Neurocalm", Schedule = "2", CurrentPrice = 200, DosageFormID = 1, SupplierID = 2, ReOrderLevel = 110, QuantityOnHand = 100 },
-                new Medication { MedcationID = 3, MedicationName = "Allerfree Duo", Schedule = "0", CurrentPrice = 180, DosageFormID = 12, SupplierID = 3, ReOrderLevel = 150, QuantityOnHand = 100 },
-                new Medication { MedcationID = 4, MedicationName = "GastroEase", Schedule = "3", CurrentPrice = 95, DosageFormID = 1, SupplierID = 4, ReOrderLevel = 400, QuantityOnHand = 470 },
-                new Medication { MedcationID = 5, MedicationName = "Respivent", Schedule = "3", CurrentPrice = 120, DosageFormID = 1, SupplierID = 5, ReOrderLevel = 300, QuantityOnHand = 490 },
-                new Medication { MedcationID = 6, MedicationName = "Dermagard", Schedule = "3", CurrentPrice = 85, DosageFormID = 1, SupplierID = 2, ReOrderLevel = 600, QuantityOnHand = 790 },
-                new Medication { MedcationID = 7, MedicationName = "Metaborex", Schedule = "4", CurrentPrice = 210, DosageFormID = 1, SupplierID = 2, ReOrderLevel = 200, QuantityOnHand = 250 },
-                new Medication { MedcationID = 8, MedicationName = "Sleeptraze", Schedule = "2", CurrentPrice = 175, DosageFormID = 1, SupplierID = 2, ReOrderLevel = 100, QuantityOnHand = 110 },
-                new Medication { MedcationID = 9, MedicationName = "OsteoFlex", Schedule = "3", CurrentPrice = 300, DosageFormID = 3, SupplierID = 2, ReOrderLevel = 200, QuantityOnHand = 210 },
-                new Medication { MedcationID = 10, MedicationName = "Immunexin", Schedule = "6", CurrentPrice = 450, DosageFormID = 9, SupplierID = 2, ReOrderLevel = 200, QuantityOnHand = 190 },
-                new Medication { MedcationID = 11, MedicationName = "CardioPlus", Schedule = "6", CurrentPrice = 600, DosageFormID = 11, SupplierID = 2, ReOrderLevel = 500, QuantityOnHand = 600 },
-                new Medication { MedcationID = 12, MedicationName = "AllerCalm", Schedule = "6", CurrentPrice = 350, DosageFormID = 11, SupplierID = 2, ReOrderLevel = 400, QuantityOnHand = 410 },
-                new Medication { MedcationID = 13, MedicationName = "RespirAid", Schedule = "6", CurrentPrice = 280, DosageFormID = 9, SupplierID = 2, ReOrderLevel = 100, QuantityOnHand = 100 },
-                new Medication { MedcationID = 14, MedicationName = "DermaClear", Schedule = "6", CurrentPrice = 125, DosageFormID = 5, SupplierID = 2, ReOrderLevel = 100, QuantityOnHand = 200 },
-                new Medication { MedcationID = 15, MedicationName = "OsteoPrime", Schedule = "6", CurrentPrice = 190, DosageFormID = 2, SupplierID = 2, ReOrderLevel = 100, QuantityOnHand = 400 }
-            );
+            //// Seed Medications
+            //modelBuilder.Entity<Medication>().HasData(
+            //    new Medication { MedcationID = 1, MedicationName = "CardioVex", Schedule = "6", CurrentPrice = 150, DosageFormID = 1, SupplierID = 1, ReOrderLevel = 100, QuantityOnHand = 90 },
+            //    new Medication { MedcationID = 2, MedicationName = "Neurocalm", Schedule = "2", CurrentPrice = 200, DosageFormID = 1, SupplierID = 2, ReOrderLevel = 110, QuantityOnHand = 100 },
+            //    new Medication { MedcationID = 3, MedicationName = "Allerfree Duo", Schedule = "0", CurrentPrice = 180, DosageFormID = 12, SupplierID = 3, ReOrderLevel = 150, QuantityOnHand = 100 },
+            //    new Medication { MedcationID = 4, MedicationName = "GastroEase", Schedule = "3", CurrentPrice = 95, DosageFormID = 1, SupplierID = 4, ReOrderLevel = 400, QuantityOnHand = 470 },
+            //    new Medication { MedcationID = 5, MedicationName = "Respivent", Schedule = "3", CurrentPrice = 120, DosageFormID = 1, SupplierID = 5, ReOrderLevel = 300, QuantityOnHand = 490 },
+            //    new Medication { MedcationID = 6, MedicationName = "Dermagard", Schedule = "3", CurrentPrice = 85, DosageFormID = 1, SupplierID = 2, ReOrderLevel = 600, QuantityOnHand = 790 },
+            //    new Medication { MedcationID = 7, MedicationName = "Metaborex", Schedule = "4", CurrentPrice = 210, DosageFormID = 1, SupplierID = 2, ReOrderLevel = 200, QuantityOnHand = 250 },
+            //    new Medication { MedcationID = 8, MedicationName = "Sleeptraze", Schedule = "2", CurrentPrice = 175, DosageFormID = 1, SupplierID = 2, ReOrderLevel = 100, QuantityOnHand = 110 },
+            //    new Medication { MedcationID = 9, MedicationName = "OsteoFlex", Schedule = "3", CurrentPrice = 300, DosageFormID = 3, SupplierID = 2, ReOrderLevel = 200, QuantityOnHand = 210 },
+            //    new Medication { MedcationID = 10, MedicationName = "Immunexin", Schedule = "6", CurrentPrice = 450, DosageFormID = 9, SupplierID = 2, ReOrderLevel = 200, QuantityOnHand = 190 },
+            //    new Medication { MedcationID = 11, MedicationName = "CardioPlus", Schedule = "6", CurrentPrice = 600, DosageFormID = 11, SupplierID = 2, ReOrderLevel = 500, QuantityOnHand = 600 },
+            //    new Medication { MedcationID = 12, MedicationName = "AllerCalm", Schedule = "6", CurrentPrice = 350, DosageFormID = 11, SupplierID = 2, ReOrderLevel = 400, QuantityOnHand = 410 },
+            //    new Medication { MedcationID = 13, MedicationName = "RespirAid", Schedule = "6", CurrentPrice = 280, DosageFormID = 9, SupplierID = 2, ReOrderLevel = 100, QuantityOnHand = 100 },
+            //    new Medication { MedcationID = 14, MedicationName = "DermaClear", Schedule = "6", CurrentPrice = 125, DosageFormID = 5, SupplierID = 2, ReOrderLevel = 100, QuantityOnHand = 200 },
+            //    new Medication { MedcationID = 15, MedicationName = "OsteoPrime", Schedule = "6", CurrentPrice = 190, DosageFormID = 2, SupplierID = 2, ReOrderLevel = 100, QuantityOnHand = 400 }
+            //);
 
-            // Seed Medication Ingredients
-            modelBuilder.Entity<Medication_Ingredient>().HasData(
-                new Medication_Ingredient { Medication_IngredientID = 1, MedicationID = 1, Active_IngredientID = 6, Strength = "18mg" },
-                new Medication_Ingredient { Medication_IngredientID = 2, MedicationID = 2, Active_IngredientID = 2, Strength = "2mg" },
-                new Medication_Ingredient { Medication_IngredientID = 3, MedicationID = 2, Active_IngredientID = 3, Strength = "50mg" },
-                new Medication_Ingredient { Medication_IngredientID = 4, MedicationID = 3, Active_IngredientID = 4, Strength = "325mg" },
-                new Medication_Ingredient { Medication_IngredientID = 5, MedicationID = 3, Active_IngredientID = 5, Strength = "453.6g" },
-                new Medication_Ingredient { Medication_IngredientID = 6, MedicationID = 4, Active_IngredientID = 1, Strength = "Standard" },
-                new Medication_Ingredient { Medication_IngredientID = 7, MedicationID = 5, Active_IngredientID = 7, Strength = "Standard" },
-                new Medication_Ingredient { Medication_IngredientID = 8, MedicationID = 5, Active_IngredientID = 8, Strength = "Standard" },
-                new Medication_Ingredient { Medication_IngredientID = 9, MedicationID = 6, Active_IngredientID = 9, Strength = "Standard" },
-                new Medication_Ingredient { Medication_IngredientID = 10, MedicationID = 6, Active_IngredientID = 10, Strength = "Standard" },
-                new Medication_Ingredient { Medication_IngredientID = 11, MedicationID = 7, Active_IngredientID = 11, Strength = "Standard" },
-                new Medication_Ingredient { Medication_IngredientID = 12, MedicationID = 8, Active_IngredientID = 12, Strength = "Standard" },
-                new Medication_Ingredient { Medication_IngredientID = 13, MedicationID = 9, Active_IngredientID = 13, Strength = "Standard" },
-                new Medication_Ingredient { Medication_IngredientID = 14, MedicationID = 9, Active_IngredientID = 14, Strength = "Standard" },
-                new Medication_Ingredient { Medication_IngredientID = 15, MedicationID = 10, Active_IngredientID = 15, Strength = "Standard" },
-                new Medication_Ingredient { Medication_IngredientID = 16, MedicationID = 10, Active_IngredientID = 16, Strength = "Standard" },
-                new Medication_Ingredient { Medication_IngredientID = 17, MedicationID = 11, Active_IngredientID = 13, Strength = "Standard" },
-                new Medication_Ingredient { Medication_IngredientID = 18, MedicationID = 11, Active_IngredientID = 6, Strength = "Standard" },
-                new Medication_Ingredient { Medication_IngredientID = 19, MedicationID = 12, Active_IngredientID = 4, Strength = "Standard" },
-                new Medication_Ingredient { Medication_IngredientID = 20, MedicationID = 13, Active_IngredientID = 7, Strength = "Standard" },
-                new Medication_Ingredient { Medication_IngredientID = 21, MedicationID = 14, Active_IngredientID = 9, Strength = "20mg" },
-                new Medication_Ingredient { Medication_IngredientID = 22, MedicationID = 15, Active_IngredientID = 13, Strength = "20mg" }
-            );
+            //// Seed Medication Ingredients
+            //modelBuilder.Entity<Medication_Ingredient>().HasData(
+            //    new Medication_Ingredient { Medication_IngredientID = 1, MedicationID = 1, Active_IngredientID = 6, Strength = "18mg" },
+            //    new Medication_Ingredient { Medication_IngredientID = 2, MedicationID = 2, Active_IngredientID = 2, Strength = "2mg" },
+            //    new Medication_Ingredient { Medication_IngredientID = 3, MedicationID = 2, Active_IngredientID = 3, Strength = "50mg" },
+            //    new Medication_Ingredient { Medication_IngredientID = 4, MedicationID = 3, Active_IngredientID = 4, Strength = "325mg" },
+            //    new Medication_Ingredient { Medication_IngredientID = 5, MedicationID = 3, Active_IngredientID = 5, Strength = "453.6g" },
+            //    new Medication_Ingredient { Medication_IngredientID = 6, MedicationID = 4, Active_IngredientID = 1, Strength = "Standard" },
+            //    new Medication_Ingredient { Medication_IngredientID = 7, MedicationID = 5, Active_IngredientID = 7, Strength = "Standard" },
+            //    new Medication_Ingredient { Medication_IngredientID = 8, MedicationID = 5, Active_IngredientID = 8, Strength = "Standard" },
+            //    new Medication_Ingredient { Medication_IngredientID = 9, MedicationID = 6, Active_IngredientID = 9, Strength = "Standard" },
+            //    new Medication_Ingredient { Medication_IngredientID = 10, MedicationID = 6, Active_IngredientID = 10, Strength = "Standard" },
+            //    new Medication_Ingredient { Medication_IngredientID = 11, MedicationID = 7, Active_IngredientID = 11, Strength = "Standard" },
+            //    new Medication_Ingredient { Medication_IngredientID = 12, MedicationID = 8, Active_IngredientID = 12, Strength = "Standard" },
+            //    new Medication_Ingredient { Medication_IngredientID = 13, MedicationID = 9, Active_IngredientID = 13, Strength = "Standard" },
+            //    new Medication_Ingredient { Medication_IngredientID = 14, MedicationID = 9, Active_IngredientID = 14, Strength = "Standard" },
+            //    new Medication_Ingredient { Medication_IngredientID = 15, MedicationID = 10, Active_IngredientID = 15, Strength = "Standard" },
+            //    new Medication_Ingredient { Medication_IngredientID = 16, MedicationID = 10, Active_IngredientID = 16, Strength = "Standard" },
+            //    new Medication_Ingredient { Medication_IngredientID = 17, MedicationID = 11, Active_IngredientID = 13, Strength = "Standard" },
+            //    new Medication_Ingredient { Medication_IngredientID = 18, MedicationID = 11, Active_IngredientID = 6, Strength = "Standard" },
+            //    new Medication_Ingredient { Medication_IngredientID = 19, MedicationID = 12, Active_IngredientID = 4, Strength = "Standard" },
+            //    new Medication_Ingredient { Medication_IngredientID = 20, MedicationID = 13, Active_IngredientID = 7, Strength = "Standard" },
+            //    new Medication_Ingredient { Medication_IngredientID = 21, MedicationID = 14, Active_IngredientID = 9, Strength = "20mg" },
+            //    new Medication_Ingredient { Medication_IngredientID = 22, MedicationID = 15, Active_IngredientID = 13, Strength = "20mg" }
+            //);
 
-            
+
         }
     }
 }
