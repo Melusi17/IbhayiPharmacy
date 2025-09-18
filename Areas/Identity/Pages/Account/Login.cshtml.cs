@@ -107,22 +107,7 @@ namespace IbhayiPharmacy.Areas.Identity.Pages.Account
 
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
         {
-            if (SD.Role_Customer != null)
-            {
-                returnUrl ??= Url.Content("~/Customer/UploadPrescription");
-
-            }
-            else if (SD.Role_PhamacyManager != null)
-            {
-                returnUrl ??= Url.Content("~/PharmacyManager/Index ");
-
-            }
-            else if (SD.Role_Phamacist != null)
-            {
-                returnUrl ??= Url.Content("~/Pharmacist/Dashboard");
-
-            }
-
+            
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
 
             if (ModelState.IsValid)

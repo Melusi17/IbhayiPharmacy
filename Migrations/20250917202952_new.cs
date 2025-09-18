@@ -184,22 +184,6 @@ namespace IbhayiPharmacy.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Prescriptions",
-                columns: table => new
-                {
-                    PrescriptionID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    DateIssued = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Script = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
-                    DispenseUponApproval = table.Column<bool>(type: "bit", nullable: false),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Prescriptions", x => x.PrescriptionID);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "StockOrderDetails",
                 columns: table => new
                 {
@@ -418,6 +402,29 @@ namespace IbhayiPharmacy.Migrations
                     table.PrimaryKey("PK_PharmacyManagers", x => x.PharmacyManagerID);
                     table.ForeignKey(
                         name: "FK_PharmacyManagers_AspNetUsers_ApplicationUserId",
+                        column: x => x.ApplicationUserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Prescriptions",
+                columns: table => new
+                {
+                    PrescriptionID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ApplicationUserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    DateIssued = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Script = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
+                    DispenseUponApproval = table.Column<bool>(type: "bit", nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Prescriptions", x => x.PrescriptionID);
+                    table.ForeignKey(
+                        name: "FK_Prescriptions_AspNetUsers_ApplicationUserId",
                         column: x => x.ApplicationUserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
@@ -687,6 +694,11 @@ namespace IbhayiPharmacy.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_PharmacyManagers_ApplicationUserId",
                 table: "PharmacyManagers",
+                column: "ApplicationUserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Prescriptions_ApplicationUserId",
+                table: "Prescriptions",
                 column: "ApplicationUserId");
 
             migrationBuilder.CreateIndex(
