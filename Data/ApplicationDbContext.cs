@@ -43,16 +43,36 @@ namespace IbhayiPharmacy.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<CustomerAllergy>()
-                .HasOne(ca => ca.Customer)
-                .WithMany(c => c.CustomerAllergies)
-                .HasForeignKey(ca => ca.CustomerId);
+            //modelBuilder.Entity<CustomerAllergy>()
+            //    .HasOne(ca => ca.Customer)
+            //    .WithMany(c => c.CustomerAllergies)
+            //    .HasForeignKey(ca => ca.CustomerId);
 
-            modelBuilder.Entity<CustomerAllergy>()
-                .HasOne(ca => ca.Allergy)
-                .WithMany(a => a.CustomerAllergies)
-                .HasForeignKey(ca => ca.AllergyId);
+            //modelBuilder.Entity<CustomerAllergy>()
+            //    .HasOne(ca => ca.Allergy)
+            //    .WithMany(a => a.CustomerAllergies)
+            //    .HasForeignKey(ca => ca.AllergyId);
 
+            // Customer → Prescription
+            modelBuilder.Entity<Prescription>()
+                .HasOne(p => p.Customer)
+                .WithMany(c => c.Prescriptions)
+                .HasForeignKey(p => p.CustomerID)
+                .OnDelete(DeleteBehavior.Restrict); // NO CASCADE
+
+            // Doctor → Prescription
+            modelBuilder.Entity<Prescription>()
+                .HasOne(p => p.Doctor)
+                .WithMany(d => d.Prescriptions)
+                .HasForeignKey(p => p.DoctorID)
+                .OnDelete(DeleteBehavior.Restrict); // NO CASCADE
+
+            // Pharmacist → Prescription
+            modelBuilder.Entity<Prescription>()
+                .HasOne(p => p.Pharmacist)
+                .WithMany(ph => ph.Prescriptions)
+                .HasForeignKey(p => p.PharmacistID)
+                .OnDelete(DeleteBehavior.Restrict); // NO CASCADE
 
 
 

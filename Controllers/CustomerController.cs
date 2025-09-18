@@ -8,6 +8,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using Microsoft.CodeAnalysis.Scripting;
+using Microsoft.EntityFrameworkCore;
 
 namespace IbhayiPharmacy.Controllers
 {
@@ -20,6 +21,7 @@ namespace IbhayiPharmacy.Controllers
             _context = context;
         }
 
+        //REGISTER NEW CUSTOMER
         // GET: Register
         [HttpGet]
         public IActionResult Register()
@@ -103,17 +105,90 @@ namespace IbhayiPharmacy.Controllers
             return RedirectToAction("Login", "Customer");
         }
 
-        //Dashboard
+
+
+
+
+
+
+
+        // DASHBOARD
         public IActionResult CustomerDashboard()
         {
             return View();
         }
 
-        //Upload Prescription
-        public IActionResult UploadPrescription()
+
+
+
+
+
+
+        // UPLOAD PRESCRIPTION
+        [HttpGet]
+        public async Task<IActionResult> UploadPrescription()
         {
-            return View();
+            var model = new UploadPrescriptionViewModel
+            {
+                UnprocessedPrescriptions = _context.Prescriptions
+                .Where(p => !p.IsProcessed)
+                .ToList(),
+                ProcessedPrescriptions = _context.Prescriptions
+                .Where(p => p.IsProcessed)
+                .ToList()
+            };
+            return View(model);
         }
+
+        [HttpPost]
+        public async Task<IActionResult> UploadPrescription(IFormFile prescriptionFile, bool dispenseCheckbox)
+        {
+            if (prescriptionFile == null || prescriptionFile.Length == 0)
+            {
+                TempData["Error"] = "Please select a prescription file.";
+                return RedirectToAction("UploadPrescription");
+            }
+
+            using var ms = new MemoryStream();
+            await prescriptionFile.CopyToAsync(ms);
+
+            var prescription = new Prescription
+            {
+
+                //CustomerID = 1/* Get logged-in customer ID */,
+                //DoctorID = 1 /* Assign doctor ID */,
+                //PharmacistID = 1 /* Assign pharmacist ID */,
+                DateIssued = DateTime.Now,
+                Script = ms.ToArray(),
+                FileName = prescriptionFile.FileName,
+                ContentType = prescriptionFile.ContentType,
+                IsProcessed = false,
+
+
+            };
+
+            _context.Prescriptions.Add(prescription);
+            await _context.SaveChangesAsync();
+
+            TempData["Message"] = "Prescription uploaded successfully!";
+            return RedirectToAction("UploadPrescription");
+        }
+
+        public async Task<IActionResult> DownloadPrescription(int id)
+        {
+            var prescription = await _context.Prescriptions.FindAsync(id);
+
+            if (prescription == null || prescription.Script == null)
+                return NotFound();
+
+            return File(prescription.Script, prescription.ContentType, prescription.FileName);
+        }
+
+
+
+
+
+
 
         // Place Order
         public IActionResult PlaceOrder()
@@ -125,17 +200,39 @@ namespace IbhayiPharmacy.Controllers
             return View();
         }
 
+
+
+
+
+
+
         // Manage Repeats
         public IActionResult ManageRepeats()
         {
             return View();
         }
 
+
+
+
+
+
+
+
+
         // View Reports
         public IActionResult ViewReports()
         {
             return View();
         }
+
+
+
+
+
+
+
+
 
         // Profile
         public IActionResult Profile()
