@@ -32,7 +32,9 @@ namespace IbhayiPharmacy.Models
 
         // ---- Uploaded Script (BLOB) ----
         [Required]
-        public byte[] Script { get; set; }   // File stored as varbinary(max)
+        public DateTime DateIssued { get; set; }
+        [ValidateNever]
+        public byte[] Script { get; set; }
 
         [Required]
         [MaxLength(255)]
