@@ -62,6 +62,7 @@ namespace IbhayiPharmacy.Migrations
                     IDNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CellphoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Active_IngredientID = table.Column<int>(type: "int", nullable: true),
+                    Password = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -368,14 +369,8 @@ namespace IbhayiPharmacy.Migrations
                 {
                     PharmacistID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    ApplicationUserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     HealthCouncilRegNo = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Surname = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    IDNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CellphoneNumber = table.Column<int>(type: "int", nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Password = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    ApplicationUserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -402,29 +397,6 @@ namespace IbhayiPharmacy.Migrations
                     table.PrimaryKey("PK_PharmacyManagers", x => x.PharmacyManagerID);
                     table.ForeignKey(
                         name: "FK_PharmacyManagers_AspNetUsers_ApplicationUserId",
-                        column: x => x.ApplicationUserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Prescriptions",
-                columns: table => new
-                {
-                    PrescriptionID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    ApplicationUserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    DateIssued = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Script = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
-                    DispenseUponApproval = table.Column<bool>(type: "bit", nullable: false),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Prescriptions", x => x.PrescriptionID);
-                    table.ForeignKey(
-                        name: "FK_Prescriptions_AspNetUsers_ApplicationUserId",
                         column: x => x.ApplicationUserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
@@ -490,6 +462,44 @@ namespace IbhayiPharmacy.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Prescriptions",
+                columns: table => new
+                {
+                    PrescriptionID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    DoctorID = table.Column<int>(type: "int", nullable: false),
+                    PharmacistID = table.Column<int>(type: "int", nullable: false),
+                    CustomerID = table.Column<int>(type: "int", nullable: false),
+                    DateIssued = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Script = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
+                    FileName = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
+                    ContentType = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    IsProcessed = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Prescriptions", x => x.PrescriptionID);
+                    table.ForeignKey(
+                        name: "FK_Prescriptions_Customers_CustomerID",
+                        column: x => x.CustomerID,
+                        principalTable: "Customers",
+                        principalColumn: "CustomerID",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Prescriptions_Doctors_DoctorID",
+                        column: x => x.DoctorID,
+                        principalTable: "Doctors",
+                        principalColumn: "DoctorID",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Prescriptions_Pharmacists_PharmacistID",
+                        column: x => x.PharmacistID,
+                        principalTable: "Pharmacists",
+                        principalColumn: "PharmacistID",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Medication_Ingredients",
                 columns: table => new
                 {
@@ -513,6 +523,35 @@ namespace IbhayiPharmacy.Migrations
                         column: x => x.MedicationID,
                         principalTable: "Medications",
                         principalColumn: "MedicationID",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "StockOrders",
+                columns: table => new
+                {
+                    StockOrderID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    OrderDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    SupplierID = table.Column<int>(type: "int", nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    MedicationID = table.Column<int>(type: "int", nullable: false),
+                    Quantity = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_StockOrders", x => x.StockOrderID);
+                    table.ForeignKey(
+                        name: "FK_StockOrders_Medications_MedicationID",
+                        column: x => x.MedicationID,
+                        principalTable: "Medications",
+                        principalColumn: "MedicationID",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_StockOrders_Suppliers_SupplierID",
+                        column: x => x.SupplierID,
+                        principalTable: "Suppliers",
+                        principalColumn: "SupplierID",
                         onDelete: ReferentialAction.Restrict);
                 });
 
@@ -580,35 +619,6 @@ namespace IbhayiPharmacy.Migrations
                         column: x => x.PrescriptionID,
                         principalTable: "Prescriptions",
                         principalColumn: "PrescriptionID",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "StockOrders",
-                columns: table => new
-                {
-                    StockOrderID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    OrderDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    SupplierID = table.Column<int>(type: "int", nullable: false),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    MedicationID = table.Column<int>(type: "int", nullable: false),
-                    Quantity = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_StockOrders", x => x.StockOrderID);
-                    table.ForeignKey(
-                        name: "FK_StockOrders_Medications_MedicationID",
-                        column: x => x.MedicationID,
-                        principalTable: "Medications",
-                        principalColumn: "MedicationID",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_StockOrders_Suppliers_SupplierID",
-                        column: x => x.SupplierID,
-                        principalTable: "Suppliers",
-                        principalColumn: "SupplierID",
                         onDelete: ReferentialAction.Restrict);
                 });
 
@@ -697,9 +707,19 @@ namespace IbhayiPharmacy.Migrations
                 column: "ApplicationUserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Prescriptions_ApplicationUserId",
+                name: "IX_Prescriptions_CustomerID",
                 table: "Prescriptions",
-                column: "ApplicationUserId");
+                column: "CustomerID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Prescriptions_DoctorID",
+                table: "Prescriptions",
+                column: "DoctorID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Prescriptions_PharmacistID",
+                table: "Prescriptions",
+                column: "PharmacistID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_PresScriptLines_MedicationID",
@@ -759,9 +779,6 @@ namespace IbhayiPharmacy.Migrations
                 name: "Customer_Allergies");
 
             migrationBuilder.DropTable(
-                name: "Doctors");
-
-            migrationBuilder.DropTable(
                 name: "Medication_Ingredients");
 
             migrationBuilder.DropTable(
@@ -772,9 +789,6 @@ namespace IbhayiPharmacy.Migrations
 
             migrationBuilder.DropTable(
                 name: "Pharmacies");
-
-            migrationBuilder.DropTable(
-                name: "Pharmacists");
 
             migrationBuilder.DropTable(
                 name: "PharmacyManagers");
@@ -801,9 +815,6 @@ namespace IbhayiPharmacy.Migrations
                 name: "Allergies");
 
             migrationBuilder.DropTable(
-                name: "Customers");
-
-            migrationBuilder.DropTable(
                 name: "Active_Ingredients");
 
             migrationBuilder.DropTable(
@@ -816,13 +827,22 @@ namespace IbhayiPharmacy.Migrations
                 name: "Medications");
 
             migrationBuilder.DropTable(
-                name: "AspNetUsers");
+                name: "Customers");
+
+            migrationBuilder.DropTable(
+                name: "Doctors");
+
+            migrationBuilder.DropTable(
+                name: "Pharmacists");
 
             migrationBuilder.DropTable(
                 name: "DosageForms");
 
             migrationBuilder.DropTable(
                 name: "Suppliers");
+
+            migrationBuilder.DropTable(
+                name: "AspNetUsers");
         }
     }
 }

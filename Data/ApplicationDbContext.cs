@@ -58,21 +58,21 @@ namespace IbhayiPharmacy.Data
                 .HasOne(p => p.Customer)
                 .WithMany(c => c.Prescriptions)
                 .HasForeignKey(p => p.CustomerID)
-                .OnDelete(DeleteBehavior.Restrict); // NO CASCADE
+                .OnDelete(DeleteBehavior.Restrict); // NO Restrict
 
             // Doctor → Prescription
             modelBuilder.Entity<Prescription>()
                 .HasOne(p => p.Doctor)
                 .WithMany(d => d.Prescriptions)
                 .HasForeignKey(p => p.DoctorID)
-                .OnDelete(DeleteBehavior.Restrict); // NO CASCADE
+                .OnDelete(DeleteBehavior.Restrict); // NO Restrict
 
             // Pharmacist → Prescription
             modelBuilder.Entity<Prescription>()
                 .HasOne(p => p.Pharmacist)
                 .WithMany(ph => ph.Prescriptions)
                 .HasForeignKey(p => p.PharmacistID)
-                .OnDelete(DeleteBehavior.Restrict); // NO CASCADE
+                .OnDelete(DeleteBehavior.Restrict); // NO Restrict
 
 
 

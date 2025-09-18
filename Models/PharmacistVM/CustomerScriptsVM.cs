@@ -31,7 +31,7 @@ namespace IbhayiPharmacy.Models.PharmacistVM
 
         //public int Repeats { get; set; }
 
-        
+
         //public int RepeatsLeft { get; set; }
 
     }
