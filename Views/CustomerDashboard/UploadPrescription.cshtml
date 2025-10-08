@@ -301,6 +301,16 @@
             font-weight: 500;
         }
 
+        .success-message {
+            text-align: center;
+            color: #1f9f77;
+            font-weight: 500;
+            background-color: #e6f5f1;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+
         /* Styles for rejected medications */
         .rejected-row {
             background-color: #ffeaea !important;
@@ -341,7 +351,32 @@
             color: #e74c3c;
         }
 
-        /* Add all other styles from your original HTML */
+        /* Upload progress */
+        .upload-progress {
+            margin: 10px 0;
+            display: none;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background-color: #f0f0f0;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: #1f9f77;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .filename-cell {
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            color: #22586A;
+        }
     </style>
 </head>
 <body>
@@ -375,11 +410,25 @@
                 <div class="upload-prescription-panel">
                     <h2>📥 Upload Prescription</h2>
 
-                    <form asp-controller="Prescription" asp-action="Upsert" method="post" enctype="multipart/form-data">
+                    <!-- Upload Status Messages -->
+                    <div id="uploadStatus"></div>
+
+                    <!-- Upload Progress -->
+                    <div id="uploadProgress" class="upload-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressFill"></div>
+                        </div>
+                        <p id="progressText">Uploading...</p>
+                    </div>
+
+                    <!-- Upload Form -->
+                    <form id="uploadForm" method="post" enctype="multipart/form-data">
+                        @Html.AntiForgeryToken()
+
                         <!-- Drop area -->
                         <div id="drop-area" class="drop-area">
-                            <p>Drag & Drop PDF/Image here or click to select</p>
-                            <input type="file" id="prescriptionFile" name="file" accept=".pdf, image/*" required hidden>
+                            <p>Drag & Drop PDF file here or click to select</p>
+                            <input type="file" id="prescriptionFile" name="file" accept=".pdf" required hidden>
                         </div>
 
                         <!-- File preview with remove button -->
@@ -391,48 +440,52 @@
                         <!-- Dispense checkbox -->
                         <div class="checkbox-container">
                             <label class="checkbox-label">
-                                <input type="checkbox" id="dispenseCheckbox" name="DispenseUponApproval">
+                                <input type="checkbox" id="dispenseCheckbox" name="dispenseUponApproval">
                                 Dispense this prescription upon approval
                             </label>
                         </div>
 
                         <!-- Upload Button -->
-                        <button type="submit" class="btn-upload">Upload Prescription</button>
+                        <button type="button" class="btn-upload" onclick="uploadPrescription()">Upload Prescription</button>
                     </form>
 
                     <!-- Unprocessed Prescriptions -->
                     <div style="margin-top: 40px;">
                         <h2>📋 Unprocessed Prescriptions</h2>
-                        @if (Model.UnprocessedPrescriptions.Any())
-                        {
-                            <table class="prescription-table">
-                                <thead>
-                                    <tr>
-                                        <th>Date</th>
-                                        <th>Status</th>
-                                        <th>Dispense</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach (var prescription in Model.UnprocessedPrescriptions)
-                                    {
+                        <div id="unprocessedPrescriptions">
+                            @if (Model.UnprocessedPrescriptions.Any())
+                            {
+                                <table class="prescription-table">
+                                    <thead>
                                         <tr>
-                                            <td>@prescription.DateIssued.ToString("yyyy-MM-dd")</td>
-                                            <td>@(prescription.Status ?? "Pending")</td>
-                                            <td>@(prescription.DispenseUponApproval ? "Yes" : "No")</td>
-                                            <td>
-                                                <a href="@Url.Action("Download", "Prescription", new { id = prescription.PrescriptionID })" class="btn-upload">Download</a>
-                                            </td>
+                                            <th>Filename</th>
+                                            <th>Date</th>
+                                            <th>Status</th>
+                                            <th>Dispense</th>
+                                            <th>Actions</th>
                                         </tr>
-                                    }
-                                </tbody>
-                            </table>
-                        }
-                        else
-                        {
-                            <p>No unprocessed prescriptions found.</p>
-                        }
+                                    </thead>
+                                    <tbody id="unprocessedPrescriptionsBody">
+                                        @foreach (var prescription in Model.UnprocessedPrescriptions)
+                                        {
+                                            <tr id="prescription-@prescription.PrescriptionID">
+                                                <td class="filename-cell">Prescription_@(prescription.PrescriptionID.ToString("D3"))</td>
+                                                <td>@prescription.DateIssued.ToString("yyyy-MM-dd")</td>
+                                                <td>@(prescription.Status ?? "Pending")</td>
+                                                <td>@(prescription.DispenseUponApproval ? "Yes" : "No")</td>
+                                                <td>
+                                                    <a href="@Url.Action("DownloadPrescription", "CustomerDashboard", new { id = prescription.PrescriptionID })" class="btn-upload">Download</a>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            }
+                            else
+                            {
+                                <p id="noUnprocessedMessage">No unprocessed prescriptions found.</p>
+                            }
+                        </div>
                     </div>
 
                     <!-- Processed Prescriptions -->
@@ -443,6 +496,7 @@
                             <table class="prescription-table">
                                 <thead>
                                     <tr>
+                                        <th>Filename</th>
                                         <th>Date</th>
                                         <th>Doctor</th>
                                         <th>Status</th>
@@ -453,11 +507,12 @@
                                     @foreach (var prescription in Model.ProcessedPrescriptions)
                                     {
                                         <tr>
+                                            <td class="filename-cell">Prescription_@(prescription.PrescriptionID.ToString("D3"))</td>
                                             <td>@prescription.DateIssued.ToString("yyyy-MM-dd")</td>
                                             <td>@(prescription.Doctors?.Name ?? "Not Assigned")</td>
                                             <td>@prescription.Status</td>
                                             <td>
-                                                <a href="@Url.Action("Download", "Prescription", new { id = prescription.PrescriptionID })" class="btn-upload">Download</a>
+                                                <a href="@Url.Action("DownloadPrescription", "CustomerDashboard", new { id = prescription.PrescriptionID })" class="btn-upload">Download</a>
                                                 <button class="btn-upload" onclick="openOrderModal('@prescription.DateIssued.ToString("yyyy-MM-dd")', '@(prescription.Doctors?.Name ?? "Not Assigned")', @prescription.PrescriptionID)">Order</button>
                                             </td>
                                         </tr>
@@ -473,6 +528,7 @@
                 </div>
             }
 
+            <!-- Other sections remain the same -->
             <!-- Place Order Section -->
             @if (ViewContext.RouteData.Values["action"].ToString() == "PlaceOrder")
             {
@@ -607,6 +663,10 @@
             });
 
             function handleFileUpload(file) {
+                if (file.type !== 'application/pdf') {
+                    showUploadStatus('Please select a PDF file only.', 'error');
+                    return;
+                }
                 fileNameDisplay.textContent = file.name;
                 filePreview.style.display = 'flex';
             }
@@ -619,12 +679,134 @@
 
             if (fileInput) {
                 fileInput.value = "";
-                filePreview.style.display = 'none';
+                filePreview.style.display = "none";
                 fileNameDisplay.textContent = "";
             }
         }
 
-        // Modal functions
+        // Upload prescription via AJAX
+        async function uploadPrescription() {
+            const fileInput = document.getElementById('prescriptionFile');
+            const file = fileInput.files[0];
+            const dispenseCheckbox = document.getElementById('dispenseCheckbox');
+
+            if (!file) {
+                showUploadStatus('Please select a file to upload.', 'error');
+                return;
+            }
+
+            if (file.type !== 'application/pdf') {
+                showUploadStatus('Only PDF files are allowed.', 'error');
+                return;
+            }
+
+            // Show progress
+            showUploadProgress(true);
+            showUploadStatus('', 'clear');
+
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('dispenseUponApproval', dispenseCheckbox.checked);
+            formData.append('__RequestVerificationToken', document.querySelector('input[name="__RequestVerificationToken"]').value);
+
+            try {
+                const response = await fetch('@Url.Action("UploadPrescription", "CustomerDashboard")', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showUploadStatus('✅ ' + result.message, 'success');
+                    addPrescriptionToTable(result);
+                    removeSelectedFile();
+                    resetForm();
+                } else {
+                    showUploadStatus('❌ ' + result.message, 'error');
+                }
+            } catch (error) {
+                showUploadStatus('❌ Error uploading prescription: ' + error.message, 'error');
+            } finally {
+                showUploadProgress(false);
+            }
+        }
+
+        function showUploadStatus(message, type) {
+            const statusDiv = document.getElementById('uploadStatus');
+            statusDiv.innerHTML = '';
+
+            if (message) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = type === 'success' ? 'success-message' : 'error-message';
+                messageDiv.textContent = message;
+                statusDiv.appendChild(messageDiv);
+            }
+        }
+
+        function showUploadProgress(show) {
+            const progressDiv = document.getElementById('uploadProgress');
+            if (show) {
+                progressDiv.style.display = 'block';
+                document.getElementById('progressFill').style.width = '0%';
+            } else {
+                progressDiv.style.display = 'none';
+            }
+        }
+
+        function addPrescriptionToTable(result) {
+            // Remove "no prescriptions" message if it exists
+            const noUnprocessedMessage = document.getElementById('noUnprocessedMessage');
+            if (noUnprocessedMessage) {
+                noUnprocessedMessage.remove();
+            }
+
+            // Get or create the table body
+            let tbody = document.getElementById('unprocessedPrescriptionsBody');
+            if (!tbody) {
+                // Create table structure if it doesn't exist
+                const table = document.createElement('table');
+                table.className = 'prescription-table';
+                table.innerHTML = `
+                    <thead>
+                        <tr>
+                            <th>Filename</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th>Dispense</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="unprocessedPrescriptionsBody"></tbody>
+                `;
+                document.getElementById('unprocessedPrescriptions').appendChild(table);
+                tbody = document.getElementById('unprocessedPrescriptionsBody');
+            }
+
+            // Format the prescription ID with leading zeros
+            const formattedId = result.prescriptionId.toString().padStart(3, '0');
+
+            // Add new prescription row
+            const newRow = document.createElement('tr');
+            newRow.id = 'prescription-' + result.prescriptionId;
+            newRow.innerHTML = `
+                <td class="filename-cell">Prescription_${formattedId}</td>
+                <td>${result.date}</td>
+                <td>${result.status}</td>
+                <td>${result.dispense}</td>
+                <td>
+                    <a href="@Url.Action("DownloadPrescription", "CustomerDashboard")/${result.prescriptionId}" class="btn-upload">Download</a>
+                </td>
+            `;
+
+            tbody.appendChild(newRow);
+        }
+
+        function resetForm() {
+            document.getElementById('dispenseCheckbox').checked = false;
+        }
+
+        // Modal functions (keep your existing modal functions)
         function openOrderModal(date, doctor, prescriptionId) {
             console.log('Opening order modal for prescription:', prescriptionId);
             document.getElementById("modalDate").textContent = date;
@@ -756,11 +938,11 @@
                 const row = checkbox.closest('tr');
                 const qtyInput = row.querySelector('.med-qty');
                 const qty = parseInt(qtyInput.value) || 1;
-                const instructions = row.cells[4].textContent; // Instructions is now in 5th cell
+                const instructions = row.cells[4].textContent;
 
                 selectedMedications.push({
                     medicationId: parseInt(medicationId),
-                    scriptLineId: parseInt(scriptLineId), // ADDED: ScriptLineId
+                    scriptLineId: parseInt(scriptLineId),
                     quantity: qty,
                     instructions: instructions,
                     isRepeat: false
@@ -791,8 +973,6 @@
                 if (result.success) {
                     alert('✅ Order placed successfully!');
                     closeModal();
-                    // Refresh the page to show updated orders
-                    window.location.reload();
                 } else {
                     alert('❌ Error: ' + result.message);
                 }
@@ -851,38 +1031,6 @@
                 }
             } catch (error) {
                 alert('❌ Error requesting refill: ' + error.message);
-            }
-        }
-
-        // Generate PDF report
-        async function generatePDFReport() {
-            const reportDate = document.getElementById("reportDate").value;
-            if (!reportDate) {
-                alert("Please select a date.");
-                return;
-            }
-
-            try {
-                const response = await fetch('@Url.Action("GenerateReport", "CustomerDashboard")', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
-                    },
-                    body: JSON.stringify({ reportDate: reportDate })
-                });
-
-                const result = await response.json();
-
-                if (result.success) {
-                    // Here you would typically generate and download the PDF
-                    // For now, just show success message
-                    alert('✅ Report generated successfully!');
-                } else {
-                    alert('❌ Error: ' + result.message);
-                }
-            } catch (error) {
-                alert('❌ Error generating report: ' + error.message);
             }
         }
     </script>

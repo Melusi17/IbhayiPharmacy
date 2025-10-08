@@ -24,7 +24,7 @@ namespace IbhayiPharmacy.Controllers
             return View();
         }
 
-        // Upload Prescription Section
+        // Upload Prescription Section - GET
         public async Task<IActionResult> UploadPrescription()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -46,6 +46,82 @@ namespace IbhayiPharmacy.Controllers
             };
 
             return View(model);
+        }
+
+        // Upload Prescription - POST (AJAX)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<JsonResult> UploadPrescription(IFormFile file, bool dispenseUponApproval)
+        {
+            try
+            {
+                if (file == null || file.Length == 0)
+                {
+                    return Json(new { success = false, message = "Please select a file to upload." });
+                }
+
+                // Validate file type
+                var fileExtension = Path.GetExtension(file.FileName).ToLower();
+                if (fileExtension != ".pdf")
+                {
+                    return Json(new { success = false, message = "Only PDF files are allowed." });
+                }
+
+                // Validate file size (optional: limit to 10MB)
+                if (file.Length > 10 * 1024 * 1024) // 10MB
+                {
+                    return Json(new { success = false, message = "File size must be less than 10MB." });
+                }
+
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+                // Create new prescription
+                var prescription = new Prescription
+                {
+                    ApplicationUserId = userId,
+                    DateIssued = DateTime.Now,
+                    DispenseUponApproval = dispenseUponApproval,
+                    Status = "Unprocessed"
+                };
+
+                // Store file as byte array in database ONLY (no file system storage)
+                using (var ms = new MemoryStream())
+                {
+                    await file.CopyToAsync(ms);
+                    prescription.Script = ms.ToArray();
+                }
+
+                // Save to database
+                _context.Prescriptions.Add(prescription);
+                await _context.SaveChangesAsync();
+
+                return Json(new
+                {
+                    success = true,
+                    message = "Prescription uploaded successfully!",
+                    prescriptionId = prescription.PrescriptionID,
+                    date = prescription.DateIssued.ToString("yyyy-MM-dd"),
+                    status = prescription.Status,
+                    dispense = prescription.DispenseUponApproval ? "Yes" : "No"
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"Error uploading prescription: {ex.Message}" });
+            }
+        }
+
+        // Download Prescription
+        public async Task<IActionResult> DownloadPrescription(int id)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var prescription = await _context.Prescriptions
+                .FirstOrDefaultAsync(p => p.PrescriptionID == id && p.ApplicationUserId == userId);
+
+            if (prescription == null || prescription.Script == null)
+                return NotFound();
+
+            return File(prescription.Script, "application/pdf", $"Prescription_{id.ToString("D3")}.pdf");
         }
 
         // Place Orders Section
@@ -104,7 +180,7 @@ namespace IbhayiPharmacy.Controllers
         }
 
         // View Reports Section
-        public IActionResult ViewReports() // Removed async - no await needed
+        public IActionResult ViewReports()
         {
             return View();
         }
@@ -115,10 +191,11 @@ namespace IbhayiPharmacy.Controllers
         {
             try
             {
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
                 var prescription = await _context.Prescriptions
                     .Include(p => p.scriptLines!)
                     .ThenInclude(sl => sl.Medications)
-                    .FirstOrDefaultAsync(p => p.PrescriptionID == prescriptionId);
+                    .FirstOrDefaultAsync(p => p.PrescriptionID == prescriptionId && p.ApplicationUserId == userId);
 
                 if (prescription == null || prescription.scriptLines == null)
                     return Json(new List<object>());
