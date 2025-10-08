@@ -6,8 +6,6 @@ namespace IbhayiPharmacy.Models
 {
     public class ApplicationUser : IdentityUser
     {
-       
-
         [Required]
         public string Name { get; set; }
 
@@ -25,6 +23,8 @@ namespace IbhayiPharmacy.Models
         public string RoleId { get; set; }
         [NotMapped]
         public string UserClaim { get; set; }
+        [Required]
+        public string Password { get; set; }
 
     }
 }

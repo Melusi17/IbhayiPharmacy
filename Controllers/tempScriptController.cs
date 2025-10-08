@@ -234,7 +234,7 @@ public class tempScriptController : Controller
         var medication = await _context.Medications
             .Include(m => m.Medication_Ingredients)
             .ThenInclude(mi => mi.Active_Ingredients)
-            .FirstOrDefaultAsync(m => m.MedcationID == id);
+            .FirstOrDefaultAsync(m => m.MedicationID == id);
 
         if (medication == null) return NotFound();
 
