@@ -37,76 +37,194 @@ namespace IbhayiPharmacy.Migrations
                     b.HasKey("Active_IngredientID");
 
                     b.ToTable("Active_Ingredients");
-                });
 
-            modelBuilder.Entity("IbhayiPharmacy.Models.Allergy", b =>
-                {
-                    b.Property<int>("AllergyId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AllergyId"));
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("AllergyId");
-
-                    b.ToTable("Allergies");
+                    b.HasData(
+                        new
+                        {
+                            Active_IngredientID = 1,
+                            Name = "Pylorazine"
+                        },
+                        new
+                        {
+                            Active_IngredientID = 2,
+                            Name = "Vaspril"
+                        },
+                        new
+                        {
+                            Active_IngredientID = 3,
+                            Name = "Zentropine"
+                        },
+                        new
+                        {
+                            Active_IngredientID = 4,
+                            Name = "Histarelin"
+                        },
+                        new
+                        {
+                            Active_IngredientID = 5,
+                            Name = "Lorvexamine"
+                        },
+                        new
+                        {
+                            Active_IngredientID = 6,
+                            Name = "Aterolazine"
+                        },
+                        new
+                        {
+                            Active_IngredientID = 7,
+                            Name = "Bronchomid"
+                        },
+                        new
+                        {
+                            Active_IngredientID = 8,
+                            Name = "Alveclear"
+                        },
+                        new
+                        {
+                            Active_IngredientID = 9,
+                            Name = "Epidraxol"
+                        },
+                        new
+                        {
+                            Active_IngredientID = 10,
+                            Name = "Cortizane"
+                        },
+                        new
+                        {
+                            Active_IngredientID = 11,
+                            Name = "Glycerrol"
+                        },
+                        new
+                        {
+                            Active_IngredientID = 12,
+                            Name = "Sonnexil"
+                        },
+                        new
+                        {
+                            Active_IngredientID = 13,
+                            Name = "Calcitrine"
+                        },
+                        new
+                        {
+                            Active_IngredientID = 14,
+                            Name = "Phospholax"
+                        },
+                        new
+                        {
+                            Active_IngredientID = 15,
+                            Name = "Virocelin"
+                        },
+                        new
+                        {
+                            Active_IngredientID = 16,
+                            Name = "Immubrine"
+                        },
+                        new
+                        {
+                            Active_IngredientID = 17,
+                            Name = "Trosamine"
+                        },
+                        new
+                        {
+                            Active_IngredientID = 18,
+                            Name = "Velocidine"
+                        },
+                        new
+                        {
+                            Active_IngredientID = 19,
+                            Name = "Nexorin"
+                        },
+                        new
+                        {
+                            Active_IngredientID = 20,
+                            Name = "Zyphralex"
+                        },
+                        new
+                        {
+                            Active_IngredientID = 21,
+                            Name = "Cardionol"
+                        },
+                        new
+                        {
+                            Active_IngredientID = 22,
+                            Name = "Alveretol"
+                        },
+                        new
+                        {
+                            Active_IngredientID = 23,
+                            Name = "Xylogran"
+                        },
+                        new
+                        {
+                            Active_IngredientID = 24,
+                            Name = "Fematrix"
+                        },
+                        new
+                        {
+                            Active_IngredientID = 25,
+                            Name = "Plastorin"
+                        },
+                        new
+                        {
+                            Active_IngredientID = 26,
+                            Name = "Seralox"
+                        },
+                        new
+                        {
+                            Active_IngredientID = 27,
+                            Name = "Quantrel"
+                        },
+                        new
+                        {
+                            Active_IngredientID = 28,
+                            Name = "Myvetrin"
+                        },
+                        new
+                        {
+                            Active_IngredientID = 29,
+                            Name = "Draxolene"
+                        },
+                        new
+                        {
+                            Active_IngredientID = 30,
+                            Name = "Veltraxin"
+                        });
                 });
 
             modelBuilder.Entity("IbhayiPharmacy.Models.Customer", b =>
                 {
-                    b.Property<int>("CustomerID")
+                    b.Property<int>("CustormerID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CustomerID"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CustormerID"));
 
                     b.Property<string>("ApplicationUserId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("IdNumber")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PasswordHash")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Surname")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("CustomerID");
+                    b.HasKey("CustormerID");
 
                     b.HasIndex("ApplicationUserId");
 
                     b.ToTable("Customers");
                 });
 
-            modelBuilder.Entity("IbhayiPharmacy.Models.CustomerAllergy", b =>
+            modelBuilder.Entity("IbhayiPharmacy.Models.Custormer_Allergy", b =>
                 {
-                    b.Property<int>("Customer_AllergyId")
+                    b.Property<int>("Custormer_AllergyID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Customer_AllergyId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Custormer_AllergyID"));
 
                     b.Property<int>("Active_IngredientID")
                         .HasColumnType("int");
 
-                    b.Property<int>("AllergyId")
+                    b.Property<int>("CustomerID")
                         .HasColumnType("int");
 
-                    b.Property<int>("CustomerId")
-                        .HasColumnType("int");
+                    b.HasKey("Custormer_AllergyID");
 
                     b.HasIndex("Active_IngredientID");
 
@@ -146,6 +264,71 @@ namespace IbhayiPharmacy.Migrations
                     b.HasKey("DoctorID");
 
                     b.ToTable("Doctors");
+
+                    b.HasData(
+                        new
+                        {
+                            DoctorID = 1,
+                            ContactNumber = "071 234 5678",
+                            Email = "charmaine@example.com",
+                            HealthCouncilRegistrationNumber = "976431",
+                            Name = "Charmaine",
+                            Surname = "Meintjies"
+                        },
+                        new
+                        {
+                            DoctorID = 2,
+                            ContactNumber = "072 234 5678",
+                            Email = "jacob@example.com",
+                            HealthCouncilRegistrationNumber = "316497",
+                            Name = "Jacob",
+                            Surname = "Moloi"
+                        },
+                        new
+                        {
+                            DoctorID = 3,
+                            ContactNumber = "073 234 5678",
+                            Email = "david@gmail.example",
+                            HealthCouncilRegistrationNumber = "718293",
+                            Name = "David",
+                            Surname = "Greeff"
+                        },
+                        new
+                        {
+                            DoctorID = 4,
+                            ContactNumber = "075 234 5678",
+                            Email = "karien@example.com",
+                            HealthCouncilRegistrationNumber = "159753",
+                            Name = "Karien",
+                            Surname = "Momberg"
+                        },
+                        new
+                        {
+                            DoctorID = 5,
+                            ContactNumber = "076 234 5678",
+                            Email = "felicity@example.com",
+                            HealthCouncilRegistrationNumber = "951357",
+                            Name = "Felicity",
+                            Surname = "Daniels"
+                        },
+                        new
+                        {
+                            DoctorID = 6,
+                            ContactNumber = "078 234 5678",
+                            Email = "errol@example.com",
+                            HealthCouncilRegistrationNumber = "852456",
+                            Name = "Errol",
+                            Surname = "Pieterse"
+                        },
+                        new
+                        {
+                            DoctorID = 7,
+                            ContactNumber = "079 234 5678",
+                            Email = "alyce@example.com",
+                            HealthCouncilRegistrationNumber = "654852",
+                            Name = "Alyce",
+                            Surname = "Morapedi"
+                        });
                 });
 
             modelBuilder.Entity("IbhayiPharmacy.Models.DosageForm", b =>
@@ -163,15 +346,77 @@ namespace IbhayiPharmacy.Migrations
                     b.HasKey("DosageFormID");
 
                     b.ToTable("DosageForms");
+
+                    b.HasData(
+                        new
+                        {
+                            DosageFormID = 1,
+                            DosageFormName = "Tablet"
+                        },
+                        new
+                        {
+                            DosageFormID = 2,
+                            DosageFormName = "Capsule"
+                        },
+                        new
+                        {
+                            DosageFormID = 3,
+                            DosageFormName = "Suspension"
+                        },
+                        new
+                        {
+                            DosageFormID = 4,
+                            DosageFormName = "Syrup"
+                        },
+                        new
+                        {
+                            DosageFormID = 5,
+                            DosageFormName = "Lotion"
+                        },
+                        new
+                        {
+                            DosageFormID = 6,
+                            DosageFormName = "Spray"
+                        },
+                        new
+                        {
+                            DosageFormID = 7,
+                            DosageFormName = "Gel"
+                        },
+                        new
+                        {
+                            DosageFormID = 8,
+                            DosageFormName = "Suppository"
+                        },
+                        new
+                        {
+                            DosageFormID = 9,
+                            DosageFormName = "Injectable"
+                        },
+                        new
+                        {
+                            DosageFormID = 10,
+                            DosageFormName = "Drops"
+                        },
+                        new
+                        {
+                            DosageFormID = 11,
+                            DosageFormName = "IV Drip"
+                        },
+                        new
+                        {
+                            DosageFormID = 12,
+                            DosageFormName = "Powder"
+                        });
                 });
 
             modelBuilder.Entity("IbhayiPharmacy.Models.Medication", b =>
                 {
-                    b.Property<int>("MedicationID")
+                    b.Property<int>("MedcationID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MedicationID"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MedcationID"));
 
                     b.Property<int>("CurrentPrice")
                         .HasColumnType("int");
@@ -196,13 +441,180 @@ namespace IbhayiPharmacy.Migrations
                     b.Property<int>("SupplierID")
                         .HasColumnType("int");
 
-                    b.HasKey("MedicationID");
+                    b.HasKey("MedcationID");
 
                     b.HasIndex("DosageFormID");
 
                     b.HasIndex("SupplierID");
 
                     b.ToTable("Medications");
+
+                    b.HasData(
+                        new
+                        {
+                            MedcationID = 1,
+                            CurrentPrice = 150,
+                            DosageFormID = 1,
+                            MedicationName = "CardioVex",
+                            QuantityOnHand = 90,
+                            ReOrderLevel = 100,
+                            Schedule = "6",
+                            SupplierID = 1
+                        },
+                        new
+                        {
+                            MedcationID = 2,
+                            CurrentPrice = 200,
+                            DosageFormID = 1,
+                            MedicationName = "Neurocalm",
+                            QuantityOnHand = 100,
+                            ReOrderLevel = 110,
+                            Schedule = "2",
+                            SupplierID = 2
+                        },
+                        new
+                        {
+                            MedcationID = 3,
+                            CurrentPrice = 180,
+                            DosageFormID = 12,
+                            MedicationName = "Allerfree Duo",
+                            QuantityOnHand = 100,
+                            ReOrderLevel = 150,
+                            Schedule = "0",
+                            SupplierID = 3
+                        },
+                        new
+                        {
+                            MedcationID = 4,
+                            CurrentPrice = 95,
+                            DosageFormID = 1,
+                            MedicationName = "GastroEase",
+                            QuantityOnHand = 470,
+                            ReOrderLevel = 400,
+                            Schedule = "3",
+                            SupplierID = 4
+                        },
+                        new
+                        {
+                            MedcationID = 5,
+                            CurrentPrice = 120,
+                            DosageFormID = 1,
+                            MedicationName = "Respivent",
+                            QuantityOnHand = 490,
+                            ReOrderLevel = 300,
+                            Schedule = "3",
+                            SupplierID = 5
+                        },
+                        new
+                        {
+                            MedcationID = 6,
+                            CurrentPrice = 85,
+                            DosageFormID = 1,
+                            MedicationName = "Dermagard",
+                            QuantityOnHand = 790,
+                            ReOrderLevel = 600,
+                            Schedule = "3",
+                            SupplierID = 2
+                        },
+                        new
+                        {
+                            MedcationID = 7,
+                            CurrentPrice = 210,
+                            DosageFormID = 1,
+                            MedicationName = "Metaborex",
+                            QuantityOnHand = 250,
+                            ReOrderLevel = 200,
+                            Schedule = "4",
+                            SupplierID = 2
+                        },
+                        new
+                        {
+                            MedcationID = 8,
+                            CurrentPrice = 175,
+                            DosageFormID = 1,
+                            MedicationName = "Sleeptraze",
+                            QuantityOnHand = 110,
+                            ReOrderLevel = 100,
+                            Schedule = "2",
+                            SupplierID = 2
+                        },
+                        new
+                        {
+                            MedcationID = 9,
+                            CurrentPrice = 300,
+                            DosageFormID = 3,
+                            MedicationName = "OsteoFlex",
+                            QuantityOnHand = 210,
+                            ReOrderLevel = 200,
+                            Schedule = "3",
+                            SupplierID = 2
+                        },
+                        new
+                        {
+                            MedcationID = 10,
+                            CurrentPrice = 450,
+                            DosageFormID = 9,
+                            MedicationName = "Immunexin",
+                            QuantityOnHand = 190,
+                            ReOrderLevel = 200,
+                            Schedule = "6",
+                            SupplierID = 2
+                        },
+                        new
+                        {
+                            MedcationID = 11,
+                            CurrentPrice = 600,
+                            DosageFormID = 11,
+                            MedicationName = "CardioPlus",
+                            QuantityOnHand = 600,
+                            ReOrderLevel = 500,
+                            Schedule = "6",
+                            SupplierID = 2
+                        },
+                        new
+                        {
+                            MedcationID = 12,
+                            CurrentPrice = 350,
+                            DosageFormID = 11,
+                            MedicationName = "AllerCalm",
+                            QuantityOnHand = 410,
+                            ReOrderLevel = 400,
+                            Schedule = "6",
+                            SupplierID = 2
+                        },
+                        new
+                        {
+                            MedcationID = 13,
+                            CurrentPrice = 280,
+                            DosageFormID = 9,
+                            MedicationName = "RespirAid",
+                            QuantityOnHand = 100,
+                            ReOrderLevel = 100,
+                            Schedule = "6",
+                            SupplierID = 2
+                        },
+                        new
+                        {
+                            MedcationID = 14,
+                            CurrentPrice = 125,
+                            DosageFormID = 5,
+                            MedicationName = "DermaClear",
+                            QuantityOnHand = 200,
+                            ReOrderLevel = 100,
+                            Schedule = "6",
+                            SupplierID = 2
+                        },
+                        new
+                        {
+                            MedcationID = 15,
+                            CurrentPrice = 190,
+                            DosageFormID = 2,
+                            MedicationName = "OsteoPrime",
+                            QuantityOnHand = 400,
+                            ReOrderLevel = 100,
+                            Schedule = "6",
+                            SupplierID = 2
+                        });
                 });
 
             modelBuilder.Entity("IbhayiPharmacy.Models.Medication_Ingredient", b =>
@@ -230,6 +642,162 @@ namespace IbhayiPharmacy.Migrations
                     b.HasIndex("MedicationID");
 
                     b.ToTable("Medication_Ingredients");
+
+                    b.HasData(
+                        new
+                        {
+                            Medication_IngredientID = 1,
+                            Active_IngredientID = 6,
+                            MedicationID = 1,
+                            Strength = "18mg"
+                        },
+                        new
+                        {
+                            Medication_IngredientID = 2,
+                            Active_IngredientID = 2,
+                            MedicationID = 2,
+                            Strength = "2mg"
+                        },
+                        new
+                        {
+                            Medication_IngredientID = 3,
+                            Active_IngredientID = 3,
+                            MedicationID = 2,
+                            Strength = "50mg"
+                        },
+                        new
+                        {
+                            Medication_IngredientID = 4,
+                            Active_IngredientID = 4,
+                            MedicationID = 3,
+                            Strength = "325mg"
+                        },
+                        new
+                        {
+                            Medication_IngredientID = 5,
+                            Active_IngredientID = 5,
+                            MedicationID = 3,
+                            Strength = "453.6g"
+                        },
+                        new
+                        {
+                            Medication_IngredientID = 6,
+                            Active_IngredientID = 1,
+                            MedicationID = 4,
+                            Strength = "Standard"
+                        },
+                        new
+                        {
+                            Medication_IngredientID = 7,
+                            Active_IngredientID = 7,
+                            MedicationID = 5,
+                            Strength = "Standard"
+                        },
+                        new
+                        {
+                            Medication_IngredientID = 8,
+                            Active_IngredientID = 8,
+                            MedicationID = 5,
+                            Strength = "Standard"
+                        },
+                        new
+                        {
+                            Medication_IngredientID = 9,
+                            Active_IngredientID = 9,
+                            MedicationID = 6,
+                            Strength = "Standard"
+                        },
+                        new
+                        {
+                            Medication_IngredientID = 10,
+                            Active_IngredientID = 10,
+                            MedicationID = 6,
+                            Strength = "Standard"
+                        },
+                        new
+                        {
+                            Medication_IngredientID = 11,
+                            Active_IngredientID = 11,
+                            MedicationID = 7,
+                            Strength = "Standard"
+                        },
+                        new
+                        {
+                            Medication_IngredientID = 12,
+                            Active_IngredientID = 12,
+                            MedicationID = 8,
+                            Strength = "Standard"
+                        },
+                        new
+                        {
+                            Medication_IngredientID = 13,
+                            Active_IngredientID = 13,
+                            MedicationID = 9,
+                            Strength = "Standard"
+                        },
+                        new
+                        {
+                            Medication_IngredientID = 14,
+                            Active_IngredientID = 14,
+                            MedicationID = 9,
+                            Strength = "Standard"
+                        },
+                        new
+                        {
+                            Medication_IngredientID = 15,
+                            Active_IngredientID = 15,
+                            MedicationID = 10,
+                            Strength = "Standard"
+                        },
+                        new
+                        {
+                            Medication_IngredientID = 16,
+                            Active_IngredientID = 16,
+                            MedicationID = 10,
+                            Strength = "Standard"
+                        },
+                        new
+                        {
+                            Medication_IngredientID = 17,
+                            Active_IngredientID = 13,
+                            MedicationID = 11,
+                            Strength = "Standard"
+                        },
+                        new
+                        {
+                            Medication_IngredientID = 18,
+                            Active_IngredientID = 6,
+                            MedicationID = 11,
+                            Strength = "Standard"
+                        },
+                        new
+                        {
+                            Medication_IngredientID = 19,
+                            Active_IngredientID = 4,
+                            MedicationID = 12,
+                            Strength = "Standard"
+                        },
+                        new
+                        {
+                            Medication_IngredientID = 20,
+                            Active_IngredientID = 7,
+                            MedicationID = 13,
+                            Strength = "Standard"
+                        },
+                        new
+                        {
+                            Medication_IngredientID = 21,
+                            Active_IngredientID = 9,
+                            MedicationID = 14,
+                            Strength = "20mg"
+                        },
+                        new
+                        {
+                            Medication_IngredientID = 22,
+                            Active_IngredientID = 13,
+                            MedicationID = 15,
+                            Strength = "20mg"
+                        });
                 });
 
             modelBuilder.Entity("IbhayiPharmacy.Models.NewScript", b =>
@@ -478,15 +1046,7 @@ namespace IbhayiPharmacy.Migrations
                     b.Property<DateTime>("DateIssued")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("DoctorID")
-                        .HasColumnType("int");
-
-                    b.Property<string>("FileName")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<bool>("IsProcessed")
+                    b.Property<bool>("DispenseUponApproval")
                         .HasColumnType("bit");
 
                     b.Property<int?>("DoctorID")
@@ -496,13 +1056,10 @@ namespace IbhayiPharmacy.Migrations
                         .IsRequired()
                         .HasColumnType("varbinary(max)");
 
+                    b.Property<string>("Status")
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("PrescriptionID");
-
-                    b.HasIndex("CustomerID");
-
-                    b.HasIndex("DoctorID");
-
-                    b.HasIndex("PharmacistID");
 
                     b.HasIndex("ApplicationUserId");
 
@@ -568,14 +1125,8 @@ namespace IbhayiPharmacy.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("StockOrderID"));
 
-                    b.Property<int>("MedicationID")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("OrderDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<int>("Quantity")
-                        .HasColumnType("int");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -585,10 +1136,6 @@ namespace IbhayiPharmacy.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("StockOrderID");
-
-                    b.HasIndex("MedicationID");
-
-                    b.HasIndex("SupplierID");
 
                     b.ToTable("StockOrders");
                 });
@@ -627,10 +1174,6 @@ namespace IbhayiPharmacy.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ContactNumber")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("ContactSurname")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -646,6 +1189,48 @@ namespace IbhayiPharmacy.Migrations
                     b.HasKey("SupplierID");
 
                     b.ToTable("Suppliers");
+
+                    b.HasData(
+                        new
+                        {
+                            SupplierID = 1,
+                            ContactName = "Davie",
+                            ContactSurname = "Jones",
+                            EmailAddress = "davie@example.com",
+                            SupplierName = "NovaCure"
+                        },
+                        new
+                        {
+                            SupplierID = 2,
+                            ContactName = "Nicky",
+                            ContactSurname = "Mostert",
+                            EmailAddress = "nmostert@mandela.ac.za",
+                            SupplierName = "HelixMed"
+                        },
+                        new
+                        {
+                            SupplierID = 3,
+                            ContactName = "Matimu",
+                            ContactSurname = "Vuqa",
+                            EmailAddress = "matimu@example.com",
+                            SupplierName = "VitaGenix"
+                        },
+                        new
+                        {
+                            SupplierID = 4,
+                            ContactName = "Lulu",
+                            ContactSurname = "Ndhambi",
+                            EmailAddress = "lulu@example.com",
+                            SupplierName = "Apex Biomed"
+                        },
+                        new
+                        {
+                            SupplierID = 5,
+                            ContactName = "Pharmacy Manager Group Member Name",
+                            ContactSurname = "Pharmacy Manager Group Member Surname",
+                            EmailAddress = "Pharmacy Manager Group Member E-mail",
+                            SupplierName = "CuraNova"
+                        });
                 });
 
             modelBuilder.Entity("IbhayiPharmacy.Models.UnprocessedScripts", b =>
@@ -900,10 +1485,6 @@ namespace IbhayiPharmacy.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Password")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Surname")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -1094,7 +1675,7 @@ namespace IbhayiPharmacy.Migrations
                         .IsRequired();
 
                     b.HasOne("IbhayiPharmacy.Models.Prescription", "Prescriptions")
-                        .WithMany()
+                        .WithMany("scriptLines")
                         .HasForeignKey("PrescriptionID")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
@@ -1102,25 +1683,6 @@ namespace IbhayiPharmacy.Migrations
                     b.Navigation("Medications");
 
                     b.Navigation("Prescriptions");
-                });
-
-            modelBuilder.Entity("IbhayiPharmacy.Models.StockOrder", b =>
-                {
-                    b.HasOne("IbhayiPharmacy.Models.Medication", "Medication")
-                        .WithMany()
-                        .HasForeignKey("MedicationID")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("IbhayiPharmacy.Models.Supplier", "Supplier")
-                        .WithMany()
-                        .HasForeignKey("SupplierID")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Medication");
-
-                    b.Navigation("Supplier");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -1196,7 +1758,7 @@ namespace IbhayiPharmacy.Migrations
 
             modelBuilder.Entity("IbhayiPharmacy.Models.Prescription", b =>
                 {
-                    b.Navigation("Prescriptions");
+                    b.Navigation("scriptLines");
                 });
 #pragma warning restore 612, 618
         }

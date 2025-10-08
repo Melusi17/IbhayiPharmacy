@@ -1,4 +1,4 @@
-﻿@model IbhayiPharmacy.Models.DosageForm
+﻿
 @{
     ViewData["Title"] = "AddDosageForms";
     Layout = "~/Views/Shared/_ManagerLayout.cshtml";
@@ -9,12 +9,10 @@
 <div class="card p-3">
     <h5 class="title-underline">New Dosage Form</h5>
     <div class="card-body">
-        <form asp-action="AddDosageForms" asp-controller="PharmacyManager" method="post">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <form>
             <div class="mb-3">
-                <label asp-for="DosageFormName" class="form-label">Dosage Form Name</label>
-                <input asp-for="DosageFormName" type="text" class="form-control" id="dosageFormName" placeholder="e.g. Tablet, Syrup">
-                <span asp-validation-for="DosageFormName" class="text-danger"></span>
+                <label for="dosageFormName" class="form-label">Dosage Form Name</label>
+                <input type="text" class="form-control" id="dosageFormName" placeholder="e.g. Tablet, Syrup">
             </div>
             <button type="submit" class="btn btn-primary">Add Dosage Form</button>
         </form>

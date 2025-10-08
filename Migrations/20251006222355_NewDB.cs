@@ -8,11 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace IbhayiPharmacy.Migrations
 {
     /// <inheritdoc />
-<<<<<<<< HEAD:Migrations/20251006222355_NewDB.cs
     public partial class NewDB : Migration
-========
-    public partial class @new : Migration
->>>>>>>> 7ddec7275b4771ca7bb88a7b4e8be51fc30c4c8a:Migrations/20250918114404_new.cs
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -28,19 +24,6 @@ namespace IbhayiPharmacy.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Active_Ingredients", x => x.Active_IngredientID);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Allergies",
-                columns: table => new
-                {
-                    AllergyId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Allergies", x => x.AllergyId);
                 });
 
             migrationBuilder.CreateTable(
@@ -68,10 +51,6 @@ namespace IbhayiPharmacy.Migrations
                     IDNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CellphoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Active_IngredientID = table.Column<int>(type: "int", nullable: true),
-<<<<<<<< HEAD:Migrations/20251006222355_NewDB.cs
-========
-                    Password = table.Column<string>(type: "nvarchar(max)", nullable: true),
->>>>>>>> 7ddec7275b4771ca7bb88a7b4e8be51fc30c4c8a:Migrations/20250918114404_new.cs
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -209,6 +188,21 @@ namespace IbhayiPharmacy.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "StockOrders",
+                columns: table => new
+                {
+                    StockOrderID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    OrderDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    SupplierID = table.Column<int>(type: "int", nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_StockOrders", x => x.StockOrderID);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Suppliers",
                 columns: table => new
                 {
@@ -217,7 +211,6 @@ namespace IbhayiPharmacy.Migrations
                     SupplierName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ContactName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ContactSurname = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ContactNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     EmailAddress = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
@@ -351,22 +344,13 @@ namespace IbhayiPharmacy.Migrations
                 name: "Customers",
                 columns: table => new
                 {
-                    CustomerID = table.Column<int>(type: "int", nullable: false)
+                    CustormerID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-<<<<<<<< HEAD:Migrations/20251006222355_NewDB.cs
-========
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Surname = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    IdNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Cellphone = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: false),
->>>>>>>> 7ddec7275b4771ca7bb88a7b4e8be51fc30c4c8a:Migrations/20250918114404_new.cs
                     ApplicationUserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Customers", x => x.CustomerID);
+                    table.PrimaryKey("PK_Customers", x => x.CustormerID);
                     table.ForeignKey(
                         name: "FK_Customers_AspNetUsers_ApplicationUserId",
                         column: x => x.ApplicationUserId,
@@ -381,8 +365,8 @@ namespace IbhayiPharmacy.Migrations
                 {
                     PharmacistID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    HealthCouncilRegNo = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ApplicationUserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                    ApplicationUserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    HealthCouncilRegNo = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -413,7 +397,6 @@ namespace IbhayiPharmacy.Migrations
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
-<<<<<<<< HEAD:Migrations/20251006222355_NewDB.cs
                 });
 
             migrationBuilder.CreateTable(
@@ -443,15 +426,13 @@ namespace IbhayiPharmacy.Migrations
                         column: x => x.DoctorID,
                         principalTable: "Doctors",
                         principalColumn: "DoctorID");
-========
->>>>>>>> 7ddec7275b4771ca7bb88a7b4e8be51fc30c4c8a:Migrations/20250918114404_new.cs
                 });
 
             migrationBuilder.CreateTable(
                 name: "Medications",
                 columns: table => new
                 {
-                    MedicationID = table.Column<int>(type: "int", nullable: false)
+                    MedcationID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     DosageFormID = table.Column<int>(type: "int", nullable: false),
                     MedicationName = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -463,7 +444,7 @@ namespace IbhayiPharmacy.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Medications", x => x.MedicationID);
+                    table.PrimaryKey("PK_Medications", x => x.MedcationID);
                     table.ForeignKey(
                         name: "FK_Medications_DosageForms_DosageFormID",
                         column: x => x.DosageFormID,
@@ -479,27 +460,16 @@ namespace IbhayiPharmacy.Migrations
                 });
 
             migrationBuilder.CreateTable(
-<<<<<<<< HEAD:Migrations/20251006222355_NewDB.cs
                 name: "Custormer_Allergies",
                 columns: table => new
                 {
                     Custormer_AllergyID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     CustomerID = table.Column<int>(type: "int", nullable: false),
-========
-                name: "Customer_Allergies",
-                columns: table => new
-                {
-                    Customer_AllergyId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    CustomerId = table.Column<int>(type: "int", nullable: false),
-                    AllergyId = table.Column<int>(type: "int", nullable: false),
->>>>>>>> 7ddec7275b4771ca7bb88a7b4e8be51fc30c4c8a:Migrations/20250918114404_new.cs
                     Active_IngredientID = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-<<<<<<<< HEAD:Migrations/20251006222355_NewDB.cs
                     table.PrimaryKey("PK_Custormer_Allergies", x => x.Custormer_AllergyID);
                     table.ForeignKey(
                         name: "FK_Custormer_Allergies_Active_Ingredients_Active_IngredientID",
@@ -512,58 +482,6 @@ namespace IbhayiPharmacy.Migrations
                         column: x => x.CustomerID,
                         principalTable: "Customers",
                         principalColumn: "CustormerID",
-========
-                    table.PrimaryKey("PK_Customer_Allergies", x => x.Customer_AllergyId);
-                    table.ForeignKey(
-                        name: "FK_Customer_Allergies_Allergies_AllergyId",
-                        column: x => x.AllergyId,
-                        principalTable: "Allergies",
-                        principalColumn: "AllergyId",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Customer_Allergies_Customers_CustomerId",
-                        column: x => x.CustomerId,
-                        principalTable: "Customers",
-                        principalColumn: "CustomerID",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Prescriptions",
-                columns: table => new
-                {
-                    PrescriptionID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    DoctorID = table.Column<int>(type: "int", nullable: false),
-                    PharmacistID = table.Column<int>(type: "int", nullable: false),
-                    CustomerID = table.Column<int>(type: "int", nullable: false),
-                    DateIssued = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Script = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
-                    FileName = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
-                    ContentType = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    IsProcessed = table.Column<bool>(type: "bit", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Prescriptions", x => x.PrescriptionID);
-                    table.ForeignKey(
-                        name: "FK_Prescriptions_Customers_CustomerID",
-                        column: x => x.CustomerID,
-                        principalTable: "Customers",
-                        principalColumn: "CustomerID",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Prescriptions_Doctors_DoctorID",
-                        column: x => x.DoctorID,
-                        principalTable: "Doctors",
-                        principalColumn: "DoctorID",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Prescriptions_Pharmacists_PharmacistID",
-                        column: x => x.PharmacistID,
-                        principalTable: "Pharmacists",
-                        principalColumn: "PharmacistID",
->>>>>>>> 7ddec7275b4771ca7bb88a7b4e8be51fc30c4c8a:Migrations/20250918114404_new.cs
                         onDelete: ReferentialAction.Restrict);
                 });
 
@@ -590,40 +508,7 @@ namespace IbhayiPharmacy.Migrations
                         name: "FK_Medication_Ingredients_Medications_MedicationID",
                         column: x => x.MedicationID,
                         principalTable: "Medications",
-<<<<<<<< HEAD:Migrations/20251006222355_NewDB.cs
                         principalColumn: "MedcationID",
-========
-                        principalColumn: "MedicationID",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "StockOrders",
-                columns: table => new
-                {
-                    StockOrderID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    OrderDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    SupplierID = table.Column<int>(type: "int", nullable: false),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    MedicationID = table.Column<int>(type: "int", nullable: false),
-                    Quantity = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_StockOrders", x => x.StockOrderID);
-                    table.ForeignKey(
-                        name: "FK_StockOrders_Medications_MedicationID",
-                        column: x => x.MedicationID,
-                        principalTable: "Medications",
-                        principalColumn: "MedicationID",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_StockOrders_Suppliers_SupplierID",
-                        column: x => x.SupplierID,
-                        principalTable: "Suppliers",
-                        principalColumn: "SupplierID",
->>>>>>>> 7ddec7275b4771ca7bb88a7b4e8be51fc30c4c8a:Migrations/20250918114404_new.cs
                         onDelete: ReferentialAction.Restrict);
                 });
 
@@ -649,11 +534,7 @@ namespace IbhayiPharmacy.Migrations
                         name: "FK_PresScriptLines_Medications_MedicationID",
                         column: x => x.MedicationID,
                         principalTable: "Medications",
-<<<<<<<< HEAD:Migrations/20251006222355_NewDB.cs
                         principalColumn: "MedcationID",
-========
-                        principalColumn: "MedicationID",
->>>>>>>> 7ddec7275b4771ca7bb88a7b4e8be51fc30c4c8a:Migrations/20250918114404_new.cs
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_PresScriptLines_NewScripts_NewScriptPrescriptionID",
@@ -692,11 +573,7 @@ namespace IbhayiPharmacy.Migrations
                         name: "FK_ScriptLines_Medications_MedicationID",
                         column: x => x.MedicationID,
                         principalTable: "Medications",
-<<<<<<<< HEAD:Migrations/20251006222355_NewDB.cs
                         principalColumn: "MedcationID",
-========
-                        principalColumn: "MedicationID",
->>>>>>>> 7ddec7275b4771ca7bb88a7b4e8be51fc30c4c8a:Migrations/20250918114404_new.cs
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_ScriptLines_Prescriptions_PrescriptionID",
@@ -704,7 +581,6 @@ namespace IbhayiPharmacy.Migrations
                         principalTable: "Prescriptions",
                         principalColumn: "PrescriptionID",
                         onDelete: ReferentialAction.Restrict);
-<<<<<<<< HEAD:Migrations/20251006222355_NewDB.cs
                 });
 
             migrationBuilder.InsertData(
@@ -838,8 +714,6 @@ namespace IbhayiPharmacy.Migrations
                     { 20, 7, 13, "Standard" },
                     { 21, 9, 14, "20mg" },
                     { 22, 13, 15, "20mg" }
-========
->>>>>>>> 7ddec7275b4771ca7bb88a7b4e8be51fc30c4c8a:Migrations/20250918114404_new.cs
                 });
 
             migrationBuilder.CreateIndex(
@@ -880,16 +754,6 @@ namespace IbhayiPharmacy.Migrations
                 column: "NormalizedUserName",
                 unique: true,
                 filter: "[NormalizedUserName] IS NOT NULL");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Customer_Allergies_AllergyId",
-                table: "Customer_Allergies",
-                column: "AllergyId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Customer_Allergies_CustomerId",
-                table: "Customer_Allergies",
-                column: "CustomerId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Customers_ApplicationUserId",
@@ -937,15 +801,9 @@ namespace IbhayiPharmacy.Migrations
                 column: "ApplicationUserId");
 
             migrationBuilder.CreateIndex(
-<<<<<<<< HEAD:Migrations/20251006222355_NewDB.cs
                 name: "IX_Prescriptions_ApplicationUserId",
                 table: "Prescriptions",
                 column: "ApplicationUserId");
-========
-                name: "IX_Prescriptions_CustomerID",
-                table: "Prescriptions",
-                column: "CustomerID");
->>>>>>>> 7ddec7275b4771ca7bb88a7b4e8be51fc30c4c8a:Migrations/20250918114404_new.cs
 
             migrationBuilder.CreateIndex(
                 name: "IX_Prescriptions_DoctorID",
@@ -953,14 +811,6 @@ namespace IbhayiPharmacy.Migrations
                 column: "DoctorID");
 
             migrationBuilder.CreateIndex(
-<<<<<<<< HEAD:Migrations/20251006222355_NewDB.cs
-========
-                name: "IX_Prescriptions_PharmacistID",
-                table: "Prescriptions",
-                column: "PharmacistID");
-
-            migrationBuilder.CreateIndex(
->>>>>>>> 7ddec7275b4771ca7bb88a7b4e8be51fc30c4c8a:Migrations/20250918114404_new.cs
                 name: "IX_PresScriptLines_MedicationID",
                 table: "PresScriptLines",
                 column: "MedicationID");
@@ -984,16 +834,6 @@ namespace IbhayiPharmacy.Migrations
                 name: "IX_ScriptLines_PrescriptionID",
                 table: "ScriptLines",
                 column: "PrescriptionID");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_StockOrders_MedicationID",
-                table: "StockOrders",
-                column: "MedicationID");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_StockOrders_SupplierID",
-                table: "StockOrders",
-                column: "SupplierID");
         }
 
         /// <inheritdoc />
@@ -1015,11 +855,7 @@ namespace IbhayiPharmacy.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-<<<<<<<< HEAD:Migrations/20251006222355_NewDB.cs
                 name: "Custormer_Allergies");
-========
-                name: "Customer_Allergies");
->>>>>>>> 7ddec7275b4771ca7bb88a7b4e8be51fc30c4c8a:Migrations/20250918114404_new.cs
 
             migrationBuilder.DropTable(
                 name: "Medication_Ingredients");
@@ -1032,6 +868,9 @@ namespace IbhayiPharmacy.Migrations
 
             migrationBuilder.DropTable(
                 name: "Pharmacies");
+
+            migrationBuilder.DropTable(
+                name: "Pharmacists");
 
             migrationBuilder.DropTable(
                 name: "PharmacyManagers");
@@ -1055,11 +894,7 @@ namespace IbhayiPharmacy.Migrations
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
-<<<<<<<< HEAD:Migrations/20251006222355_NewDB.cs
                 name: "Customers");
-========
-                name: "Allergies");
->>>>>>>> 7ddec7275b4771ca7bb88a7b4e8be51fc30c4c8a:Migrations/20250918114404_new.cs
 
             migrationBuilder.DropTable(
                 name: "Active_Ingredients");
@@ -1068,19 +903,10 @@ namespace IbhayiPharmacy.Migrations
                 name: "NewScripts");
 
             migrationBuilder.DropTable(
-                name: "Prescriptions");
-
-            migrationBuilder.DropTable(
                 name: "Medications");
 
             migrationBuilder.DropTable(
-                name: "Customers");
-
-            migrationBuilder.DropTable(
-                name: "Doctors");
-
-            migrationBuilder.DropTable(
-                name: "Pharmacists");
+                name: "Prescriptions");
 
             migrationBuilder.DropTable(
                 name: "DosageForms");
@@ -1090,12 +916,9 @@ namespace IbhayiPharmacy.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
-<<<<<<<< HEAD:Migrations/20251006222355_NewDB.cs
 
             migrationBuilder.DropTable(
                 name: "Doctors");
-========
->>>>>>>> 7ddec7275b4771ca7bb88a7b4e8be51fc30c4c8a:Migrations/20250918114404_new.cs
         }
     }
 }

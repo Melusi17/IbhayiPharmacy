@@ -12,13 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace IbhayiPharmacy.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-<<<<<<<< HEAD:Migrations/20251007222030_NewTablesAgain.Designer.cs
     [Migration("20251007222030_NewTablesAgain")]
     partial class NewTablesAgain
-========
-    [Migration("20250918114404_new")]
-    partial class @new
->>>>>>>> 7ddec7275b4771ca7bb88a7b4e8be51fc30c4c8a:Migrations/20250918114404_new.Designer.cs
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -199,101 +194,46 @@ namespace IbhayiPharmacy.Migrations
                         });
                 });
 
-            modelBuilder.Entity("IbhayiPharmacy.Models.Allergy", b =>
-                {
-                    b.Property<int>("AllergyId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AllergyId"));
-
-<<<<<<<< HEAD:Migrations/20251007222030_NewTablesAgain.Designer.cs
-========
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("AllergyId");
-
-                    b.ToTable("Allergies");
-                });
-
             modelBuilder.Entity("IbhayiPharmacy.Models.Customer", b =>
                 {
-                    b.Property<int>("CustomerID")
+                    b.Property<int>("CustormerID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CustomerID"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CustormerID"));
 
->>>>>>>> 7ddec7275b4771ca7bb88a7b4e8be51fc30c4c8a:Migrations/20250918114404_new.Designer.cs
                     b.Property<string>("ApplicationUserId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("Cellphone")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("IdNumber")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PasswordHash")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Surname")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("CustomerID");
+                    b.HasKey("CustormerID");
 
                     b.HasIndex("ApplicationUserId");
 
                     b.ToTable("Customers");
                 });
 
-            modelBuilder.Entity("IbhayiPharmacy.Models.CustomerAllergy", b =>
+            modelBuilder.Entity("IbhayiPharmacy.Models.Custormer_Allergy", b =>
                 {
-                    b.Property<int>("Customer_AllergyId")
+                    b.Property<int>("Custormer_AllergyID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Customer_AllergyId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Custormer_AllergyID"));
 
                     b.Property<int>("Active_IngredientID")
                         .HasColumnType("int");
 
-                    b.Property<int>("AllergyId")
+                    b.Property<int>("CustomerID")
                         .HasColumnType("int");
 
-                    b.Property<int>("CustomerId")
-                        .HasColumnType("int");
+                    b.HasKey("Custormer_AllergyID");
 
-<<<<<<<< HEAD:Migrations/20251007222030_NewTablesAgain.Designer.cs
                     b.HasIndex("Active_IngredientID");
 
                     b.HasIndex("CustomerID");
 
                     b.ToTable("Custormer_Allergies");
-========
-                    b.HasKey("Customer_AllergyId");
-
-                    b.HasIndex("AllergyId");
-
-                    b.HasIndex("CustomerId");
-
-                    b.ToTable("Customer_Allergies");
->>>>>>>> 7ddec7275b4771ca7bb88a7b4e8be51fc30c4c8a:Migrations/20250918114404_new.Designer.cs
                 });
 
             modelBuilder.Entity("IbhayiPharmacy.Models.Doctor", b =>
@@ -475,11 +415,11 @@ namespace IbhayiPharmacy.Migrations
 
             modelBuilder.Entity("IbhayiPharmacy.Models.Medication", b =>
                 {
-                    b.Property<int>("MedicationID")
+                    b.Property<int>("MedcationID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MedicationID"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MedcationID"));
 
                     b.Property<int>("CurrentPrice")
                         .HasColumnType("int");
@@ -504,7 +444,7 @@ namespace IbhayiPharmacy.Migrations
                     b.Property<int>("SupplierID")
                         .HasColumnType("int");
 
-                    b.HasKey("MedicationID");
+                    b.HasKey("MedcationID");
 
                     b.HasIndex("DosageFormID");
 
@@ -1102,60 +1042,32 @@ namespace IbhayiPharmacy.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PrescriptionID"));
 
-<<<<<<<< HEAD:Migrations/20251007222030_NewTablesAgain.Designer.cs
                     b.Property<string>("ApplicationUserId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
-========
-                    b.Property<string>("ContentType")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<int>("CustomerID")
-                        .HasColumnType("int");
->>>>>>>> 7ddec7275b4771ca7bb88a7b4e8be51fc30c4c8a:Migrations/20250918114404_new.Designer.cs
 
                     b.Property<DateTime>("DateIssued")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("DoctorID")
-                        .HasColumnType("int");
-
-                    b.Property<string>("FileName")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<bool>("IsProcessed")
+                    b.Property<bool>("DispenseUponApproval")
                         .HasColumnType("bit");
 
-<<<<<<<< HEAD:Migrations/20251007222030_NewTablesAgain.Designer.cs
                     b.Property<int?>("DoctorID")
-========
-                    b.Property<int>("PharmacistID")
->>>>>>>> 7ddec7275b4771ca7bb88a7b4e8be51fc30c4c8a:Migrations/20250918114404_new.Designer.cs
                         .HasColumnType("int");
 
                     b.Property<byte[]>("Script")
                         .IsRequired()
                         .HasColumnType("varbinary(max)");
 
+                    b.Property<string>("Status")
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("PrescriptionID");
 
-<<<<<<<< HEAD:Migrations/20251007222030_NewTablesAgain.Designer.cs
                     b.HasIndex("ApplicationUserId");
 
                     b.HasIndex("DoctorID");
 
-========
-                    b.HasIndex("CustomerID");
-
-                    b.HasIndex("DoctorID");
-
-                    b.HasIndex("PharmacistID");
-
->>>>>>>> 7ddec7275b4771ca7bb88a7b4e8be51fc30c4c8a:Migrations/20250918114404_new.Designer.cs
                     b.ToTable("Prescriptions");
                 });
 
@@ -1216,14 +1128,8 @@ namespace IbhayiPharmacy.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("StockOrderID"));
 
-                    b.Property<int>("MedicationID")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("OrderDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<int>("Quantity")
-                        .HasColumnType("int");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -1233,10 +1139,6 @@ namespace IbhayiPharmacy.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("StockOrderID");
-
-                    b.HasIndex("MedicationID");
-
-                    b.HasIndex("SupplierID");
 
                     b.ToTable("StockOrders");
                 });
@@ -1272,10 +1174,6 @@ namespace IbhayiPharmacy.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SupplierID"));
 
                     b.Property<string>("ContactName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ContactNumber")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -1590,10 +1488,6 @@ namespace IbhayiPharmacy.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Password")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Surname")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -1612,37 +1506,21 @@ namespace IbhayiPharmacy.Migrations
                     b.Navigation("ApplicationUser");
                 });
 
-<<<<<<<< HEAD:Migrations/20251007222030_NewTablesAgain.Designer.cs
             modelBuilder.Entity("IbhayiPharmacy.Models.Custormer_Allergy", b =>
                 {
                     b.HasOne("IbhayiPharmacy.Models.Active_Ingredient", "Active_Ingredient")
                         .WithMany()
                         .HasForeignKey("Active_IngredientID")
-========
-            modelBuilder.Entity("IbhayiPharmacy.Models.CustomerAllergy", b =>
-                {
-                    b.HasOne("IbhayiPharmacy.Models.Allergy", "Allergy")
-                        .WithMany("CustomerAllergies")
-                        .HasForeignKey("AllergyId")
->>>>>>>> 7ddec7275b4771ca7bb88a7b4e8be51fc30c4c8a:Migrations/20250918114404_new.Designer.cs
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("IbhayiPharmacy.Models.Customer", "Customer")
                         .WithMany("CustomerAllergies")
-<<<<<<<< HEAD:Migrations/20251007222030_NewTablesAgain.Designer.cs
                         .HasForeignKey("CustomerID")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Active_Ingredient");
-========
-                        .HasForeignKey("CustomerId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Allergy");
->>>>>>>> 7ddec7275b4771ca7bb88a7b4e8be51fc30c4c8a:Migrations/20250918114404_new.Designer.cs
 
                     b.Navigation("Customer");
                 });
@@ -1776,7 +1654,6 @@ namespace IbhayiPharmacy.Migrations
 
             modelBuilder.Entity("IbhayiPharmacy.Models.Prescription", b =>
                 {
-<<<<<<<< HEAD:Migrations/20251007222030_NewTablesAgain.Designer.cs
                     b.HasOne("IbhayiPharmacy.Models.ApplicationUser", "ApplicationUser")
                         .WithMany()
                         .HasForeignKey("ApplicationUserId")
@@ -1790,31 +1667,6 @@ namespace IbhayiPharmacy.Migrations
                     b.Navigation("ApplicationUser");
 
                     b.Navigation("Doctors");
-========
-                    b.HasOne("IbhayiPharmacy.Models.Customer", "Customer")
-                        .WithMany("Prescriptions")
-                        .HasForeignKey("CustomerID")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("IbhayiPharmacy.Models.Doctor", "Doctor")
-                        .WithMany("Prescriptions")
-                        .HasForeignKey("DoctorID")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("IbhayiPharmacy.Models.Pharmacist", "Pharmacist")
-                        .WithMany("Prescriptions")
-                        .HasForeignKey("PharmacistID")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Customer");
-
-                    b.Navigation("Doctor");
-
-                    b.Navigation("Pharmacist");
->>>>>>>> 7ddec7275b4771ca7bb88a7b4e8be51fc30c4c8a:Migrations/20250918114404_new.Designer.cs
                 });
 
             modelBuilder.Entity("IbhayiPharmacy.Models.ScriptLine", b =>
@@ -1826,7 +1678,7 @@ namespace IbhayiPharmacy.Migrations
                         .IsRequired();
 
                     b.HasOne("IbhayiPharmacy.Models.Prescription", "Prescriptions")
-                        .WithMany()
+                        .WithMany("scriptLines")
                         .HasForeignKey("PrescriptionID")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
@@ -1834,25 +1686,6 @@ namespace IbhayiPharmacy.Migrations
                     b.Navigation("Medications");
 
                     b.Navigation("Prescriptions");
-                });
-
-            modelBuilder.Entity("IbhayiPharmacy.Models.StockOrder", b =>
-                {
-                    b.HasOne("IbhayiPharmacy.Models.Medication", "Medication")
-                        .WithMany()
-                        .HasForeignKey("MedicationID")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("IbhayiPharmacy.Models.Supplier", "Supplier")
-                        .WithMany()
-                        .HasForeignKey("SupplierID")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Medication");
-
-                    b.Navigation("Supplier");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -1906,30 +1739,11 @@ namespace IbhayiPharmacy.Migrations
                         .IsRequired();
                 });
 
-<<<<<<<< HEAD:Migrations/20251007222030_NewTablesAgain.Designer.cs
-            modelBuilder.Entity("IbhayiPharmacy.Models.Customer", b =>
-========
-            modelBuilder.Entity("IbhayiPharmacy.Models.Allergy", b =>
->>>>>>>> 7ddec7275b4771ca7bb88a7b4e8be51fc30c4c8a:Migrations/20250918114404_new.Designer.cs
-                {
-                    b.Navigation("CustomerAllergies");
-                });
-
-<<<<<<<< HEAD:Migrations/20251007222030_NewTablesAgain.Designer.cs
-========
             modelBuilder.Entity("IbhayiPharmacy.Models.Customer", b =>
                 {
                     b.Navigation("CustomerAllergies");
-
-                    b.Navigation("Prescriptions");
                 });
 
-            modelBuilder.Entity("IbhayiPharmacy.Models.Doctor", b =>
-                {
-                    b.Navigation("Prescriptions");
-                });
-
->>>>>>>> 7ddec7275b4771ca7bb88a7b4e8be51fc30c4c8a:Migrations/20250918114404_new.Designer.cs
             modelBuilder.Entity("IbhayiPharmacy.Models.Medication", b =>
                 {
                     b.Navigation("Medication_Ingredients");
@@ -1940,18 +1754,14 @@ namespace IbhayiPharmacy.Migrations
                     b.Navigation("scriptLines");
                 });
 
-<<<<<<<< HEAD:Migrations/20251007222030_NewTablesAgain.Designer.cs
             modelBuilder.Entity("IbhayiPharmacy.Models.Order", b =>
                 {
                     b.Navigation("OrderLines");
                 });
 
             modelBuilder.Entity("IbhayiPharmacy.Models.Prescription", b =>
-========
-            modelBuilder.Entity("IbhayiPharmacy.Models.Pharmacist", b =>
->>>>>>>> 7ddec7275b4771ca7bb88a7b4e8be51fc30c4c8a:Migrations/20250918114404_new.Designer.cs
                 {
-                    b.Navigation("Prescriptions");
+                    b.Navigation("scriptLines");
                 });
 #pragma warning restore 612, 618
         }

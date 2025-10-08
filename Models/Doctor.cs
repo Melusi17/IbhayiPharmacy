@@ -21,8 +21,5 @@ namespace IbhayiPharmacy.Models
 
         [Required]
         public string Email { get; set; }
-
-        // --- Prescriptions issued by Doctor ---
-        public ICollection<Prescription> Prescriptions { get; set; }
     }
 }

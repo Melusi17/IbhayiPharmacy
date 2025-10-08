@@ -1,4 +1,4 @@
-﻿@model IbhayiPharmacy.Models.Pharmacy
+﻿
 @{
     ViewData["Title"] = "AddPharmacyInfo";
     Layout = "~/Views/Shared/_ManagerLayout.cshtml";
@@ -9,60 +9,45 @@
 <div class=" card p-3">
     <h5 class="mb-4 title-underline">Manage Pharmacy Information</h5>
 
-    <form asp-action="AddPharmacyInfo" asp-controller="PharmacyManager" method="post">
-        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <form>
         <div class="mb-3">
-            <label asp-for="Name" for="pharmacyName" class="form-label">Pharmacy Name</label>
-            <input asp-for="Name" type="text" class="form-control" id="pharmacyName" placeholder="Ibhayi Pharmacy">
-            <span asp-validation-for="Name" class="text-danger"></span>
+            <label for="pharmacyName" class="form-label">Pharmacy Name</label>
+            <input type="text" class="form-control" id="pharmacyName" placeholder="Ibhayi Pharmacy">
         </div>
 
         <div class="mb-3">
-            <label asp-for="HealthCouncilRegNo" for="registrationNumber" class="form-label">Health Council Registration Number</label>
-            <input asp-for="HealthCouncilRegNo" type="text" class="form-control" id="registrationNumber" placeholder="HCR-123456">
-            <span asp-validation-for="HealthCouncilRegNo" class="text-danger"></span>
-
+            <label for="registrationNumber" class="form-label">Health Council Registration Number</label>
+            <input type="text" class="form-control" id="registrationNumber" placeholder="HCR-123456">
         </div>
 
         <div class="mb-3">
-            <label asp-for="Address" for="physicalAddress" class="form-label">Physical Address</label>
-            <textarea asp-for="Address" class="form-control" id="physicalAddress" rows="2" placeholder="123 Main Street, Nelson Mandela Bay "></textarea>
-            <span asp-validation-for="Address" class="text-danger"></span>
-
+            <label for="physicalAddress" class="form-label">Physical Address</label>
+            <textarea class="form-control" id="physicalAddress" rows="2" placeholder="123 Main Street, Nelson Mandela Bay"></textarea>
         </div>
 
         <div class="mb-3">
-            <label asp-for="PhoneNumber" for="contactNumber" class="form-label">Contact Number</label>
-            <input asp-for="PhoneNumber" type="tel" class="form-control" id="contactNumber" placeholder="+27 41 123 4567">
-            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
-
+            <label for="contactNumber" class="form-label">Contact Number</label>
+            <input type="tel" class="form-control" id="contactNumber" placeholder="+27 41 123 4567">
         </div>
 
         <div class="mb-3">
-            <label asp-for="Email" for="emailAddress" class="form-label">Email Address</label>
-            <input asp-for="Email" type="email" class="form-control" id="emailAddress" placeholder="info@ibhayipharmacy.co.za">
-            <span asp-validation-for="Email" class="text-danger"></span>
-
+            <label for="emailAddress" class="form-label">Email Address</label>
+            <input type="email" class="form-control" id="emailAddress" placeholder="info@ibhayipharmacy.co.za">
         </div>
 
         <div class="mb-3">
-            <label asp-for="WebsiteURL" for="websiteUrl" class="form-label">Website URL</label>
-            <input asp-for="WebsiteURL" type="url" class="form-control" id="websiteUrl" placeholder="https://www.ibhayipharmacy.co.za">
-            <span asp-validation-for="WebsiteURL" class="text-danger"></span>
-
+            <label for="websiteUrl" class="form-label">Website URL</label>
+            <input type="url" class="form-control" id="websiteUrl" placeholder="https://www.ibhayipharmacy.co.za">
         </div>
 
         <div class="mb-3">
-            <label asp-for="PharmacistID" class="form-label">Responsible Pharmacist</label>
-            <select asp-for="PharmacistID" class="form-select" id="responsiblePharmacist">
+            <label for="responsiblePharmacist" class="form-label">Responsible Pharmacist</label>
+            <select class="form-select" id="responsiblePharmacist">
                 <option selected disabled>Select a pharmacist</option>
-                @foreach (var item in ViewBag.Pharmacist)
-                {
-                    <option value="@item.PharmacistID">@item.Name</option>
-                }
+                <option value="1">Pharmacist A</option>
+                <option value="2">Pharmacist B</option>
+                <option value="3">Pharmacist C</option>
             </select>
-            <span asp-validation-for="PharmacistID" class="text-danger"></span>
-
         </div>
 
         <button type="submit" class="btn btn-success">Save Changes</button>

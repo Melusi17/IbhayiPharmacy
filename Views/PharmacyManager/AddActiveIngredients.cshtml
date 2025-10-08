@@ -1,22 +1,20 @@
-﻿@model IbhayiPharmacy.Models.Active_Ingredient
+﻿
 @{
     ViewData["Title"] = "AddActiveIngredients";
     Layout = "~/Views/Shared/_ManagerLayout.cshtml";
 
 }
 
-
+ 
 
 <!-- Add New Ingredient Form -->
 <div class="card p-3">
     <h5 class="title-underline">New Ingredient</h5>
     <div class="card-body">
-        <form asp-action="AddActiveIngredients" asp-controller="PharmacyManager" method="post">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <form>
             <div class="mb-3">
-                <label asp-for="Name" class="form-label">Ingredient Name</label>
-                <input asp-for="Name" type="text" class="form-control" id="ingredientName" placeholder="e.g. Paracetamol">
-                <span asp-validation-for="Name" class="text-danger"></span>
+                <label for="ingredientName" class="form-label">Ingredient Name</label>
+                <input type="text" class="form-control" id="ingredientName" placeholder="e.g. Paracetamol">
             </div>
             <button type="submit" class="btn btn-primary">Add Ingredient</button>
         </form>
