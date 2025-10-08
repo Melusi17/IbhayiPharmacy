@@ -4,6 +4,7 @@ using IbhayiPharmacy.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace IbhayiPharmacy.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251007221131_changedtables")]
+    partial class changedtables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -874,7 +877,10 @@ namespace IbhayiPharmacy.Migrations
                     b.Property<int>("ItemPrice")
                         .HasColumnType("int");
 
-                    b.Property<int>("MedicationID")
+                    b.Property<int>("MedcationID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MedicationsMedcationID")
                         .HasColumnType("int");
 
                     b.Property<int>("OrderID")
@@ -888,7 +894,7 @@ namespace IbhayiPharmacy.Migrations
 
                     b.HasKey("OrderLineID");
 
-                    b.HasIndex("MedicationID");
+                    b.HasIndex("MedicationsMedcationID");
 
                     b.HasIndex("OrderID");
 
@@ -1581,7 +1587,7 @@ namespace IbhayiPharmacy.Migrations
                 {
                     b.HasOne("IbhayiPharmacy.Models.Medication", "Medications")
                         .WithMany()
-                        .HasForeignKey("MedicationID")
+                        .HasForeignKey("MedicationsMedcationID")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 

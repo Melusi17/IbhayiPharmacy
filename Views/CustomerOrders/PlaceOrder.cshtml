@@ -1,0 +1,423 @@
+﻿@using IbhayiPharmacy.Models.PharmacistVM
+@model List<CustomerOrderVM>
+
+@{
+    ViewData["Title"] = "Place Medication Order";
+}
+
+<style>
+    /* Modal Styling */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+        display: none;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .modal-content {
+        background: #fff;
+        padding: 30px;
+        border-radius: 10px;
+        width: 600px;
+        max-height: 80vh;
+        overflow-y: auto;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    }
+
+        .modal-content h3 {
+            margin-bottom: 20px;
+            font-size: 20px;
+        }
+
+    .modal-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+    }
+
+        .modal-table th,
+        .modal-table td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: left;
+        }
+
+        .modal-table th {
+            background-color: #f5f5f5;
+        }
+
+    .modal-buttons {
+        text-align: right;
+    }
+
+    .btn-upload {
+        background-color: #1f9f77;
+        color: white;
+        border: none;
+        padding: 10px 18px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 600;
+        transition: background-color 0.3s ease;
+        margin-left: 10px;
+    }
+
+        .btn-upload:hover {
+            background-color: #28bf96;
+        }
+
+        .btn-upload.cancel {
+            background-color: #999;
+        }
+
+            .btn-upload.cancel:hover {
+                background-color: #777;
+            }
+
+    .total-summary {
+        font-size: 16px;
+        margin-bottom: 10px;
+    }
+
+    .styled-medication-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 0 auto 30px auto;
+        font-size: 14px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+        .styled-medication-table th,
+        .styled-medication-table td {
+            border: 1px solid #ccc;
+            padding: 10px 12px;
+            text-align: center;
+        }
+
+        .styled-medication-table thead {
+            background-color: #1f9f77;
+            color: white;
+        }
+
+        .styled-medication-table tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .styled-medication-table tbody tr:hover {
+            background-color: #e3f5f0;
+        }
+
+    .order-summary-container {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 8px;
+        margin-top: 20px;
+    }
+
+    .summary {
+        margin-bottom: 20px;
+    }
+
+        .summary p {
+            margin: 5px 0;
+            font-size: 16px;
+        }
+
+    .no-medications {
+        text-align: center;
+        padding: 40px;
+        color: #666;
+        font-size: 18px;
+    }
+
+    .alert-error {
+        background-color: #f8d7da;
+        color: #721c24;
+        padding: 10px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+        border: 1px solid #f5c6cb;
+    }
+
+    .alert-success {
+        background-color: #d1edff;
+        color: #0c5460;
+        padding: 10px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+        border: 1px solid #bee5eb;
+    }
+
+    .status-approved {
+        color: #28a745;
+        font-weight: bold;
+    }
+
+    .status-rejected {
+        color: #dc3545;
+        font-weight: bold;
+    }
+
+    .checkbox-cell {
+        text-align: center;
+    }
+
+    .medication-info {
+        text-align: left;
+    }
+</style>
+
+<div class="track-order-panel upload-prescription-panel">
+    <h2>📦 Place Medication Order</h2>
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert-error">
+            ⚠️ @TempData["Error"]
+        </div>
+    }
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert-success">
+            ✅ @TempData["Success"]
+        </div>
+    }
+
+    @if (Model == null || !Model.Any())
+    {
+        <div class="no-medications">
+            <h3>No Approved Medications Available</h3>
+            <p>You don't have any approved medications ready for ordering.</p>
+            <p>This could be because:</p>
+            <ul style="text-align: left; display: inline-block; margin-top: 10px;">
+                <li>Your medications are still awaiting pharmacist approval</li>
+                <li>All your approved medications have been fully dispensed</li>
+                <li>Your medications were rejected by the pharmacist</li>
+            </ul>
+        </div>
+    }
+    else
+    {
+        <form id="orderForm" method="post" asp-action="PlaceOrder">
+            @Html.AntiForgeryToken()
+
+            <table id="medicationTable" class="styled-medication-table">
+                <thead>
+                    <tr>
+                        <th class="checkbox-cell">Select</th>
+                        <th>Doctor</th>
+                        <th>Medication Details</th>
+                        <th>Quantity</th>
+                        <th>Repeats Available</th>
+                        <th>Instructions</th>
+                        <th>Schedule</th>
+                        <th>Line Total (R)</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="medicationBody">
+                    @foreach (var medication in Model)
+                    {
+                        <tr>
+                            <td class="checkbox-cell">
+                                <input type="checkbox"
+                                       class="med-check"
+                                       name="SelectedScriptLineIds"
+                                       value="@medication.ScriptLineID"
+                                       data-price="@medication.LineTotal"
+                                       data-medication-name="@medication.MedicationName"
+                                       data-doctor="@medication.FullDoctorName"
+                                       data-quantity="@medication.Quantity"
+                                       data-repeats="@medication.RepeatsDisplay"
+                                       onchange="updateTotals()">
+                            </td>
+                            <td>@medication.FullDoctorName</td>
+                            <td class="medication-info">
+                                <strong>@medication.MedicationName</strong>
+                                <br />
+                                <small style="color: #666;">Script Line ID: @medication.ScriptLineID</small>
+                            </td>
+                            <td>@medication.Quantity</td>
+                            <td>
+                                <span class="status-approved">@medication.RepeatsLeft of @medication.TotalRepeats</span>
+                            </td>
+                            <td>@medication.Instructions</td>
+                            <td>Schedule @medication.Schedule</td>
+                            <td>R @medication.LineTotal.ToString("F2")</td>
+                            <td>
+                                <span class="status-approved">✅ Approved</span>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            <div class="order-summary-container">
+                <div class="summary">
+                    <p>Subtotal: R <span id="subtotal">0.00</span></p>
+                    <p>VAT (15%): R <span id="tax">0.00</span></p>
+                    <p><strong>Total Due: R </strong><span id="total">0.00</span></p>
+                </div>
+
+                <div class="form-group">
+                    <button type="button" class="btn-upload" onclick="showOrderSummary()">
+                        📋 Review & Place Order
+                    </button>
+                </div>
+            </div>
+        </form>
+
+        <!-- ✅ Styled Confirmation Modal -->
+        <div id="confirmationModal" class="modal-overlay">
+            <div class="modal-content">
+                <h3>✅ Review Your Medication Order</h3>
+
+                <p><strong>Estimated Order Number:</strong> <span id="orderNumber"></span></p>
+                <p><em>This order will be created once you confirm below</em></p>
+
+                <table class="modal-table">
+                    <thead>
+                        <tr>
+                            <th>Doctor</th>
+                            <th>Medication</th>
+                            <th>Quantity</th>
+                            <th>Repeats After Order</th>
+                            <th>Line Total (R)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="confirmationBody"></tbody>
+                </table>
+
+                <div class="summary">
+                    <p>Subtotal: R <span id="modalSubtotal">0.00</span></p>
+                    <p>VAT (15%): R <span id="modalTax">0.00</span></p>
+                    <p class="total-summary"><strong>Total Due: R <span id="modalTotal">0.00</span></strong></p>
+                </div>
+
+                <div class="modal-buttons">
+                    <button type="button" class="btn-upload" onclick="confirmFinalOrder()">
+                        ✅ Confirm & Place Order
+                    </button>
+                    <button type="button" class="btn-upload cancel" onclick="closeConfirmation()">
+                        ✗ Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        function updateTotals() {
+            const checkboxes = document.querySelectorAll('.med-check:checked');
+            let subtotal = 0;
+
+            checkboxes.forEach(cb => {
+                subtotal += parseFloat(cb.dataset.price || 0);
+            });
+
+            const tax = subtotal * 0.15;
+            const total = subtotal + tax;
+
+            document.getElementById('subtotal').textContent = subtotal.toFixed(2);
+            document.getElementById('tax').textContent = tax.toFixed(2);
+            document.getElementById('total').textContent = total.toFixed(2);
+        }
+
+        function showOrderSummary() {
+            const checkboxes = document.querySelectorAll('.med-check:checked');
+            if (checkboxes.length === 0) {
+                alert('⚠️ Please select at least one medication to order.');
+                return;
+            }
+
+            const tbody = document.getElementById('confirmationBody');
+            tbody.innerHTML = '';
+
+            let subtotal = 0;
+
+            checkboxes.forEach(cb => {
+                const medicationName = cb.dataset.medicationName;
+                const doctorName = cb.dataset.doctor;
+                const quantity = cb.dataset.quantity;
+                const repeatsText = cb.dataset.repeats;
+                const price = parseFloat(cb.dataset.price);
+
+                // Calculate repeats after ordering
+                const currentRepeats = parseInt(repeatsText.split(' of ')[0]);
+                const totalRepeats = parseInt(repeatsText.split(' of ')[1]);
+                const repeatsAfter = currentRepeats - 1;
+
+                subtotal += price;
+
+                const confirmationRow = document.createElement('tr');
+                confirmationRow.innerHTML = `
+                    <td>${doctorName}</td>
+                    <td><strong>${medicationName}</strong></td>
+                    <td>${quantity}</td>
+                    <td>${repeatsAfter} of ${totalRepeats}</td>
+                    <td>R ${price.toFixed(2)}</td>
+                `;
+                tbody.appendChild(confirmationRow);
+            });
+
+            const tax = subtotal * 0.15;
+            const total = subtotal + tax;
+
+            document.getElementById('modalSubtotal').textContent = subtotal.toFixed(2);
+            document.getElementById('modalTax').textContent = tax.toFixed(2);
+            document.getElementById('modalTotal').textContent = total.toFixed(2);
+
+            // Generate order number
+            const now = new Date();
+            const orderNum = 'ORD' +
+                now.getFullYear().toString() +
+                (now.getMonth() + 1).toString().padStart(2, '0') +
+                now.getDate().toString().padStart(2, '0') +
+                now.getHours().toString().padStart(2, '0') +
+                now.getMinutes().toString().padStart(2, '0') +
+                now.getSeconds().toString().padStart(2, '0');
+
+            document.getElementById("orderNumber").textContent = orderNum;
+
+            // Show modal
+            document.getElementById('confirmationModal').style.display = 'flex';
+        }
+
+        function confirmFinalOrder() {
+            // Show loading state
+            const confirmBtn = document.querySelector('.btn-upload:not(.cancel)');
+            const originalText = confirmBtn.innerHTML;
+            confirmBtn.innerHTML = '⏳ Processing...';
+            confirmBtn.disabled = true;
+
+            // Submit the form
+            document.getElementById('orderForm').submit();
+        }
+
+        function closeConfirmation() {
+            document.getElementById('confirmationModal').style.display = 'none';
+        }
+
+        // Initialize totals on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            updateTotals();
+        });
+
+        // Close modal when clicking outside
+        document.getElementById('confirmationModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeConfirmation();
+            }
+        });
+    </script>
+}

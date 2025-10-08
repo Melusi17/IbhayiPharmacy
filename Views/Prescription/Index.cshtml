@@ -1,4 +1,4 @@
-﻿@model IEnumerable<IbhayiPharmacy.Models.NewScript>
+﻿@model IEnumerable<IbhayiPharmacy.Models.Prescription>
 
 @{
     ViewData["Title"] = "Prescriptions List";
@@ -39,7 +39,7 @@
                         @(prescription.DispenseUponApproval ? "Yes" : "")
                     </td>
                     <td>
-                        <a asp-action="Upsert" asp-route-id="@prescription.PrescriptionID" class="btn btn-sm btn-primary">Edit</a>
+                        <a asp-action="Edit" asp-route-id="@prescription.PrescriptionID" class="btn btn-sm btn-primary">Edit</a>
                     </td>
                 </tr>
             }

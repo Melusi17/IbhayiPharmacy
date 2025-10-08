@@ -14,7 +14,8 @@ namespace IbhayiPharmacy.Models
         [ValidateNever]
         public ApplicationUser ApplicationUser { get; set; }
 
-        //[Required]
-        //public string Allergy { get; set; }
+        // Navigation property to the junction table
+        [ValidateNever]
+        public ICollection<Custormer_Allergy> CustomerAllergies { get; set; } = new List<Custormer_Allergy>();
     }
 }

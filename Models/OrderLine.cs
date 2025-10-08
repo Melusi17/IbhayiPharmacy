@@ -7,16 +7,22 @@ namespace IbhayiPharmacy.Models
     {
         [Key]
         public int OrderLineID { get; set; }
+
         [ForeignKey("OrderID")]
         public int OrderID { get; set; }
-        [ForeignKey("ScriptLineID")]
-        public int ScriptLineID { get; set; }
-        //public List<PresScriptLine>? scriptLines { get; set; } = new List<PresScriptLine>();
-        [Required]
-        public int ItemPrice { get; set; }
+        public Order Order { get; set; } = null!;
+
         [ForeignKey("MedicationID")]
         public int MedicationID { get; set; }
-        //public Medication Medications { get; set; }
+        public Medication Medications { get; set; } = null!;
+
+        [ForeignKey("ScriptLineID")]
+        public int ScriptLineID { get; set; }
+        public ScriptLine ScriptLine { get; set; } = null!;
+
+        [Required]
+        public int ItemPrice { get; set; }
+
         [Required]
         public int Quantity { get; set; }
     }

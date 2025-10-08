@@ -21,17 +21,22 @@ namespace IbhayiPharmacy.Models
         //[ForeignKey("PharmacistID")]
         //public int PharmacistID { get; set; }
 
-        [Required]
+      
         public int Quantity { get; set; }
 
-        [Required]
-        public string? Instructions { get; set; }
+        public string Instructions { get; set; }
 
-        [Required]
+       
         public int Repeats { get; set; }
 
-        [Required]
+   
         public int RepeatsLeft { get; set; }
+
+        
+        public string Status { get; set; } = "Pending"; // Pending, Approved, Rejected
+        public string? RejectionReason { get; set; }
+        public DateTime? ApprovedDate { get; set; }
+        public DateTime? RejectedDate { get; set; }
 
     }
 }
