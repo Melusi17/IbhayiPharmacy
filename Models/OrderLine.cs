@@ -25,5 +25,11 @@ namespace IbhayiPharmacy.Models
 
         [Required]
         public int Quantity { get; set; }
+
+        // NEW: Status for order line processing
+        public string Status { get; set; } = "Pending";
+
+        // NEW: Reason for rejection if applicable
+        public string? RejectionReason { get; set; }
     }
 }

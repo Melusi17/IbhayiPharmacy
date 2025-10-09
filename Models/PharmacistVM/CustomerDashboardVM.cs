@@ -32,7 +32,7 @@
     public class OrderItemVM
     {
         public int MedicationId { get; set; }
-        public int ScriptLineId { get; set; } // ADDED: ScriptLineId
+        public int ScriptLineId { get; set; }
         public int Quantity { get; set; }
         public string Instructions { get; set; } = string.Empty;
         public bool IsRepeat { get; set; }
@@ -41,5 +41,27 @@
     public class ReportRequestVM
     {
         public DateTime ReportDate { get; set; }
+    }
+
+    // NEW: Order Tracking View Model
+    public class OrderTrackingVM
+    {
+        public int OrderID { get; set; }
+        public DateTime OrderDate { get; set; }
+        public string Status { get; set; } = string.Empty;
+        public string TotalDue { get; set; } = string.Empty;
+        public List<OrderLineVM> OrderLines { get; set; } = new();
+    }
+
+    // NEW: Order Line View Model for tracking
+    public class OrderLineVM
+    {
+        public string MedicationName { get; set; } = string.Empty;
+        public int Quantity { get; set; }
+        public string Instructions { get; set; } = string.Empty;
+        public int ItemPrice { get; set; }
+        public string Status { get; set; } = "Pending";
+        public string? RejectionReason { get; set; }
+        public string DoctorName { get; set; } = string.Empty; // For the table display
     }
 }

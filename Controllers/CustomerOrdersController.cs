@@ -1,10 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using IbhayiPharmacy.Data;
+using IbhayiPharmacy.Models;
+using IbhayiPharmacy.Models.PharmacistVM;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
-using IbhayiPharmacy.Data;
-using IbhayiPharmacy.Models.PharmacistVM;
-using IbhayiPharmacy.Models;
-using Microsoft.AspNetCore.Authorization;
 
 namespace IbhayiPharmacy.Controllers
 {
@@ -64,26 +64,25 @@ namespace IbhayiPharmacy.Controllers
 
             debugInfo += "\n";
 
-            // Check what the current query returns
+            // Check what the current query returns (UPDATED - removed repeats requirement)
             var availableScriptLines = await _context.ScriptLines
                 .Include(sl => sl.Medications)
                 .Include(sl => sl.Prescriptions)
                     .ThenInclude(p => p.Doctors)
                 .Where(sl => sl.Prescriptions.ApplicationUserId == currentUserId &&
-                            sl.Status == "Approved" &&
-                            sl.RepeatsLeft > 0)
+                            sl.Status == "Approved") // ← REMOVED: && sl.RepeatsLeft > 0
                 .ToListAsync();
 
             debugInfo += $"AVAILABLE FOR ORDERING: {availableScriptLines.Count}\n";
             foreach (var sl in availableScriptLines)
             {
-                debugInfo += $"  ScriptLine {sl.ScriptLineID}: {sl.Medications?.MedicationName} - RepeatsLeft: {sl.RepeatsLeft}\n";
+                debugInfo += $"  ScriptLine {sl.ScriptLineID}: {sl.Medications?.MedicationName} - Status: {sl.Status}, RepeatsLeft: {sl.RepeatsLeft}\n";
             }
 
             return Content(debugInfo);
         }
 
-        // GET: Display available medications from approved scriptlines
+        // GET: Display available medications from approved scriptlines (UPDATED)
         public async Task<IActionResult> PlaceOrder()
         {
             try
@@ -95,13 +94,13 @@ namespace IbhayiPharmacy.Controllers
                     return RedirectToAction("Login", "Account");
                 }
 
+                // UPDATED QUERY: Removed RepeatsLeft > 0 requirement
                 var availableScriptLines = await _context.ScriptLines
                     .Include(sl => sl.Medications)
                     .Include(sl => sl.Prescriptions)
                         .ThenInclude(p => p.Doctors)
                     .Where(sl => sl.Prescriptions.ApplicationUserId == currentUserId &&
-                                sl.Status == "Approved" &&
-                                sl.RepeatsLeft > 0)
+                                sl.Status == "Approved") // ← Only status check now
                     .Select(sl => new CustomerOrderVM
                     {
                         ScriptLineID = sl.ScriptLineID,
@@ -128,7 +127,7 @@ namespace IbhayiPharmacy.Controllers
             }
         }
 
-        // POST: Create order from selected medications
+        // POST: Create order from selected medications (UPDATED validation)
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> PlaceOrder(PlaceOrderFormVM model)
@@ -141,14 +140,13 @@ namespace IbhayiPharmacy.Controllers
                 return RedirectToAction("PlaceOrder");
             }
 
-            // Validate all selected script lines belong to current user and are still available
+            // UPDATED VALIDATION: Removed RepeatsLeft check for initial order
             var validScriptLines = await _context.ScriptLines
                 .Include(sl => sl.Medications)
                 .Include(sl => sl.Prescriptions)
                 .Where(sl => model.SelectedScriptLineIds.Contains(sl.ScriptLineID) &&
                             sl.Prescriptions.ApplicationUserId == currentUserId &&
-                            sl.Status == "Approved" &&
-                            sl.RepeatsLeft > 0)
+                            sl.Status == "Approved") // ← Only status check for initial order
                 .ToListAsync();
 
             if (!validScriptLines.Any())
@@ -161,7 +159,7 @@ namespace IbhayiPharmacy.Controllers
 
             try
             {
-                // Get customer ID - ensure it belongs to current user
+                // Get customer ID
                 var customer = await _context.Customers
                     .FirstOrDefaultAsync(c => c.ApplicationUserId == currentUserId);
 
@@ -188,8 +186,12 @@ namespace IbhayiPharmacy.Controllers
                 // Create order lines and update script lines
                 foreach (var scriptLine in validScriptLines)
                 {
-                    // Update script line repeats
-                    scriptLine.RepeatsLeft--;
+                    // IMPORTANT: Only decrement repeats if it actually has repeats
+                    // For one-time medications (Repeats = 0), don't touch RepeatsLeft
+                    if (scriptLine.Repeats > 0 && scriptLine.RepeatsLeft > 0)
+                    {
+                        scriptLine.RepeatsLeft--;
+                    }
 
                     // Create order line
                     var orderLine = new OrderLine
@@ -198,7 +200,8 @@ namespace IbhayiPharmacy.Controllers
                         ScriptLineID = scriptLine.ScriptLineID,
                         MedicationID = scriptLine.MedicationID,
                         Quantity = scriptLine.Quantity,
-                        ItemPrice = (int)scriptLine.Medications.CurrentPrice
+                        ItemPrice = (int)scriptLine.Medications.CurrentPrice,
+                        Status = "Ordered" // Set initial status
                     };
 
                     _context.OrderLines.Add(orderLine);
@@ -220,7 +223,7 @@ namespace IbhayiPharmacy.Controllers
             }
         }
 
-        // Order confirmation page
+        // Order confirmation page (unchanged)
         public async Task<IActionResult> OrderConfirmation(int orderId)
         {
             var currentUserId = GetCurrentUserId();
@@ -265,7 +268,7 @@ namespace IbhayiPharmacy.Controllers
             return View(viewModel);
         }
 
-        // Order history
+        // Order history (unchanged)
         public async Task<IActionResult> OrderHistory()
         {
             var currentUserId = GetCurrentUserId();
@@ -288,6 +291,38 @@ namespace IbhayiPharmacy.Controllers
                 .ToListAsync();
 
             return View(orders);
+        }
+
+        // NEW: Method specifically for refills (only shows medications with repeats)
+        public async Task<IActionResult> RequestRefill()
+        {
+            var currentUserId = GetCurrentUserId();
+
+            var refillScriptLines = await _context.ScriptLines
+                .Include(sl => sl.Medications)
+                .Include(sl => sl.Prescriptions)
+                    .ThenInclude(p => p.Doctors)
+                .Where(sl => sl.Prescriptions.ApplicationUserId == currentUserId &&
+                            sl.Status == "Approved" &&
+                            sl.RepeatsLeft > 0) // ← This is where repeats matter
+                .Select(sl => new CustomerOrderVM
+                {
+                    ScriptLineID = sl.ScriptLineID,
+                    PrescriptionID = sl.PrescriptionID,
+                    MedicationID = sl.MedicationID,
+                    Quantity = sl.Quantity,
+                    TotalRepeats = sl.Repeats,
+                    RepeatsLeft = sl.RepeatsLeft,
+                    Instructions = sl.Instructions ?? string.Empty,
+                    MedicationName = sl.Medications.MedicationName ?? string.Empty,
+                    CurrentPrice = sl.Medications.CurrentPrice,
+                    Schedule = sl.Medications.Schedule ?? string.Empty,
+                    DoctorName = sl.Prescriptions.Doctors.Name ?? string.Empty,
+                    DoctorSurname = sl.Prescriptions.Doctors.Surname ?? string.Empty
+                })
+                .ToListAsync();
+
+            return View(refillScriptLines);
         }
     }
 }

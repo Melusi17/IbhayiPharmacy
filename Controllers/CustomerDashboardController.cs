@@ -141,19 +141,23 @@ namespace IbhayiPharmacy.Controllers
             return View(model);
         }
 
-        // Track Orders Section
+        // Track Orders Section - SIMPLIFIED (Server-Side Rendering)
         public async Task<IActionResult> TrackOrder()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             var orders = await _context.Orders
-                .Where(o => o.Customer.ApplicationUserId == userId)
+                .Where(o => o.Customer.ApplicationUserId == userId && o.Status == "Ordered")
                 .Include(o => o.OrderLines)
                     .ThenInclude(ol => ol.Medications)
+                .Include(o => o.OrderLines)
+                    .ThenInclude(ol => ol.ScriptLine)
+                        .ThenInclude(sl => sl.Prescriptions)
+                            .ThenInclude(p => p.Doctors)
                 .OrderByDescending(o => o.OrderDate)
                 .ToListAsync();
 
-            return View(orders);
+            return View(orders); // Pass orders directly to the view
         }
 
         // Manage Repeats Section
@@ -300,7 +304,7 @@ namespace IbhayiPharmacy.Controllers
             }
         }
 
-        // API: Submit order
+        // API: Submit order - UPDATED
         [HttpPost]
         public async Task<JsonResult> SubmitOrder([FromBody] OrderSubmissionVM orderData)
         {
@@ -313,12 +317,12 @@ namespace IbhayiPharmacy.Controllers
                 if (customer == null)
                     return Json(new { success = false, message = "Customer not found" });
 
-                // Create new order
+                // Create new order - UPDATED STATUS
                 var order = new Order
                 {
                     CustomerID = customer.CustormerID,
                     OrderDate = DateTime.Now,
-                    Status = "Pending",
+                    Status = "Ordered", // CHANGED FROM "Pending" TO "Ordered"
                     VAT = 15 // 15% VAT
                 };
 
@@ -338,7 +342,8 @@ namespace IbhayiPharmacy.Controllers
                             MedicationID = item.MedicationId,
                             Quantity = item.Quantity,
                             ItemPrice = medication.CurrentPrice,
-                            ScriptLineID = item.ScriptLineId
+                            ScriptLineID = item.ScriptLineId,
+                            Status = "Pending" // NEW: Set default status for order line
                         };
 
                         order.OrderLines.Add(orderLine);
@@ -409,7 +414,8 @@ namespace IbhayiPharmacy.Controllers
                         {
                             Name = ol.Medications.MedicationName,
                             Quantity = ol.Quantity,
-                            Price = ol.ItemPrice
+                            Price = ol.ItemPrice,
+                            Status = ol.Status // NEW: Include status in report
                         }),
                         Total = o.TotalDue
                     })
