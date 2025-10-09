@@ -19,14 +19,14 @@ namespace IbhayiPharmacy.Models
         [ValidateNever]
         public Pharmacist Pharmacist { get; set; } = null!;
 
-        //public string? OrderNumber { get; set; }//(e.g., "ORD-20251001-001")
+        public string? OrderNumber { get; set; }//(e.g., "ORD-20251001-001")
         public DateTime OrderDate { get; set; }
 
         public string Status { get; set; } = "Ordered";
 
         public string TotalDue { get; set; } = string.Empty;
 
-        public int VAT { get; set; }
+        public int VAT { get; set; }    
 
         // Add this navigation property
         public virtual ICollection<OrderLine> OrderLines { get; set; } = new List<OrderLine>();

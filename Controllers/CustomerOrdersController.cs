@@ -12,6 +12,7 @@ namespace IbhayiPharmacy.Controllers
     public class CustomerOrdersController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly Random _random = new Random();
 
         public CustomerOrdersController(ApplicationDbContext context)
         {
@@ -22,6 +23,36 @@ namespace IbhayiPharmacy.Controllers
         private string GetCurrentUserId()
         {
             return User.FindFirstValue(ClaimTypes.NameIdentifier);
+        }
+
+        // Generate unique order number with ORD-C-RRRR format
+        private async Task<string> GenerateUniqueOrderNumber()
+        {
+            string orderNumber;
+            bool isUnique;
+            int maxAttempts = 5;
+            int attempts = 0;
+
+            do
+            {
+                // Format: ORD-C-RRRR (RRRR = 4 random digits)
+                string randomPart = _random.Next(1000, 10000).ToString(); // 4-digit random number
+                orderNumber = $"ORD-C-{randomPart}";
+
+                // Check if this order number already exists
+                isUnique = !await _context.Orders.AnyAsync(o => o.OrderNumber == orderNumber);
+                attempts++;
+
+            } while (!isUnique && attempts < maxAttempts);
+
+            // Fallback if we still don't have a unique number
+            if (!isUnique)
+            {
+                string timestamp = DateTime.Now.ToString("HHmmss");
+                orderNumber = $"ORD-C-{timestamp}";
+            }
+
+            return orderNumber;
         }
 
         // DEBUG ACTION - Check what's actually in the database
@@ -127,7 +158,7 @@ namespace IbhayiPharmacy.Controllers
             }
         }
 
-        // POST: Create order from selected medications (UPDATED validation)
+        // POST: Create order from selected medications (UPDATED with order number generation)
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> PlaceOrder(PlaceOrderFormVM model)
@@ -169,13 +200,17 @@ namespace IbhayiPharmacy.Controllers
                     return RedirectToAction("PlaceOrder");
                 }
 
-                // Create order
+                // Generate unique order number
+                string orderNumber = await GenerateUniqueOrderNumber();
+
+                // Create order with generated order number
                 var order = new Order
                 {
                     CustomerID = customer.CustormerID,
                     OrderDate = DateTime.Now,
-                    Status = "Pending",
-                    VAT = 15 // 15% VAT
+                    Status = "Ordered",
+                    VAT = 15, // 15% VAT
+                    OrderNumber = orderNumber
                 };
 
                 _context.Orders.Add(order);
@@ -212,8 +247,10 @@ namespace IbhayiPharmacy.Controllers
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
 
-                TempData["Success"] = "Order placed successfully!";
-                return RedirectToAction("OrderConfirmation", new { orderId = order.OrderID });
+                TempData["Success"] = $"Order {orderNumber} placed successfully!";
+
+                // REDIRECT to Track Order in CustomerDashboardController
+                return RedirectToAction("TrackOrder", "CustomerDashboard");
             }
             catch (Exception ex)
             {
@@ -223,7 +260,7 @@ namespace IbhayiPharmacy.Controllers
             }
         }
 
-        // Order confirmation page (unchanged)
+        // Order confirmation page (kept for reference, but redirecting to TrackOrder instead)
         public async Task<IActionResult> OrderConfirmation(int orderId)
         {
             var currentUserId = GetCurrentUserId();
@@ -249,7 +286,7 @@ namespace IbhayiPharmacy.Controllers
             var viewModel = new OrderConfirmationVM
             {
                 OrderID = order.OrderID,
-                OrderNumber = $"ORD{order.OrderID:D6}",
+                OrderNumber = order.OrderNumber, // Now using actual order number
                 OrderDate = order.OrderDate,
                 Status = order.Status,
                 TotalAmount = decimal.Parse(order.TotalDue),
@@ -268,7 +305,7 @@ namespace IbhayiPharmacy.Controllers
             return View(viewModel);
         }
 
-        // Order history (unchanged)
+        // Order history (updated to use actual order numbers)
         public async Task<IActionResult> OrderHistory()
         {
             var currentUserId = GetCurrentUserId();
@@ -281,7 +318,7 @@ namespace IbhayiPharmacy.Controllers
                 .Select(o => new OrderConfirmationVM
                 {
                     OrderID = o.OrderID,
-                    OrderNumber = $"ORD{o.OrderID:D6}",
+                    OrderNumber = o.OrderNumber, // Now using actual order number
                     OrderDate = o.OrderDate,
                     Status = o.Status,
                     TotalAmount = decimal.Parse(o.TotalDue),

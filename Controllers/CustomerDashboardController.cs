@@ -12,6 +12,7 @@ namespace IbhayiPharmacy.Controllers
     public class CustomerDashboardController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly Random _random = new Random();
 
         public CustomerDashboardController(ApplicationDbContext context)
         {
@@ -147,7 +148,7 @@ namespace IbhayiPharmacy.Controllers
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             var orders = await _context.Orders
-                .Where(o => o.Customer.ApplicationUserId == userId && o.Status == "Ordered")
+                .Where(o => o.Customer.ApplicationUserId == userId)
                 .Include(o => o.OrderLines)
                     .ThenInclude(ol => ol.Medications)
                 .Include(o => o.OrderLines)
@@ -157,7 +158,7 @@ namespace IbhayiPharmacy.Controllers
                 .OrderByDescending(o => o.OrderDate)
                 .ToListAsync();
 
-            return View(orders); // Pass orders directly to the view
+            return View(orders);
         }
 
         // Manage Repeats Section
@@ -304,7 +305,7 @@ namespace IbhayiPharmacy.Controllers
             }
         }
 
-        // API: Submit order - UPDATED
+        // API: Submit order - UPDATED WITH ORDER NUMBER GENERATION
         [HttpPost]
         public async Task<JsonResult> SubmitOrder([FromBody] OrderSubmissionVM orderData)
         {
@@ -317,13 +318,17 @@ namespace IbhayiPharmacy.Controllers
                 if (customer == null)
                     return Json(new { success = false, message = "Customer not found" });
 
-                // Create new order - UPDATED STATUS
+                // Generate unique order number
+                string orderNumber = await GenerateUniqueOrderNumber();
+
+                // Create new order with generated order number
                 var order = new Order
                 {
                     CustomerID = customer.CustormerID,
                     OrderDate = DateTime.Now,
-                    Status = "Ordered", // CHANGED FROM "Pending" TO "Ordered"
-                    VAT = 15 // 15% VAT
+                    Status = "Ordered",
+                    VAT = 15, // 15% VAT
+                    OrderNumber = orderNumber
                 };
 
                 // Calculate total
@@ -343,7 +348,7 @@ namespace IbhayiPharmacy.Controllers
                             Quantity = item.Quantity,
                             ItemPrice = medication.CurrentPrice,
                             ScriptLineID = item.ScriptLineId,
-                            Status = "Pending" // NEW: Set default status for order line
+                            Status = "Pending"
                         };
 
                         order.OrderLines.Add(orderLine);
@@ -355,12 +360,49 @@ namespace IbhayiPharmacy.Controllers
                 _context.Orders.Add(order);
                 await _context.SaveChangesAsync();
 
-                return Json(new { success = true, message = "Order submitted successfully!", orderId = order.OrderID });
+                return Json(new
+                {
+                    success = true,
+                    message = "Order submitted successfully!",
+                    orderId = order.OrderID,
+                    orderNumber = order.OrderNumber
+                });
             }
             catch (Exception ex)
             {
                 return Json(new { success = false, message = $"Error submitting order: {ex.Message}" });
             }
+        }
+
+        // Generate unique order number
+        private async Task<string> GenerateUniqueOrderNumber()
+        {
+            string orderNumber;
+            bool isUnique;
+            int maxAttempts = 5; // Prevent infinite loop
+            int attempts = 0;
+
+            do
+            {
+                // Format: ORD-YYYYMMDD-RRRR (RRRR = 4 random digits)
+                string datePart = DateTime.Now.ToString("yyyyMMdd");
+                string randomPart = _random.Next(1000, 10000).ToString(); // 4-digit random number
+                orderNumber = $"ORD-{datePart}-{randomPart}";
+
+                // Check if this order number already exists
+                isUnique = !await _context.Orders.AnyAsync(o => o.OrderNumber == orderNumber);
+                attempts++;
+
+            } while (!isUnique && attempts < maxAttempts);
+
+            // If we still don't have a unique number after max attempts, use a fallback
+            if (!isUnique)
+            {
+                string timestamp = DateTime.Now.ToString("yyyyMMddHHmmss");
+                orderNumber = $"ORD-{timestamp}";
+            }
+
+            return orderNumber;
         }
 
         // API: Request refill
@@ -415,7 +457,7 @@ namespace IbhayiPharmacy.Controllers
                             Name = ol.Medications.MedicationName,
                             Quantity = ol.Quantity,
                             Price = ol.ItemPrice,
-                            Status = ol.Status // NEW: Include status in report
+                            Status = ol.Status
                         }),
                         Total = o.TotalDue
                     })

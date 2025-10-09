@@ -1,11 +1,17 @@
 ﻿@model List<IbhayiPharmacy.Models.PharmacistVM.CustomerOrderVM>
+@{
+    ViewData["Title"] = "Place Order - Customer Dashboard";
+    Layout = null;
+}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Place Order - Customer Dashboard</title>
     <style>
-        /* General Body Style */
+        /* Your exact CSS styles */
         body {
             margin: 0;
             font-family: 'Segoe UI', sans-serif;
@@ -13,13 +19,11 @@
             overflow: hidden;
         }
 
-        /* Dashboard Layout */
         .dashboard-wrapper {
             display: flex;
             height: 100vh;
         }
 
-        /* Shared Sidebar Styles */
         .sidebar {
             width: 220px;
             display: flex;
@@ -29,7 +33,6 @@
             box-shadow: 0 0 10px rgba(0,0,0,0.05);
         }
 
-        /* Left Sidebar */
         .sidebar-left {
             background: linear-gradient(to bottom, #22586A, #22586A);
             color: white;
@@ -41,72 +44,96 @@
             padding: 10px;
         }
 
-            .sidebar-left ul a {
-                list-style: none;
-                padding: 0;
-                margin: 0;
-            }
-
-            .sidebar-left li a {
-                display: block;
-                padding: 1rem 2rem;
-                color: white;
-                text-decoration: none;
-                transition: 0.3s;
-            }
-
-                .sidebar-left li a:hover {
-                    background-color: rgba(244, 246, 246, 0.15);
-                    transform: translateX(5px);
-                }
-
-        .logo-container {
-            text-align: center;
-            margin-bottom: 0px;
-        }
-
-        .logo {
-            width: 200px;
-            height: auto;
-        }
-
-        .sidebar-content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-        }
-
-            .sidebar-content ul {
-                list-style: none;
-                padding: 0;
-            }
-
-            .sidebar-content li {
-                margin: 10px 0;
-                font-size: 16px;
-            }
-
-        /* Main Content */
         .main-content {
             flex: 1;
             padding: 30px;
             overflow-y: auto;
         }
 
-        /* Right Sidebar */
         .sidebar-right {
-            width: 180px;
             background: linear-gradient(145deg, #ffffff, #f0f0f0);
-            border-left: 1px solid #ddd;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-start;
-            padding: 20px;
-            box-shadow: -4px 0 10px rgba(0, 0, 0, 0.03);
             border-top-left-radius: 30px;
             border-bottom-left-radius: 30px;
+            border-left: 1px solid #ddd;
+            width: 180px;
+        }
+
+        .upload-prescription-panel {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.07);
+            max-width: 1200px;
+            margin: 20px auto;
+        }
+
+        .btn-upload {
+            background-color: #1f9f77;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+            .btn-upload:hover {
+                background-color: #28bf96;
+            }
+
+        .prescription-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+
+            .prescription-table th,
+            .prescription-table td {
+                padding: 12px 15px;
+                border: 1px solid #ccc;
+                text-align: left;
+            }
+
+            .prescription-table th {
+                background-color: #e0f2f1;
+                color: #004d40;
+            }
+
+        .sidebar-button-container {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            width: 100%;
+        }
+
+        .sidebar-button {
+            display: block;
+            width: 100%;
+            text-align: left;
+            padding: 15px 25px;
+            margin: 5px 0;
+            background: transparent;
+            color: white;
+            font-weight: bold;
+            text-decoration: none;
+            border: none;
+            border-radius: 25px 0 0 25px;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.2s ease;
+            font-size: 16px;
+        }
+
+            .sidebar-button:hover {
+                background-color: rgba(255, 255, 255, 0.15);
+                transform: translateX(5px);
+                color: #e0f7f5;
+            }
+
+        .hidden {
+            display: none;
         }
 
         .profile-container {
@@ -144,61 +171,10 @@
             z-index: 10;
         }
 
-            .profile-menu a {
-                display: block;
-                padding: 8px;
-                color: #333;
-                text-decoration: none;
-                border-radius: 5px;
-            }
-
-                .profile-menu a:hover {
-                    background-color: #eaeaea;
-                }
-
         .notifications {
             border-top: 0px solid #eee;
             padding-top: 50px;
         }
-
-            .notifications h4 {
-                margin-top: 20;
-                color: #444;
-            }
-
-        .hidden {
-            display: none;
-        }
-
-        .sidebar-button-container {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            width: 100%;
-        }
-
-        .sidebar-button {
-            display: block;
-            width: 100%;
-            text-align: left;
-            padding: 15px 25px;
-            margin: 5px 0;
-            background: transparent;
-            color: white;
-            font-weight: bold;
-            text-decoration: none;
-            border: none;
-            border-radius: 25px 0 0 25px;
-            cursor: pointer;
-            transition: background 0.3s ease, transform 0.2s ease;
-            font-size: 16px;
-        }
-
-            .sidebar-button:hover {
-                background-color: rgba(255, 255, 255, 0.15);
-                transform: translateX(5px);
-                color: #e0f7f5;
-            }
 
         /* Medication Order Panel */
         .track-order-panel {
@@ -235,12 +211,6 @@
             background-color: #f8d7da;
             color: #721c24;
             border: 1px solid #f5c6cb;
-        }
-
-        .alert-info {
-            background-color: #d1ecf1;
-            color: #0c5460;
-            border: 1px solid #bee5eb;
         }
 
         /* Medication Table */
@@ -293,36 +263,18 @@
             margin-bottom: 20px;
         }
 
-        /* Buttons */
-        .btn-upload {
-            background-color: #1f9f77;
-            color: white;
-            border: none;
-            padding: 10px 18px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 600;
-            transition: background-color 0.3s ease;
-            margin-left: 10px;
+        .btn-upload:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
         }
 
-            .btn-upload:hover {
-                background-color: #28bf96;
-            }
+        .btn-upload.cancel {
+            background-color: #999;
+        }
 
-            .btn-upload:disabled {
-                background-color: #cccccc;
-                cursor: not-allowed;
+            .btn-upload.cancel:hover {
+                background-color: #777;
             }
-
-            .btn-upload.cancel {
-                background-color: #999;
-            }
-
-                .btn-upload.cancel:hover {
-                    background-color: #777;
-                }
 
         /* Modal Styling */
         .modal-overlay {
@@ -406,27 +358,40 @@
             background-color: #fff3e0;
             color: #ef6c00;
         }
+
+        .success-message {
+            text-align: center;
+            color: #1f9f77;
+            font-weight: 500;
+            background-color: #e6f5f1;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+
+        .error-message {
+            text-align: center;
+            color: #e74c3c;
+            font-weight: 500;
+        }
     </style>
 </head>
 <body>
     <div class="dashboard-wrapper">
-
         <!-- Left Sidebar -->
         <aside class="sidebar sidebar-left">
             <div class="sidebar-header">
-                <img style="height:160px;width:220px;" src="~/css/img/ibhayi2.png" />
+                <img style="height:160px;width:220px;" src="~/css/img/ibhayi2.png" alt="Ibhayi Pharmacy" />
             </div>
             <div class="sidebar-content">
                 <nav>
                     <div class="sidebar-button-container">
-                        <a asp-controller="Customer" asp-action="uploadPrescription" class="sidebar-button">📥 Upload Prescription</a>
-                        <a asp-controller="CustomerOrders" asp-action="PlaceOrder" class="sidebar-button">🛒 Place Orders</a>
-                        <a asp-controller="CustomerOrders" asp-action="OrderHistory" class="sidebar-button">📦 Track Orders</a>
-                        <a asp-controller="CustomerOrders" asp-action="RequestRefill" class="sidebar-button">🔁 Request Refills</a>
-                        <a asp-controller="Customer" asp-action="viewReports" class="sidebar-button">📄 View Reports</a>
-                        <a asp-controller="Home" asp-action="Index"
-                           class="sidebar-button"
-                           onclick="return confirm('Are you sure you want to log out?');">
+                        <a asp-controller="CustomerDashboard" asp-action="UploadPrescription" class="sidebar-button">📥 Upload Prescription</a>
+                        <a asp-controller="CustomerDashboard" asp-action="PlaceOrder" class="sidebar-button">🛒 Place Orders</a>
+                        <a asp-controller="CustomerDashboard" asp-action="TrackOrder" class="sidebar-button">📦 Track Orders</a>
+                        <a asp-controller="CustomerDashboard" asp-action="ManageRepeats" class="sidebar-button">🔁 Manage Repeats</a>
+                        <a asp-controller="CustomerDashboard" asp-action="ViewReports" class="sidebar-button">📄 View Reports</a>
+                        <a asp-controller="Home" asp-action="Index" class="sidebar-button" onclick="return confirm('Are you sure you want to log out?');">
                             &#10145; Logout
                         </a>
                     </div>
@@ -436,22 +401,11 @@
 
         <!-- Main Content -->
         <main class="main-content" id="mainContent">
-            <div class="track-order-panel upload-prescription-panel">
+            <div class="upload-prescription-panel">
                 <h2>📦 Place Medication Order</h2>
 
                 <!-- Alert Messages -->
-                @if (TempData["Success"] != null)
-                {
-                    <div class="alert alert-success">
-                        @TempData["Success"]
-                    </div>
-                }
-                @if (TempData["Error"] != null)
-                {
-                    <div class="alert alert-error">
-                        @TempData["Error"]
-                    </div>
-                }
+                <div id="orderStatus"></div>
 
                 @if (!Model.Any())
                 {
@@ -459,12 +413,8 @@
                         <h3>No medications available for ordering</h3>
                         <p>You don't have any approved prescriptions ready for ordering.</p>
                         <p>Please upload a prescription first or check if your prescriptions have been processed.</p>
-                        <a asp-controller="Customer" asp-action="UploadPrescription" class="btn-upload" style="margin-top: 15px;">
+                        <a asp-controller="CustomerDashboard" asp-action="UploadPrescription" class="btn-upload" style="margin-top: 15px;">
                             📥 Upload Prescription
-                        </a>
-                        <br />
-                        <a asp-controller="CustomerOrders" asp-action="Debug" class="btn-upload cancel" style="margin-top: 10px; text-decoration: none;">
-                            🐛 Debug Info
                         </a>
                     </div>
                 }
@@ -473,7 +423,7 @@
                     <form id="orderForm" asp-controller="CustomerOrders" asp-action="PlaceOrder" method="post">
                         @Html.AntiForgeryToken()
 
-                        <table id="medicationTable" class="styled-medication-table">
+                        <table class="prescription-table">
                             <thead>
                                 <tr>
                                     <th>Select</th>
@@ -536,14 +486,14 @@
                                 <button type="button" class="btn-upload" onclick="showOrderSummary()" id="placeOrderBtn" disabled>
                                     Place Order
                                 </button>
-                                <a asp-controller="CustomerOrders" asp-action="Debug" class="btn-upload cancel" style="text-decoration: none;">
-                                    🐛 Debug Info
-                                </a>
+                                <button type="button" class="btn-upload cancel" onclick="clearSelection()">
+                                    Clear Selection
+                                </button>
                             </div>
                         </div>
                     </form>
 
-                    <!-- ✅ Styled Confirmation Modal -->
+                    <!-- Confirmation Modal -->
                     <div id="confirmationModal" class="modal-overlay">
                         <div class="modal-content">
                             <h3>✅ Confirm Medication Order</h3>
@@ -582,16 +532,16 @@
                     <img src="~/css/img/Customer_img/Profile.png" alt="Profile" />
                 </div>
                 <div id="profileMenu" class="profile-menu hidden">
-                    <a asp-controller="Customer" asp-action="profile" class="sidebar-button">👤 Account</a>
+                    <a asp-controller="CustomerDashboard" asp-action="Profile" class="sidebar-button">👤 Account</a>
                     <a asp-controller="Home" asp-action="Index" class="sidebar-button">🚪 Logout</a>
                 </div>
             </div>
 
-            <div class="notifications" style="background-color: #ffffff; border: 1px solid #dcdcdc; padding: 20px; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.05); margin: 20px 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+            <div class="notifications" style="background-color: #ffffff; border: 1px solid #dcdcdc; padding: 20px; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.05); margin: 20px 0;">
                 <h4 style="font-size: 18px; margin-bottom: 15px; color: #333;">🔔 Notifications</h4>
                 <ul style="list-style-type: none; padding: 0; margin: 0;">
                     <li style="padding: 12px 0; border-bottom: 1px solid #eee; font-size: 15px; color: #555;">
-                        🏥 You have <strong>@Model.Count approved medications</strong> available for ordering
+                        🏥 You have <strong>@Model.Count medications</strong> available for ordering
                     </li>
                     @{
                         var medicationsWithRepeats = Model.Count(m => m.RepeatsLeft > 0);
@@ -599,7 +549,7 @@
                     @if (medicationsWithRepeats > 0)
                     {
                         <li style="padding: 12px 0; font-size: 15px; color: #555;">
-                            🔄 <strong>@medicationsWithRepeats medications</strong> available for future refills
+                            🔄 <strong>@medicationsWithRepeats medications</strong> available for refills
                         </li>
                     }
                 </ul>
@@ -655,7 +605,7 @@
         function showOrderSummary() {
             const checkboxes = document.querySelectorAll('.med-check:checked');
             if (checkboxes.length === 0) {
-                alert('⚠️ Please select at least one medication.');
+                showOrderStatus('⚠️ Please select at least one medication.', 'error');
                 return;
             }
 
@@ -694,13 +644,44 @@
             document.getElementById('confirmationModal').style.display = 'none';
         }
 
-        // Toggle profile menu
-        function toggleProfileMenu() {
-            const menu = document.getElementById('profileMenu');
-            menu.classList.toggle('hidden');
+        // Clear selection
+        function clearSelection() {
+            document.querySelectorAll('.med-check').forEach(cb => {
+                cb.checked = false;
+            });
+            updateTotals();
         }
 
-        // Initialize page - update totals on load in case of preserved checkboxes
+        // Show order status message
+        function showOrderStatus(message, type) {
+            const statusDiv = document.getElementById('orderStatus');
+            statusDiv.innerHTML = '';
+
+            const messageDiv = document.createElement('div');
+            messageDiv.className = type === 'success' ? 'success-message' : 'error-message';
+            messageDiv.textContent = message;
+            statusDiv.appendChild(messageDiv);
+        }
+
+        // Profile menu functions
+        function toggleProfileMenu() {
+            const menu = document.getElementById('profileMenu');
+            if (menu) {
+                menu.classList.toggle('hidden');
+            }
+        }
+
+        // Close profile menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const profileMenu = document.getElementById('profileMenu');
+            const profileIcon = document.querySelector('.profile-icon');
+
+            if (profileMenu && !profileMenu.contains(event.target) && !profileIcon.contains(event.target)) {
+                profileMenu.classList.add('hidden');
+            }
+        });
+
+        // Initialize page - update totals on load
         document.addEventListener('DOMContentLoaded', function() {
             updateTotals();
         });

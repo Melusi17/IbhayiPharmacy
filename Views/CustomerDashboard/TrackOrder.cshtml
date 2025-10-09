@@ -224,7 +224,7 @@
                 {
                     var order = Model[i];
                     <tr class="order-summary-row" onclick="toggleDetails(@i)">
-                        <td>ORD@(order.OrderID.ToString("D4"))</td>
+                        <td>@order.OrderNumber</td>
                         <td>@order.OrderDate.ToString("yyyy-MM-dd")</td>
                         <td>
                             @{
