@@ -302,7 +302,7 @@ namespace IbhayiPharmacy.Controllers
             }
         }
 
-        // POST: Complete order processing (Final "Dispense Order" button)
+        // POST: Complete order processing (Final "Complete Order Processing" button)
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CompleteOrderProcessing(int orderId)
