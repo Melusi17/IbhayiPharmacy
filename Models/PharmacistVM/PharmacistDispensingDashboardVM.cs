@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 
 namespace IbhayiPharmacy.Models.PharmacistVM
 {
@@ -40,11 +41,11 @@ namespace IbhayiPharmacy.Models.PharmacistVM
         // For selected medications to dispense
         public List<int> SelectedOrderLineIds { get; set; } = new List<int>();
 
-        // Calculated properties for UI
+        // NEW CALCULATED PROPERTIES FOR UI
         public int PendingCount => OrderLines.Count(ol => ol.Status == "Pending");
         public int DispensedCount => OrderLines.Count(ol => ol.Status == "Dispensed");
         public int RejectedCount => OrderLines.Count(ol => ol.Status == "Rejected");
-        public bool CanCompleteOrder => AllItemsProcessed;
+        public bool CanCompleteOrder => PendingCount == 0;
         public string ExpectedOrderStatus => AnyItemsDispensed ? "Ready for Collection" : "Waiting Customer Action";
     }
 
@@ -65,6 +66,10 @@ namespace IbhayiPharmacy.Models.PharmacistVM
         public bool CanDispense { get; set; }
         public string? RejectionReason { get; set; }
 
+        // NEW REPEATS PROPERTIES
+        public int TotalRepeats { get; set; }
+        public int RepeatsLeft { get; set; }
+
         // Selection properties
         public bool IsSelected { get; set; }
         public bool CanBeSelected => Status == "Pending";
@@ -74,6 +79,11 @@ namespace IbhayiPharmacy.Models.PharmacistVM
         public string AllergyWarning { get; set; } = string.Empty;
         public string StockStatus => IsLowStock ? "Low Stock" : "In Stock";
         public string StockStatusClass => IsLowStock ? "text-danger" : "text-success";
+
+        // NEW REPEATS UI PROPERTIES
+        public bool HasRepeats => TotalRepeats > 0;
+        public string RepeatsDisplay => HasRepeats ? $"{RepeatsLeft}/{TotalRepeats}" : "0";
+        public string RepeatsTooltip => HasRepeats ? $"Repeats: {RepeatsLeft} left of {TotalRepeats} total" : "No repeats available";
     }
 
     public class DispensingHistoryVM

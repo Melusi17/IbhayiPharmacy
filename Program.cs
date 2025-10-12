@@ -25,10 +25,10 @@ builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("Customer", policy =>
         policy.RequireRole(SD.Role_Customer));
-    options.AddPolicy("Phamacist", policy =>
-        policy.RequireRole(SD.Role_Phamacist));
-    options.AddPolicy("Phamacy Manager", policy =>
-        policy.RequireRole(SD.Role_PhamacyManager));
+    options.AddPolicy("Pharmacist", policy =>
+        policy.RequireRole(SD.Role_Pharmacist));
+    options.AddPolicy("Pharmacy Manager", policy =>
+        policy.RequireRole(SD.Role_PharmacyManager));
 });
 
 var app = builder.Build();

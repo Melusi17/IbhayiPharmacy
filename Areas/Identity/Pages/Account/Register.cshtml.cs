@@ -97,6 +97,9 @@ namespace IbhayiPharmacy.Areas.Identity.Pages.Account
 
             public string? CellphoneNumber { get; set; }
 
+            // NEW: Health Council Registration Number for Pharmacist/Pharmacy Manager
+            public string? HealthCouncilRegNo { get; set; }
+
             public List<int> SelectedAllergyIds { get; set; } = new List<int>();
 
             [ValidateNever]
@@ -105,11 +108,12 @@ namespace IbhayiPharmacy.Areas.Identity.Pages.Account
 
         public async Task OnGetAsync(string returnUrl = null)
         {
-            if (!_roleManager.RoleExistsAsync(SD.Role_Customer).GetAwaiter().GetResult())
+            // FIXED: Use proper async/await instead of .GetAwaiter().GetResult()
+            if (!await _roleManager.RoleExistsAsync(SD.Role_Customer))
             {
-                _roleManager.CreateAsync(new IdentityRole(SD.Role_Customer)).GetAwaiter().GetResult();
-                _roleManager.CreateAsync(new IdentityRole(SD.Role_Phamacist)).GetAwaiter().GetResult();
-                _roleManager.CreateAsync(new IdentityRole(SD.Role_PhamacyManager)).GetAwaiter().GetResult();
+                await _roleManager.CreateAsync(new IdentityRole(SD.Role_Customer));
+                await _roleManager.CreateAsync(new IdentityRole(SD.Role_Pharmacist));
+                await _roleManager.CreateAsync(new IdentityRole(SD.Role_PharmacyManager));
             }
 
             Input = new InputModel
@@ -187,6 +191,44 @@ namespace IbhayiPharmacy.Areas.Identity.Pages.Account
                         await _db.SaveChangesAsync();
                     }
 
+                    // NEW: Handle Pharmacist registration
+                    if (Input.Role == SD.Role_Pharmacist)
+                    {
+                        if (string.IsNullOrEmpty(Input.HealthCouncilRegNo))
+                        {
+                            ModelState.AddModelError(string.Empty, "Health Council Registration Number is required for Pharmacist role.");
+                            await _userManager.DeleteAsync(user); // Rollback user creation
+                            return await RebuildPageAsync();
+                        }
+
+                        var pharmacist = new Pharmacist
+                        {
+                            ApplicationUserId = user.Id,
+                            HealthCouncilRegNo = Input.HealthCouncilRegNo
+                        };
+                        _db.Pharmacists.Add(pharmacist);
+                        await _db.SaveChangesAsync();
+                    }
+
+                    // NEW: Handle Pharmacy Manager registration
+                    if (Input.Role == SD.Role_PharmacyManager)
+                    {
+                        if (string.IsNullOrEmpty(Input.HealthCouncilRegNo))
+                        {
+                            ModelState.AddModelError(string.Empty, "Health Council Registration Number is required for Pharmacy Manager role.");
+                            await _userManager.DeleteAsync(user); // Rollback user creation
+                            return await RebuildPageAsync();
+                        }
+
+                        var pharmacyManager = new PharmacyManager
+                        {
+                            ApplicationUserId = user.Id,
+                            HealthCouncilRegNo = Input.HealthCouncilRegNo
+                        };
+                        _db.PharmacyManagers.Add(pharmacyManager);
+                        await _db.SaveChangesAsync();
+                    }
+
                     var userId = await _userManager.GetUserIdAsync(user);
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                     code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
@@ -216,7 +258,12 @@ namespace IbhayiPharmacy.Areas.Identity.Pages.Account
                 }
             }
 
-            // If we got this far, something failed, redisplay form with allergy list
+            return await RebuildPageAsync();
+        }
+
+        private async Task<IActionResult> RebuildPageAsync()
+        {
+            // Rebuild the dropdown lists when returning to page
             Input.AllergyList = _db.Active_Ingredients.Select(a => new SelectListItem
             {
                 Text = a.Name,
