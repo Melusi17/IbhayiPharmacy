@@ -553,28 +553,40 @@
             gap: 10px;
         }
 
+        /* ===== REPEATS COLUMN STYLES ===== */
+        .repeats-cell {
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .repeats-zero {
+            color: #e74c3c;
+        }
+
+        .repeats-available {
+            color: #27ae60;
+        }
+
         /* ===== RESPONSIVE ===== */
         @@media (max-width: 992px) {
-            .patient-info-grid
+            .patient-info-grid {
+                grid-template-columns: 1fr;
+            }
 
-        {
-            grid-template-columns: 1fr;
-        }
+            .action-buttons-container {
+                flex-direction: column;
+                gap: 15px;
+            }
 
-        .action-buttons-container {
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .left-actions, .right-actions {
-            width: 100%;
-            justify-content: center;
-        }
-
+            .left-actions, .right-actions {
+                width: 100%;
+                justify-content: center;
+            }
         }
     </style>
 </head>
 <body>
+    @Html.AntiForgeryToken()
     <!-- SIDEBAR -->
     <div class="sidebar" id="sidebar">
         <button class="toggle-sidebar" onclick="toggleSidebar()">
@@ -711,12 +723,13 @@
                     <thead>
                         <tr>
                             <th width="5%"></th>
-                            <th width="25%">Medication</th>
-                            <th width="10%">Schedule</th>
-                            <th width="8%">Qty</th>
-                            <th width="15%">Instructions</th>
-                            <th width="10%">Stock</th>
-                            <th width="12%">Status</th>
+                            <th width="20%">Medication</th>
+                            <th width="8%">Schedule</th>
+                            <th width="6%">Qty</th>
+                            <th width="8%">Repeats</th> <!-- NEW REPEATS COLUMN -->
+                            <th width="14%">Instructions</th>
+                            <th width="8%">Stock</th>
+                            <th width="10%">Status</th>
                             <th width="15%">Actions</th>
                         </tr>
                     </thead>
@@ -743,6 +756,9 @@
                                 </td>
                                 <td><span class="badge bg-info">@orderLine.Schedule</span></td>
                                 <td>@orderLine.Quantity</td>
+                                <td class="repeats-cell @(orderLine.RepeatsLeft == 0 ? "repeats-zero" : "repeats-available")">
+                                    @orderLine.RepeatsLeft
+                                </td>
                                 <td>@orderLine.Instructions</td>
                                 <td>
                                     <span class="@orderLine.StockStatusClass">
@@ -751,7 +767,6 @@
                                     @if (orderLine.IsLowStock)
                                     {
                                         <br>
-                                
                                         <small class="text-danger">Low Stock</small>
                                     }
                                 </td>
@@ -809,7 +824,6 @@
                         @if (Model.AllItemsRejected)
                         {
                             <br>
-                    
                             <small>Customer will be notified that all medications were rejected.</small>
                         }
                     </div>
@@ -958,10 +972,15 @@
             }
         }
 
-        // Dispense selected medications
+        // Dispense selected medications - DEBUG VERSION
+                // Dispense selected medications - FIXED VERSION
         async function dispenseSelected() {
             const selectedCheckboxes = document.querySelectorAll('.dispense-checkbox:checked');
             const selectedIds = Array.from(selectedCheckboxes).map(cb => parseInt(cb.value));
+
+            console.log('=== START DISPENSE DEBUG ===');
+            console.log('Selected IDs:', selectedIds);
+            console.log('Order ID:', orderId);
 
             if (selectedIds.length === 0) {
                 alert('Please select at least one medication to dispense');
@@ -977,25 +996,61 @@
                 formData.append('orderId', orderId);
                 selectedIds.forEach(id => formData.append('selectedOrderLineIds', id));
 
+                // FIX: Get anti-forgery token safely
+                const tokenElement = document.querySelector('input[name="__RequestVerificationToken"]');
+                if (!tokenElement) {
+                    console.error('Anti-forgery token not found!');
+                    alert('Security token missing. Please refresh the page and try again.');
+                    return;
+                }
+
+                const token = tokenElement.value;
+                console.log('Anti-forgery token found:', !!token);
+
+                console.log('Sending request to server...');
+                console.log('FormData contents:');
+                for (let pair of formData.entries()) {
+                    console.log(pair[0] + ': ' + pair[1]);
+                }
+
                 const response = await fetch('@Url.Action("DispenseSelectedOrderLines", "PharmacistDispensing")', {
                     method: 'POST',
                     body: formData,
                     headers: {
-                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                        'RequestVerificationToken': token
                     }
                 });
 
+                console.log('Response status:', response.status);
+                console.log('Response OK:', response.ok);
+
+                // Check if response is JSON
+                const contentType = response.headers.get('content-type');
+                if (!contentType || !contentType.includes('application/json')) {
+                    console.error('Response is not JSON:', contentType);
+                    const text = await response.text();
+                    console.error('Response text:', text);
+                    alert('Server returned an invalid response. Please try again.');
+                    return;
+                }
+
                 const result = await response.json();
+                console.log('Server response:', result);
 
                 if (result.success) {
-                    // Reload page to show updated status
+                    console.log('SUCCESS: Dispensing completed');
+                    alert(result.message);
                     window.location.reload();
                 } else {
+                    console.log('ERROR from server:', result.message);
                     alert('Error: ' + result.message);
                 }
             } catch (error) {
-                console.error('Error dispensing medications:', error);
-                alert('Error dispensing medications');
+                console.error('=== FETCH ERROR ===');
+                console.error('Error type:', error.name);
+                console.error('Error message:', error.message);
+                console.error('Full error:', error);
+                alert('Error dispensing medications: ' + error.message);
             }
         }
 
@@ -1049,8 +1104,12 @@
             }
         }
 
-        // Initialize event listeners
+        // Initialize event listeners with debug
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('=== PAGE LOADED ===');
+            console.log('Order ID:', orderId);
+            console.log('Anti-forgery token found:', !!document.querySelector('input[name="__RequestVerificationToken"]'));
+
             // Update selection UI when checkboxes change
             document.querySelectorAll('.dispense-checkbox').forEach(checkbox => {
                 checkbox.addEventListener('change', updateSelectionUI);

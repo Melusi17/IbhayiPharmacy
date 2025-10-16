@@ -236,7 +236,7 @@ namespace IbhayiPharmacy.Controllers
                         MedicationID = scriptLine.MedicationID,
                         Quantity = scriptLine.Quantity,
                         ItemPrice = (int)scriptLine.Medications.CurrentPrice,
-                        Status = "Ordered" // Set initial status
+                        Status = "Pending" // Set initial status
                     };
 
                     _context.OrderLines.Add(orderLine);

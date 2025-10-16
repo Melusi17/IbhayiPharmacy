@@ -8,7 +8,7 @@ using System.Security.Claims;
 
 namespace IbhayiPharmacy.Controllers
 {
-    [Authorize(Policy = "Phamacist")]
+    [Authorize(Policy = "Pharmacist")]
     public class PharmacistDispensingController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -124,7 +124,10 @@ namespace IbhayiPharmacy.Controllers
                         IsLowStock = ol.Medications.QuantityOnHand <= ol.Medications.ReOrderLevel,
                         Status = ol.Status,
                         CanDispense = ol.Status == "Pending",
-                        RejectionReason = ol.RejectionReason
+                        RejectionReason = ol.RejectionReason,
+                        // NEW: Add repeats information
+                        TotalRepeats = ol.ScriptLine?.Repeats ?? 0,
+                        RepeatsLeft = ol.ScriptLine?.RepeatsLeft ?? 0
                     }).ToList(),
                     AllItemsProcessed = order.OrderLines.All(ol =>
                         ol.Status == "Dispensed" || ol.Status == "Rejected"),
@@ -141,97 +144,192 @@ namespace IbhayiPharmacy.Controllers
             }
         }
 
-        // POST: Dispense selected order lines
+        // POST: Dispense selected order lines - DEBUG VERSION
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DispenseSelectedOrderLines(int orderId, List<int> selectedOrderLineIds)
         {
             try
             {
+                Console.WriteLine($"=== START DispenseSelectedOrderLines ===");
+                Console.WriteLine($"OrderId: {orderId}, SelectedCount: {selectedOrderLineIds?.Count ?? 0}");
+
                 if (selectedOrderLineIds == null || !selectedOrderLineIds.Any())
                 {
+                    Console.WriteLine("ERROR: No medications selected");
                     return Json(new { success = false, message = "Please select at least one medication to dispense." });
                 }
 
+                // DEBUG: Check if we can access the database
+                Console.WriteLine("Attempting to load order...");
                 var order = await _context.Orders
                     .Include(o => o.OrderLines)
                         .ThenInclude(ol => ol.Medications)
+                    .Include(o => o.OrderLines)
+                        .ThenInclude(ol => ol.ScriptLine)
                     .FirstOrDefaultAsync(o => o.OrderID == orderId);
 
                 if (order == null)
                 {
+                    Console.WriteLine($"ERROR: Order {orderId} not found");
                     return Json(new { success = false, message = "Order not found." });
                 }
+                Console.WriteLine($"Order loaded: {order.OrderNumber}, OrderLines: {order.OrderLines.Count}");
 
                 var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                Console.WriteLine($"Current UserId: {currentUserId}");
+
                 var pharmacist = await _context.Pharmacists
                     .FirstOrDefaultAsync(p => p.ApplicationUserId == currentUserId);
 
                 if (pharmacist == null)
                 {
+                    Console.WriteLine("ERROR: Pharmacist not found");
                     return Json(new { success = false, message = "Pharmacist not found." });
                 }
+                Console.WriteLine($"Pharmacist found: {pharmacist.PharmacistID}");
 
                 using var transaction = await _context.Database.BeginTransactionAsync();
+                Console.WriteLine("Transaction started");
 
                 try
                 {
-                    var orderLinesToDispense = order.OrderLines
+                    var orderLinesToProcess = order.OrderLines
                         .Where(ol => selectedOrderLineIds.Contains(ol.OrderLineID) && ol.Status == "Pending")
                         .ToList();
 
-                    // Check stock availability for all selected medications
-                    var insufficientStockLines = orderLinesToDispense
-                        .Where(ol => ol.Medications.QuantityOnHand < ol.Quantity)
-                        .ToList();
+                    Console.WriteLine($"Order lines to process: {orderLinesToProcess.Count}");
 
-                    if (insufficientStockLines.Any())
+                    var orderLinesToDispense = new List<OrderLine>();
+                    var orderLinesToReject = new List<OrderLine>();
+
+                    // Process each order line
+                    foreach (var orderLine in orderLinesToProcess)
                     {
-                        var medicationNames = insufficientStockLines
-                            .Select(ol => ol.Medications.MedicationName)
-                            .ToList();
+                        Console.WriteLine($"Processing OrderLine {orderLine.OrderLineID}, Medication: {orderLine.Medications?.MedicationName}");
+                        Console.WriteLine($"ScriptLine: {orderLine.ScriptLine != null}, Repeats: {orderLine.ScriptLine?.Repeats}, RepeatsLeft: {orderLine.ScriptLine?.RepeatsLeft}");
+                        Console.WriteLine($"Stock: {orderLine.Medications?.QuantityOnHand}, Required: {orderLine.Quantity}");
 
-                        return Json(new
+                        // Check if medication has repeats and if they're exceeded
+                        if (orderLine.ScriptLine != null && orderLine.ScriptLine.Repeats > 0 && orderLine.ScriptLine.RepeatsLeft <= 0)
                         {
-                            success = false,
-                            message = $"Insufficient stock for: {string.Join(", ", medicationNames)}"
-                        });
+                            Console.WriteLine($"REJECTING: Repeats exceeded for {orderLine.Medications.MedicationName}");
+                            orderLine.Status = "Rejected";
+                            orderLine.RejectionReason = "Repeats exceeded";
+                            orderLinesToReject.Add(orderLine);
+                            continue;
+                        }
+
+                        // Check stock availability
+                        if (orderLine.Medications.QuantityOnHand < orderLine.Quantity)
+                        {
+                            Console.WriteLine($"REJECTING: Insufficient stock for {orderLine.Medications.MedicationName}");
+                            orderLine.Status = "Rejected";
+                            orderLine.RejectionReason = "Insufficient stock";
+                            orderLinesToReject.Add(orderLine);
+                            continue;
+                        }
+
+                        Console.WriteLine($"APPROVING: {orderLine.Medications.MedicationName} for dispensing");
+                        orderLinesToDispense.Add(orderLine);
                     }
 
-                    // Dispense selected order lines
+                    Console.WriteLine($"Dispensing {orderLinesToDispense.Count} medications, Rejecting {orderLinesToReject.Count} medications");
+
+                    // Dispense valid order lines
                     foreach (var orderLine in orderLinesToDispense)
                     {
+                        Console.WriteLine($"Dispensing {orderLine.Medications.MedicationName}");
+
                         // Update stock
+                        int oldStock = orderLine.Medications.QuantityOnHand;
                         orderLine.Medications.QuantityOnHand -= orderLine.Quantity;
+                        Console.WriteLine($"Stock updated: {oldStock} -> {orderLine.Medications.QuantityOnHand}");
+
+                        // Update repeats if medication has repeats
+                        if (orderLine.ScriptLine != null && orderLine.ScriptLine.Repeats > 0 && orderLine.ScriptLine.RepeatsLeft > 0)
+                        {
+                            int oldRepeats = orderLine.ScriptLine.RepeatsLeft;
+                            orderLine.ScriptLine.RepeatsLeft--;
+                            Console.WriteLine($"Repeats updated: {oldRepeats} -> {orderLine.ScriptLine.RepeatsLeft}");
+                        }
 
                         // Update order line status
                         orderLine.Status = "Dispensed";
+                        Console.WriteLine($"Status updated to: {orderLine.Status}");
                     }
 
                     // Set dispensing pharmacist if not set
                     if (order.PharmacistID == null)
                     {
                         order.PharmacistID = pharmacist.PharmacistID;
+                        Console.WriteLine($"Pharmacist set: {order.PharmacistID}");
                     }
 
+                    Console.WriteLine("Saving changes to database...");
                     await _context.SaveChangesAsync();
-                    await transaction.CommitAsync();
+                    Console.WriteLine("Changes saved successfully");
 
+                    await transaction.CommitAsync();
+                    Console.WriteLine("Transaction committed");
+
+                    var resultMessage = "";
+                    if (orderLinesToDispense.Count > 0 && orderLinesToReject.Count > 0)
+                    {
+                        resultMessage = $"{orderLinesToDispense.Count} medication(s) dispensed successfully! {orderLinesToReject.Count} medication(s) were automatically rejected (repeats exceeded or insufficient stock).";
+                    }
+                    else if (orderLinesToDispense.Count > 0)
+                    {
+                        resultMessage = $"{orderLinesToDispense.Count} medication(s) dispensed successfully!";
+                    }
+                    else if (orderLinesToReject.Count > 0)
+                    {
+                        resultMessage = $"{orderLinesToReject.Count} medication(s) were automatically rejected (repeats exceeded or insufficient stock).";
+                    }
+                    else
+                    {
+                        resultMessage = "No medications were processed.";
+                    }
+
+                    Console.WriteLine($"=== SUCCESS: {resultMessage} ===");
                     return Json(new
                     {
                         success = true,
-                        message = $"{orderLinesToDispense.Count} medication(s) dispensed successfully!",
-                        processedCount = orderLinesToDispense.Count
+                        message = resultMessage,
+                        dispensedCount = orderLinesToDispense.Count,
+                        rejectedCount = orderLinesToReject.Count
                     });
                 }
                 catch (Exception ex)
                 {
                     await transaction.RollbackAsync();
+                    Console.WriteLine($"=== TRANSACTION ERROR ===");
+                    Console.WriteLine($"Error Type: {ex.GetType().Name}");
+                    Console.WriteLine($"Error Message: {ex.Message}");
+                    Console.WriteLine($"Stack Trace: {ex.StackTrace}");
+
+                    if (ex.InnerException != null)
+                    {
+                        Console.WriteLine($"Inner Exception: {ex.InnerException.Message}");
+                        Console.WriteLine($"Inner Stack Trace: {ex.InnerException.StackTrace}");
+                    }
+
                     return Json(new { success = false, message = $"Error dispensing medications: {ex.Message}" });
                 }
             }
             catch (Exception ex)
             {
+                Console.WriteLine($"=== OUTER ERROR ===");
+                Console.WriteLine($"Error Type: {ex.GetType().Name}");
+                Console.WriteLine($"Error Message: {ex.Message}");
+                Console.WriteLine($"Stack Trace: {ex.StackTrace}");
+
+                if (ex.InnerException != null)
+                {
+                    Console.WriteLine($"Inner Exception: {ex.InnerException.Message}");
+                    Console.WriteLine($"Inner Stack Trace: {ex.InnerException.StackTrace}");
+                }
+
                 return Json(new { success = false, message = $"Error: {ex.Message}" });
             }
         }
@@ -250,6 +348,7 @@ namespace IbhayiPharmacy.Controllers
 
                 var orderLine = await _context.OrderLines
                     .Include(ol => ol.Order)
+                    .Include(ol => ol.ScriptLine)
                     .FirstOrDefaultAsync(ol => ol.OrderLineID == orderLineId);
 
                 if (orderLine == null)
