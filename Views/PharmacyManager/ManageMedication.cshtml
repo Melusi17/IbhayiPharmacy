@@ -1,64 +1,58 @@
-﻿
+﻿@model IEnumerable<IbhayiPharmacy.Models.Medication>
 @{
-    ViewData["Title"] = "ManageMedication";
+    ViewBag.Title = "Manage Medications";
     Layout = "~/Views/Shared/_ManagerLayout.cshtml";
 
-  
 }
 
 <div class="container mt-4">
-   
+    <h2 class="text-center mb-4">Manage Medications</h2>
 
-    <!-- Medications Table -->
-    <div class="card p-3">
-        <h5 class="title-underline">Existing Medications</h5>
-        <div class="card-body">
-            <table class="table table-borderless table-hover">
-                <thead class=" table-light" style=" color: #2c3e50;">
-                    <tr>
-                        
-                        <th>Name</th>
-                        <th>Schedule</th>
-                        <th>Form</th>
-                        <th>Supplier</th>
-                        <th>Re-order Level</th>
-                        <th>Qty On Hand</th>
-                        <th>Price</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                   
-                    <tr>
-                       
-                        <td>Myprodol</td>
-                        <td>3</td>
-                        <td>Capsule</td>
-                        <td>PharmaDirect</td>
-                        <td>20</td>
-                        <td>150</td>
-                        <td>R29.99</td>
-                        <td>
-                            <button class="btn btn-sm btn-warning me-2">Edit</button>
-                            <button class="btn btn-sm btn-danger">Delete</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        
-                        <td>Panado</td>
-                        <td>0</td>
-                        <td>Tablet</td>
-                        <td>MedLife Distributors</td>
-                        <td>10</td>
-                        <td>90</td>
-                        <td>R14.50</td>
-                        <td>
-                            <button class="btn btn-sm btn-warning me-2">Edit</button>
-                            <button class="btn btn-sm btn-danger">Delete</button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+    <div class="text-end mb-3">
+        <a asp-action="AddMedication" class="btn btn-success">+ Add New Medication</a>
     </div>
+
+    <table class="table table-bordered table-striped">
+        <thead class="table-dark">
+            <tr>
+                <th>Medication Name</th>
+                <th>Schedule</th>
+                <th>Price</th>
+                <th>Re-Order Level</th>
+                <th>Quantity On Hand</th>
+                <th>Dosage Form</th>
+                <th>Supplier</th>
+                <th>Ingredients</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var med in Model)
+            {
+                <tr>
+                    <td>@med.MedicationName</td>
+                    <td>@med.Schedule</td>
+                    <td>R @med.CurrentPrice</td>
+                    <td>@med.ReOrderLevel</td>
+                    <td>@med.QuantityOnHand</td>
+                    <td>@med.DosageForm?.DosageFormName</td>
+                    <td>@med.Supplier?.SupplierName</td>
+                    <td>
+                        @if (med.Medication_Ingredients.Any())
+                        {
+                            <ul class="mb-0">
+                                @foreach (var ing in med.Medication_Ingredients)
+                                {
+                                    <li>@ing.Active_Ingredients.Name - @ing.Strength</li>
+                                }
+                            </ul>
+                        }
+                        else
+                        {
+                            <span class="text-muted">No ingredients</span>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
 </div>

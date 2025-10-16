@@ -36,4 +36,9 @@ namespace IbhayiPharmacy.Models
         public List<Medication_Ingredient> Medication_Ingredients { get; set; } = new List<Medication_Ingredient>();
 
     }
+    public class MedicationIngredientVM
+    {
+        public int Active_IngredientID { get; set; }
+        public string Strength { get; set; }
+    }
 }
