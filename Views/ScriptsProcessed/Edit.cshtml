@@ -804,7 +804,6 @@
         <form asp-action="Edit" method="post" id="prescriptionForm">
             @Html.AntiForgeryToken()
             <input type="hidden" asp-for="Prescr" />
-            <!-- NEW: Hidden field for prescription-level DoctorId -->
             <input type="hidden" asp-for="DoctorId" id="prescriptionDoctorId" />
 
             <div class="form-container">
@@ -1011,7 +1010,6 @@
                                         </td>
                                         <td>
                                             <div class="approval-buttons">
-                                                <!-- REMOVED: DoctorId hidden field - no longer needed per script line -->
                                                 <button type="button" class="approve-btn" id="approve-btn-@i" onclick="approveMedication(@i)" title="Approve Medication" @(!Model.HasDoctor ? "disabled" : "")>
                                                     <i class="fas fa-check-circle"></i>
                                                 </button>
@@ -1104,19 +1102,15 @@
     </div>
 
     <script>
-        // Track current row being rejected
         let currentRejectionRow = null;
         let rowCounter = @Model.ScriptLines.Count;
         let selectedDoctorId = @(Model.DoctorId.HasValue? Model.DoctorId.Value : "null");
 
-        // Initialize with existing rows
         document.addEventListener('DOMContentLoaded', function() {
-            // Doctor modal
             document.getElementById('addDoctorBtn').addEventListener('click', function() {
                 document.getElementById('doctorModal').style.display = 'flex';
             });
 
-            // Filter doctors as user types
             document.getElementById('doctorSelect').addEventListener('input', function() {
                 const searchTerm = this.value.toLowerCase();
                 const options = document.querySelectorAll('#doctors-list option');
@@ -1126,40 +1120,35 @@
                 });
             });
 
-            // Track doctor selection changes
             document.getElementById('doctorSelect').addEventListener('change', handleDoctorChange);
 
-            // Show/hide other reason field
             document.getElementById('rejectionReason').addEventListener('change', function() {
                 const otherContainer = document.getElementById('otherReasonContainer');
                 otherContainer.style.display = this.value === 'Other' ? 'block' : 'none';
             });
 
-            // Initialize existing rows and doctor selection
             initializeExistingRows();
             validateDoctorSelection();
             updateApprovalButtons();
         });
 
         function initializeExistingRows() {
-            // Set initial status classes for existing rows
             @for (int i = 0; i < Model.ScriptLines.Count; i++)
             {
-                    var scriptLine = Model.ScriptLines[i];
-                    <text>
-                    const statusElement@(i) = document.getElementById('status-@i');
-                    if (statusElement@(i)) {
-                        if ('@scriptLine.Status' === 'Approved') {
-                            statusElement@(i).className = "status-indicator approved";
-                        } else if ('@scriptLine.Status' === 'Rejected') {
-                            statusElement@(i).className = "status-indicator declined";
+                        var scriptLine = Model.ScriptLines[i];
+                        <text>
+                        const statusElement@(i) = document.getElementById('status-@i');
+                        if (statusElement@(i)) {
+                            if ('@scriptLine.Status' === 'Approved') {
+                                statusElement@(i).className = "status-indicator approved";
+                            } else if ('@scriptLine.Status' === 'Rejected') {
+                                statusElement@(i).className = "status-indicator declined";
+                            }
                         }
-                    }
-                    </text>
+                        </text>
             }
         }
 
-        // Handle doctor selection change
         function handleDoctorChange() {
             const doctorSelect = document.getElementById('doctorSelect');
             const doctorValue = doctorSelect.value.trim();
@@ -1172,7 +1161,6 @@
                 return;
             }
 
-            // Parse the doctor value (format: "ID|Name Surname")
             const parts = doctorValue.split('|');
             if (parts.length < 2) {
                 selectedDoctorId = null;
@@ -1185,7 +1173,6 @@
             const doctorId = parts[0].trim();
             const doctorName = parts[1].trim();
 
-            // Validate doctor ID is a number
             if (!doctorId || isNaN(doctorId) || doctorId === 'new') {
                 selectedDoctorId = null;
                 document.getElementById('prescriptionDoctorId').value = '';
@@ -1200,7 +1187,6 @@
             updateApprovalButtons();
         }
 
-        // Validate doctor selection and show feedback
         function validateDoctorSelection() {
             const doctorSelect = document.getElementById('doctorSelect');
             const doctorFeedback = document.getElementById('doctorFeedback');
@@ -1212,18 +1198,15 @@
                 doctorFeedback.className = 'doctor-feedback doctor-valid';
                 feedbackText.innerHTML = `<strong>Doctor selected:</strong> Ready for medication approvals`;
                 doctorFeedback.style.display = 'block';
-                console.log(`✅ Doctor ready for approvals: ID ${selectedDoctorId}`);
             } else {
                 doctorSelect.style.borderColor = '#e74c3c';
                 doctorSelect.style.backgroundColor = '#fff8f8';
                 doctorFeedback.className = 'doctor-feedback doctor-invalid';
                 feedbackText.textContent = 'Please select a valid doctor from the list to enable approvals';
                 doctorFeedback.style.display = 'block';
-                console.log('❌ No valid doctor selected');
             }
         }
 
-        // Update approval buttons based on doctor selection
         function updateApprovalButtons() {
             const approveButtons = document.querySelectorAll('[id^="approve-btn-"]');
             approveButtons.forEach(btn => {
@@ -1237,7 +1220,6 @@
             });
         }
 
-        // Toggle sidebar
         function toggleSidebar() {
             const sidebar = document.querySelector('.sidebar');
             const toggleBtn = document.querySelector('.toggle-sidebar i');
@@ -1253,7 +1235,6 @@
             }
         }
 
-        // Add medication row
         function addMedicationRow() {
             const tbody = document.getElementById('medsTableBody');
             const rowId = rowCounter++;
@@ -1275,7 +1256,6 @@
                         <i class="fas fa-exclamation-triangle"></i> <strong>Allergy Warning:</strong> This medication contains ingredients the patient is allergic to!
                     </div>
                     <div id="rejection-reason-${rowId}" class="rejection-reason">
-                        <!-- Rejection reason will appear here -->
                     </div>
                 </td>
                 <td>
@@ -1323,10 +1303,9 @@
             `;
 
             tbody.appendChild(row);
-            updateApprovalButtons(); // Update buttons for new row
+            updateApprovalButtons();
         }
 
-        // Handle medication selection change
         function handleMedicationChange(rowId) {
             const input = document.getElementById(`med-input-${rowId}`);
             const medicationIdInput = document.getElementById(`medId-${rowId}`);
@@ -1344,7 +1323,6 @@
                 return;
             }
 
-            // Find the matching option from the shared datalist
             const options = document.querySelectorAll('#meds-list option');
             let selectedOption = null;
 
@@ -1361,12 +1339,10 @@
                 updateMedDetails(medicationId, rowId);
                 checkAllergyConflicts(medicationId, rowId);
             } else {
-                // Clear if no valid selection
                 medicationIdInput.value = '';
                 document.getElementById(`details-${rowId}`).innerHTML = '<small class="placeholder">Select medication</small>';
                 document.getElementById(`allergy-alert-${rowId}`).style.display = 'none';
 
-                // Show error to user
                 setTimeout(() => {
                     if (!medicationIdInput.value) {
                         alert('Please select a medication from the dropdown list.');
@@ -1377,7 +1353,6 @@
             }
         }
 
-        // Approve medication - UPDATED for single doctor
         function approveMedication(rowId) {
             const medicationId = document.getElementById(`medId-${rowId}`).value;
             if (!medicationId) {
@@ -1386,7 +1361,7 @@
             }
 
             if (!selectedDoctorId) {
-                alert('❌ Please select a doctor from the Doctor Information section before approving any medications.');
+                alert('Please select a doctor from the Doctor Information section before approving any medications.');
                 document.getElementById('doctorSelect').focus();
                 return;
             }
@@ -1398,16 +1373,12 @@
             statusElement.className = "status-indicator approved";
             statusHidden.value = "Approved";
 
-            // Hide rejection reason
             const rejectionDiv = document.getElementById(`rejection-reason-${rowId}`);
             const rejectionHidden = document.getElementById(`rejection-reason-hidden-${rowId}`);
             rejectionDiv.style.display = 'none';
             rejectionHidden.value = '';
-
-            console.log(`✅ Medication approved for row ${rowId} using Prescription Doctor ID: ${selectedDoctorId}`);
         }
 
-        // Open rejection modal
         function openRejectionModal(rowId) {
             const medicationIdInput = document.getElementById(`medId-${rowId}`);
             const medicationNameInput = document.getElementById(`med-input-${rowId}`);
@@ -1421,7 +1392,7 @@
             const medicationName = medicationNameInput.value;
 
             if (!medicationId || medicationId === '' || !medicationName || medicationName === '') {
-                alert('❌ Please select a medication first before rejecting.\n\nClick on the medication field and choose from the dropdown list.');
+                alert('Please select a medication first before rejecting.\n\nClick on the medication field and choose from the dropdown list.');
                 return;
             }
 
@@ -1432,17 +1403,13 @@
             document.getElementById('otherReasonContainer').style.display = 'none';
         }
 
-        // Update instructions
         function updateInstructions(rowId, value) {
             document.getElementById(`instructions-${rowId}`).value = value;
         }
 
-        // Update quantity
         function updateQuantity(rowId, value) {
-            // Quantity is automatically bound through form submission
         }
 
-        // Check for allergy conflicts
         async function checkAllergyConflicts(medicationId, rowId) {
             try {
                 const response = await fetch('@Url.Action("CheckAllergyConflicts", "ScriptsProcessed")?prescriptionId=@Model.Prescr&medicationId=' + medicationId);
@@ -1456,11 +1423,9 @@
                     allergyAlert.style.display = 'none';
                 }
             } catch (error) {
-                console.error('Error checking allergy conflicts:', error);
             }
         }
 
-        // Update medication details when selected
         async function updateMedDetails(medicationId, rowId) {
             const detailsDiv = document.getElementById(`details-${rowId}`);
             const stockAlert = document.getElementById(`stock-alert-${rowId}`);
@@ -1487,7 +1452,6 @@
                         }
                     }
                 } catch (error) {
-                    console.error('Error loading medication details:', error);
                     detailsDiv.innerHTML = '<small class="placeholder">Error loading details</small>';
                 }
                 return;
@@ -1497,13 +1461,11 @@
             stockAlert.style.display = 'none';
         }
 
-        // Validate before submission
         function validateBeforeSubmit() {
             let hasApprovedMedications = false;
             let hasRejectedWithoutReason = false;
             let hasNoMedications = true;
 
-            // Check if any approved medications exist and if doctor is selected
             for (let i = 0; i < rowCounter; i++) {
                 const row = document.getElementById(`row-${i}`);
                 if (!row) continue;
@@ -1528,18 +1490,18 @@
             }
 
             if (hasNoMedications) {
-                alert('❌ Please add at least one medication to process the prescription.');
+                alert('Please add at least one medication to process the prescription.');
                 return false;
             }
 
             if (hasApprovedMedications && !selectedDoctorId) {
-                alert('❌ Approved medications require a doctor to be selected. Please select a doctor from the Doctor Information section.');
+                alert('Approved medications require a doctor to be selected. Please select a doctor from the Doctor Information section.');
                 document.getElementById('doctorSelect').focus();
                 return false;
             }
 
             if (hasRejectedWithoutReason) {
-                if (!confirm('⚠️ Some rejected medications don\'t have a rejection reason. Do you want to proceed anyway?')) {
+                if (!confirm('Some rejected medications don\'t have a rejection reason. Do you want to proceed anyway?')) {
                     return false;
                 }
             }
@@ -1547,7 +1509,6 @@
             return true;
         }
 
-        // Check all interactions
         function checkAllInteractions() {
             let hasAllergyConflicts = false;
             let hasLowStock = false;
@@ -1562,25 +1523,23 @@
 
             let message = '';
             if (hasAllergyConflicts && hasLowStock) {
-                message = '⚠️ Allergy conflicts and low stock detected!\n\n• Allergy conflicts may require pharmacist review\n• Low stock is informational only';
+                message = 'Allergy conflicts and low stock detected!\n\n• Allergy conflicts may require pharmacist review\n• Low stock is informational only';
             } else if (hasAllergyConflicts) {
-                message = '⚠️ Allergy conflicts detected!\n\nAllergy conflicts may require pharmacist review.';
+                message = 'Allergy conflicts detected!\n\nAllergy conflicts may require pharmacist review.';
             } else if (hasLowStock) {
-                message = 'ℹ️ Low stock detected!\n\nThis is informational only.';
+                message = 'Low stock detected!\n\nThis is informational only.';
             } else {
-                message = '✅ No issues detected.';
+                message = 'No issues detected.';
             }
 
             alert(message);
         }
 
-        // Delete medication row
         function deleteMedicationRow(rowId) {
             const row = document.getElementById(`row-${rowId}`);
             if (row) row.remove();
         }
 
-        // Toggle repeats input based on checkbox
         function toggleRepeats(rowId) {
             const checkbox = document.getElementById(`repeat-check-${rowId}`);
             const repeatsInput = document.getElementById(`repeats-left-${rowId}`);
@@ -1591,7 +1550,6 @@
             if (!checkbox.checked) repeatsInput.value = 0;
         }
 
-        // Confirm rejection with reason
         function confirmRejection() {
             if (currentRejectionRow === null || currentRejectionRow === undefined) {
                 alert('Error: No medication selected for rejection');
@@ -1618,7 +1576,6 @@
                 return;
             }
 
-            // Update status and show reason
             const statusElement = document.getElementById(`status-${currentRejectionRow}`);
             const statusHidden = document.getElementById(`status-hidden-${currentRejectionRow}`);
             const rejectionHidden = document.getElementById(`rejection-reason-hidden-${currentRejectionRow}`);
@@ -1643,7 +1600,6 @@
             currentRejectionRow = null;
         }
 
-        // Filter medications as user types
         function filterMeds(input, rowId) {
             const searchTerm = input.value.toLowerCase();
             const options = document.querySelectorAll('#meds-list option');
@@ -1653,7 +1609,6 @@
             });
         }
 
-        // Modal functions
         function closeModal(id) {
             document.getElementById(id).style.display = 'none';
         }
@@ -1672,7 +1627,7 @@
                 datalist.appendChild(newOption);
 
                 document.getElementById('doctorSelect').value = `new|${name}`;
-                handleDoctorChange(); // Trigger doctor change to update selection
+                handleDoctorChange();
                 closeModal('doctorModal');
 
                 document.getElementById('doctorName').value = '';
@@ -1685,18 +1640,7 @@
             }
         }
 
-        // Add medication button
         document.getElementById('addMedBtn').addEventListener('click', addMedicationRow);
-
-        // Debug function - call in browser console
-        function debugDoctorSelection() {
-            console.log('=== DOCTOR DEBUG ===');
-            console.log('Selected Doctor ID:', selectedDoctorId);
-            console.log('Prescription DoctorId Field:', document.getElementById('prescriptionDoctorId').value);
-            console.log('All options:');
-            const options = document.querySelectorAll('#doctors-list option');
-            options.forEach(opt => console.log(`- ${opt.value} (data-id: ${opt.getAttribute('data-id')})`));
-        }
     </script>
 </body>
 </html>

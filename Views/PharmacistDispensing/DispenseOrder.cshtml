@@ -726,7 +726,7 @@
                             <th width="20%">Medication</th>
                             <th width="8%">Schedule</th>
                             <th width="6%">Qty</th>
-                            <th width="8%">Repeats</th> <!-- NEW REPEATS COLUMN -->
+                            <th width="8%">Repeats</th>
                             <th width="14%">Instructions</th>
                             <th width="8%">Stock</th>
                             <th width="10%">Status</th>
@@ -907,7 +907,6 @@
             document.getElementById('rejectMedicationName').textContent = medicationName;
             document.getElementById('rejectionModal').style.display = 'flex';
 
-            // Show/hide custom reason based on selection
             document.querySelectorAll('input[name="rejectionReason"]').forEach(radio => {
                 radio.addEventListener('change', function() {
                     document.getElementById('customReason').style.display =
@@ -961,26 +960,19 @@
                 const result = await response.json();
 
                 if (result.success) {
-                    // Reload page to show updated status
                     window.location.reload();
                 } else {
                     alert('Error: ' + result.message);
                 }
             } catch (error) {
-                console.error('Error rejecting medication:', error);
-                alert('Error rejecting medication');
+                alert('Error rejecting medication. Please try again.');
             }
         }
 
-        // Dispense selected medications - DEBUG VERSION
-                // Dispense selected medications - FIXED VERSION
+        // Dispense selected medications
         async function dispenseSelected() {
             const selectedCheckboxes = document.querySelectorAll('.dispense-checkbox:checked');
             const selectedIds = Array.from(selectedCheckboxes).map(cb => parseInt(cb.value));
-
-            console.log('=== START DISPENSE DEBUG ===');
-            console.log('Selected IDs:', selectedIds);
-            console.log('Order ID:', orderId);
 
             if (selectedIds.length === 0) {
                 alert('Please select at least one medication to dispense');
@@ -996,61 +988,24 @@
                 formData.append('orderId', orderId);
                 selectedIds.forEach(id => formData.append('selectedOrderLineIds', id));
 
-                // FIX: Get anti-forgery token safely
-                const tokenElement = document.querySelector('input[name="__RequestVerificationToken"]');
-                if (!tokenElement) {
-                    console.error('Anti-forgery token not found!');
-                    alert('Security token missing. Please refresh the page and try again.');
-                    return;
-                }
-
-                const token = tokenElement.value;
-                console.log('Anti-forgery token found:', !!token);
-
-                console.log('Sending request to server...');
-                console.log('FormData contents:');
-                for (let pair of formData.entries()) {
-                    console.log(pair[0] + ': ' + pair[1]);
-                }
-
                 const response = await fetch('@Url.Action("DispenseSelectedOrderLines", "PharmacistDispensing")', {
                     method: 'POST',
                     body: formData,
                     headers: {
-                        'RequestVerificationToken': token
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
                     }
                 });
 
-                console.log('Response status:', response.status);
-                console.log('Response OK:', response.ok);
-
-                // Check if response is JSON
-                const contentType = response.headers.get('content-type');
-                if (!contentType || !contentType.includes('application/json')) {
-                    console.error('Response is not JSON:', contentType);
-                    const text = await response.text();
-                    console.error('Response text:', text);
-                    alert('Server returned an invalid response. Please try again.');
-                    return;
-                }
-
                 const result = await response.json();
-                console.log('Server response:', result);
 
                 if (result.success) {
-                    console.log('SUCCESS: Dispensing completed');
                     alert(result.message);
                     window.location.reload();
                 } else {
-                    console.log('ERROR from server:', result.message);
                     alert('Error: ' + result.message);
                 }
             } catch (error) {
-                console.error('=== FETCH ERROR ===');
-                console.error('Error type:', error.name);
-                console.error('Error message:', error.message);
-                console.error('Full error:', error);
-                alert('Error dispensing medications: ' + error.message);
+                alert('Error dispensing medications. Please try again.');
             }
         }
 
@@ -1060,6 +1015,7 @@
             pendingCheckboxes.forEach(checkbox => {
                 checkbox.checked = true;
             });
+            updateSelectionUI();
         }
 
         // Complete order processing
@@ -1081,14 +1037,12 @@
                 });
 
                 if (response.ok) {
-                    // Redirect to orders list
                     window.location.href = '@Url.Action("Index", "PharmacistDispensing")';
                 } else {
                     alert('Error completing order processing');
                 }
             } catch (error) {
-                console.error('Error completing order:', error);
-                alert('Error completing order processing');
+                alert('Error completing order processing. Please try again.');
             }
         }
 
@@ -1104,18 +1058,12 @@
             }
         }
 
-        // Initialize event listeners with debug
+        // Initialize event listeners
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('=== PAGE LOADED ===');
-            console.log('Order ID:', orderId);
-            console.log('Anti-forgery token found:', !!document.querySelector('input[name="__RequestVerificationToken"]'));
-
-            // Update selection UI when checkboxes change
             document.querySelectorAll('.dispense-checkbox').forEach(checkbox => {
                 checkbox.addEventListener('change', updateSelectionUI);
             });
 
-            // Initial UI update
             updateSelectionUI();
         });
     </script>

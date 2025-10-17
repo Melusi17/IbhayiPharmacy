@@ -123,9 +123,7 @@ namespace IbhayiPharmacy.Controllers
                         CurrentStock = ol.Medications.QuantityOnHand,
                         IsLowStock = ol.Medications.QuantityOnHand <= ol.Medications.ReOrderLevel,
                         Status = ol.Status,
-                        CanDispense = ol.Status == "Pending",
                         RejectionReason = ol.RejectionReason,
-                        // NEW: Add repeats information
                         TotalRepeats = ol.ScriptLine?.Repeats ?? 0,
                         RepeatsLeft = ol.ScriptLine?.RepeatsLeft ?? 0
                     }).ToList(),
@@ -144,24 +142,18 @@ namespace IbhayiPharmacy.Controllers
             }
         }
 
-        // POST: Dispense selected order lines - DEBUG VERSION
+        // POST: Dispense selected order lines
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DispenseSelectedOrderLines(int orderId, List<int> selectedOrderLineIds)
         {
             try
             {
-                Console.WriteLine($"=== START DispenseSelectedOrderLines ===");
-                Console.WriteLine($"OrderId: {orderId}, SelectedCount: {selectedOrderLineIds?.Count ?? 0}");
-
                 if (selectedOrderLineIds == null || !selectedOrderLineIds.Any())
                 {
-                    Console.WriteLine("ERROR: No medications selected");
                     return Json(new { success = false, message = "Please select at least one medication to dispense." });
                 }
 
-                // DEBUG: Check if we can access the database
-                Console.WriteLine("Attempting to load order...");
                 var order = await _context.Orders
                     .Include(o => o.OrderLines)
                         .ThenInclude(ol => ol.Medications)
@@ -171,26 +163,19 @@ namespace IbhayiPharmacy.Controllers
 
                 if (order == null)
                 {
-                    Console.WriteLine($"ERROR: Order {orderId} not found");
                     return Json(new { success = false, message = "Order not found." });
                 }
-                Console.WriteLine($"Order loaded: {order.OrderNumber}, OrderLines: {order.OrderLines.Count}");
 
                 var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-                Console.WriteLine($"Current UserId: {currentUserId}");
-
                 var pharmacist = await _context.Pharmacists
                     .FirstOrDefaultAsync(p => p.ApplicationUserId == currentUserId);
 
                 if (pharmacist == null)
                 {
-                    Console.WriteLine("ERROR: Pharmacist not found");
                     return Json(new { success = false, message = "Pharmacist not found." });
                 }
-                Console.WriteLine($"Pharmacist found: {pharmacist.PharmacistID}");
 
                 using var transaction = await _context.Database.BeginTransactionAsync();
-                Console.WriteLine("Transaction started");
 
                 try
                 {
@@ -198,80 +183,49 @@ namespace IbhayiPharmacy.Controllers
                         .Where(ol => selectedOrderLineIds.Contains(ol.OrderLineID) && ol.Status == "Pending")
                         .ToList();
 
-                    Console.WriteLine($"Order lines to process: {orderLinesToProcess.Count}");
-
                     var orderLinesToDispense = new List<OrderLine>();
                     var orderLinesToReject = new List<OrderLine>();
 
-                    // Process each order line
                     foreach (var orderLine in orderLinesToProcess)
                     {
-                        Console.WriteLine($"Processing OrderLine {orderLine.OrderLineID}, Medication: {orderLine.Medications?.MedicationName}");
-                        Console.WriteLine($"ScriptLine: {orderLine.ScriptLine != null}, Repeats: {orderLine.ScriptLine?.Repeats}, RepeatsLeft: {orderLine.ScriptLine?.RepeatsLeft}");
-                        Console.WriteLine($"Stock: {orderLine.Medications?.QuantityOnHand}, Required: {orderLine.Quantity}");
-
-                        // Check if medication has repeats and if they're exceeded
                         if (orderLine.ScriptLine != null && orderLine.ScriptLine.Repeats > 0 && orderLine.ScriptLine.RepeatsLeft <= 0)
                         {
-                            Console.WriteLine($"REJECTING: Repeats exceeded for {orderLine.Medications.MedicationName}");
                             orderLine.Status = "Rejected";
                             orderLine.RejectionReason = "Repeats exceeded";
                             orderLinesToReject.Add(orderLine);
                             continue;
                         }
 
-                        // Check stock availability
                         if (orderLine.Medications.QuantityOnHand < orderLine.Quantity)
                         {
-                            Console.WriteLine($"REJECTING: Insufficient stock for {orderLine.Medications.MedicationName}");
                             orderLine.Status = "Rejected";
                             orderLine.RejectionReason = "Insufficient stock";
                             orderLinesToReject.Add(orderLine);
                             continue;
                         }
 
-                        Console.WriteLine($"APPROVING: {orderLine.Medications.MedicationName} for dispensing");
                         orderLinesToDispense.Add(orderLine);
                     }
 
-                    Console.WriteLine($"Dispensing {orderLinesToDispense.Count} medications, Rejecting {orderLinesToReject.Count} medications");
-
-                    // Dispense valid order lines
                     foreach (var orderLine in orderLinesToDispense)
                     {
-                        Console.WriteLine($"Dispensing {orderLine.Medications.MedicationName}");
-
-                        // Update stock
-                        int oldStock = orderLine.Medications.QuantityOnHand;
                         orderLine.Medications.QuantityOnHand -= orderLine.Quantity;
-                        Console.WriteLine($"Stock updated: {oldStock} -> {orderLine.Medications.QuantityOnHand}");
 
-                        // Update repeats if medication has repeats
                         if (orderLine.ScriptLine != null && orderLine.ScriptLine.Repeats > 0 && orderLine.ScriptLine.RepeatsLeft > 0)
                         {
-                            int oldRepeats = orderLine.ScriptLine.RepeatsLeft;
                             orderLine.ScriptLine.RepeatsLeft--;
-                            Console.WriteLine($"Repeats updated: {oldRepeats} -> {orderLine.ScriptLine.RepeatsLeft}");
                         }
 
-                        // Update order line status
                         orderLine.Status = "Dispensed";
-                        Console.WriteLine($"Status updated to: {orderLine.Status}");
                     }
 
-                    // Set dispensing pharmacist if not set
                     if (order.PharmacistID == null)
                     {
                         order.PharmacistID = pharmacist.PharmacistID;
-                        Console.WriteLine($"Pharmacist set: {order.PharmacistID}");
                     }
 
-                    Console.WriteLine("Saving changes to database...");
                     await _context.SaveChangesAsync();
-                    Console.WriteLine("Changes saved successfully");
-
                     await transaction.CommitAsync();
-                    Console.WriteLine("Transaction committed");
 
                     var resultMessage = "";
                     if (orderLinesToDispense.Count > 0 && orderLinesToReject.Count > 0)
@@ -291,7 +245,6 @@ namespace IbhayiPharmacy.Controllers
                         resultMessage = "No medications were processed.";
                     }
 
-                    Console.WriteLine($"=== SUCCESS: {resultMessage} ===");
                     return Json(new
                     {
                         success = true,
@@ -303,33 +256,11 @@ namespace IbhayiPharmacy.Controllers
                 catch (Exception ex)
                 {
                     await transaction.RollbackAsync();
-                    Console.WriteLine($"=== TRANSACTION ERROR ===");
-                    Console.WriteLine($"Error Type: {ex.GetType().Name}");
-                    Console.WriteLine($"Error Message: {ex.Message}");
-                    Console.WriteLine($"Stack Trace: {ex.StackTrace}");
-
-                    if (ex.InnerException != null)
-                    {
-                        Console.WriteLine($"Inner Exception: {ex.InnerException.Message}");
-                        Console.WriteLine($"Inner Stack Trace: {ex.InnerException.StackTrace}");
-                    }
-
                     return Json(new { success = false, message = $"Error dispensing medications: {ex.Message}" });
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"=== OUTER ERROR ===");
-                Console.WriteLine($"Error Type: {ex.GetType().Name}");
-                Console.WriteLine($"Error Message: {ex.Message}");
-                Console.WriteLine($"Stack Trace: {ex.StackTrace}");
-
-                if (ex.InnerException != null)
-                {
-                    Console.WriteLine($"Inner Exception: {ex.InnerException.Message}");
-                    Console.WriteLine($"Inner Stack Trace: {ex.InnerException.StackTrace}");
-                }
-
                 return Json(new { success = false, message = $"Error: {ex.Message}" });
             }
         }
@@ -369,11 +300,9 @@ namespace IbhayiPharmacy.Controllers
 
                 try
                 {
-                    // Update order line status and rejection reason
                     orderLine.Status = "Rejected";
                     orderLine.RejectionReason = rejectionReason.Trim();
 
-                    // Set dispensing pharmacist if not set
                     if (orderLine.Order.PharmacistID == null)
                     {
                         orderLine.Order.PharmacistID = pharmacist.PharmacistID;
@@ -401,7 +330,7 @@ namespace IbhayiPharmacy.Controllers
             }
         }
 
-        // POST: Complete order processing (Final "Complete Order Processing" button)
+        // POST: Complete order processing
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CompleteOrderProcessing(int orderId)
@@ -420,7 +349,6 @@ namespace IbhayiPharmacy.Controllers
                     return RedirectToAction(nameof(Index));
                 }
 
-                // Check if all order lines have been processed
                 var unprocessedLines = order.OrderLines.Where(ol => ol.Status == "Pending").ToList();
                 if (unprocessedLines.Any())
                 {
@@ -442,7 +370,6 @@ namespace IbhayiPharmacy.Controllers
 
                 try
                 {
-                    // Update order status based on processing outcomes
                     var dispensedLines = order.OrderLines.Count(ol => ol.Status == "Dispensed");
                     var rejectedLines = order.OrderLines.Count(ol => ol.Status == "Rejected");
 
@@ -457,7 +384,6 @@ namespace IbhayiPharmacy.Controllers
                         TempData["WarningMessage"] = $"Order {order.OrderNumber} requires customer action. All medications were rejected.";
                     }
 
-                    // Ensure pharmacist is set
                     if (order.PharmacistID == null)
                     {
                         order.PharmacistID = pharmacist.PharmacistID;

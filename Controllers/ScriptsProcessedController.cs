@@ -24,7 +24,7 @@ public class ScriptsProcessedController : Controller
         {
             var unprocessedPrescriptions = await _context.Prescriptions
                 .Include(p => p.ApplicationUser)
-                .Include(p => p.Doctors) // Include doctor information
+                .Include(p => p.Doctors)
                 .Where(p => string.IsNullOrEmpty(p.Status) || p.Status == "Unprocessed" || p.Status == "Pending")
                 .OrderByDescending(p => p.DateIssued)
                 .ToListAsync();
@@ -45,7 +45,7 @@ public class ScriptsProcessedController : Controller
         {
             var prescription = await _context.Prescriptions
                 .Include(p => p.ApplicationUser)
-                .Include(p => p.Doctors) // Include the assigned doctor
+                .Include(p => p.Doctors)
                 .Include(p => p.scriptLines)
                     .ThenInclude(sl => sl.Medications)
                 .FirstOrDefaultAsync(p => p.PrescriptionID == id);
@@ -81,7 +81,6 @@ public class ScriptsProcessedController : Controller
                 PrescriptionDate = prescription.DateIssued,
                 CustomerAllergies = customerAllergies,
                 ScriptList = new List<Prescription> { prescription },
-                // Set the doctor from prescription level
                 DoctorId = prescription.DoctorID,
                 DoctorName = prescription.Doctors != null ?
                     $"{prescription.Doctors.Name} {prescription.Doctors.Surname}" : "",
@@ -96,12 +95,10 @@ public class ScriptsProcessedController : Controller
                     RepeatsLeft = sl.RepeatsLeft,
                     Status = sl.Status ?? "Pending",
                     RejectionReason = sl.RejectionReason,
-                    // Doctor information removed from script line level
-                    CanBeApproved = prescription.DoctorID.HasValue // Set approval capability
+                    CanBeApproved = prescription.DoctorID.HasValue
                 }).ToList()
             };
 
-            // Add empty row if no script lines
             if (!viewModel.ScriptLines.Any())
             {
                 viewModel.ScriptLines.Add(new ScriptLineVM
@@ -133,20 +130,6 @@ public class ScriptsProcessedController : Controller
     {
         try
         {
-            // DEBUG: Log incoming data
-            Console.WriteLine($"=== DEBUG: Starting Edit POST ===");
-            Console.WriteLine($"Prescription ID: {model.Prescr}");
-            Console.WriteLine($"Doctor ID: {model.DoctorId}");
-            Console.WriteLine($"ScriptLines Count: {model.ScriptLines?.Count}");
-
-            if (model.ScriptLines != null)
-            {
-                foreach (var line in model.ScriptLines)
-                {
-                    Console.WriteLine($"Line {line.ScriptLineId}: MedId={line.MedicationId}, Status={line.Status}");
-                }
-            }
-
             if (!ModelState.IsValid)
             {
                 TempData["ErrorMessage"] = "Please fix the validation errors below.";
@@ -154,7 +137,6 @@ public class ScriptsProcessedController : Controller
                 return View(model);
             }
 
-            // Check if Prescription Exists
             var prescription = await _context.Prescriptions
                 .FirstOrDefaultAsync(p => p.PrescriptionID == model.Prescr);
 
@@ -164,7 +146,6 @@ public class ScriptsProcessedController : Controller
                 return RedirectToAction(nameof(Index));
             }
 
-            // Validate at least one medication is processed
             var hasMedications = model.ScriptLines?.Any(sl => sl.MedicationId > 0) == true;
             if (!hasMedications)
             {
@@ -174,7 +155,6 @@ public class ScriptsProcessedController : Controller
                 return View(model);
             }
 
-            // CRITICAL: Validate doctor is selected if any medications are approved
             var hasApprovedMedications = model.ScriptLines?.Any(sl => sl.Status == "Approved") == true;
             if (hasApprovedMedications && (!model.DoctorId.HasValue || model.DoctorId.Value == 0))
             {
@@ -184,7 +164,6 @@ public class ScriptsProcessedController : Controller
                 return View(model);
             }
 
-            // Validate all foreign keys before saving
             var validationErrors = await ValidateScriptLinesBeforeSave(model.ScriptLines);
             if (validationErrors.Any())
             {
@@ -193,11 +172,8 @@ public class ScriptsProcessedController : Controller
                 return View(model);
             }
 
-            // UPDATE PRESCRIPTION LEVEL DATA
-            prescription.DoctorID = model.DoctorId; // Set the single doctor for entire prescription
-            Console.WriteLine($"✅ Set DoctorID {model.DoctorId} for Prescription {prescription.PrescriptionID}");
+            prescription.DoctorID = model.DoctorId;
 
-            // Process script lines
             foreach (var scriptLineVM in model.ScriptLines.Where(sl => sl.MedicationId > 0))
             {
                 if (scriptLineVM.ScriptLineId > 0)
@@ -210,10 +186,7 @@ public class ScriptsProcessedController : Controller
                 }
             }
 
-            // Update prescription status based on medication outcomes
             UpdatePrescriptionStatus(model, prescription);
-
-            // Save changes
             await _context.SaveChangesAsync();
 
             TempData["SuccessMessage"] = "Prescription processed successfully!";
@@ -221,7 +194,6 @@ public class ScriptsProcessedController : Controller
         }
         catch (DbUpdateException dbEx)
         {
-            // Enhanced error handling for FK constraints
             var errorMessage = "Database error occurred while saving changes.";
 
             if (dbEx.InnerException != null)
@@ -253,7 +225,6 @@ public class ScriptsProcessedController : Controller
         }
     }
 
-    // CRITICAL FIX: Validate all foreign keys before saving
     private async Task<List<string>> ValidateScriptLinesBeforeSave(List<ScriptLineVM> scriptLines)
     {
         var errors = new List<string>();
@@ -264,19 +235,16 @@ public class ScriptsProcessedController : Controller
             return errors;
         }
 
-        // Get all valid IDs upfront for performance
         var validMedicationIds = await _context.Medications.Select(m => m.MedcationID).ToListAsync();
 
         foreach (var scriptLine in scriptLines.Where(sl => sl.MedicationId > 0))
         {
-            // Validate medication exists
             if (!validMedicationIds.Contains(scriptLine.MedicationId))
             {
                 errors.Add($"Medication ID {scriptLine.MedicationId} does not exist in database.");
                 continue;
             }
 
-            // Validate rejection reason if rejected
             if (scriptLine.Status == "Rejected" && string.IsNullOrWhiteSpace(scriptLine.RejectionReason))
             {
                 errors.Add("Rejection reason is required for rejected medications.");
@@ -293,7 +261,6 @@ public class ScriptsProcessedController : Controller
 
         if (existingScriptLine != null)
         {
-            // Update properties - NO DoctorID at script line level anymore
             existingScriptLine.MedicationID = scriptLineVM.MedicationId;
             existingScriptLine.Quantity = scriptLineVM.Quantity;
             existingScriptLine.Instructions = scriptLineVM.Instructions ?? string.Empty;
@@ -303,8 +270,6 @@ public class ScriptsProcessedController : Controller
             existingScriptLine.RejectionReason = scriptLineVM.RejectionReason;
 
             UpdateScriptLineDates(existingScriptLine, scriptLineVM.Status);
-
-            Console.WriteLine($"✅ Updated ScriptLine {existingScriptLine.ScriptLineID}: Status={existingScriptLine.Status}, MedicationID={existingScriptLine.MedicationID}");
         }
     }
 
@@ -320,14 +285,10 @@ public class ScriptsProcessedController : Controller
             RepeatsLeft = scriptLineVM.RepeatsLeft,
             Status = scriptLineVM.Status ?? "Pending",
             RejectionReason = scriptLineVM.RejectionReason
-            // NO DoctorID - now at prescription level only
         };
 
-        // Set dates based on status
         UpdateScriptLineDates(newScriptLine, scriptLineVM.Status);
-
         _context.ScriptLines.Add(newScriptLine);
-        Console.WriteLine($"✅ Created new ScriptLine: PrescriptionID={newScriptLine.PrescriptionID}, MedicationID={newScriptLine.MedicationID}, Status={newScriptLine.Status}");
     }
 
     private void UpdateScriptLineDates(ScriptLine scriptLine, string status)
@@ -362,8 +323,6 @@ public class ScriptsProcessedController : Controller
             prescription.Status = "Rejected";
         else
             prescription.Status = "Pending";
-
-        Console.WriteLine($"✅ Updated prescription {prescription.PrescriptionID} status to: {prescription.Status}");
     }
 
     // Download prescription file
@@ -469,33 +428,6 @@ public class ScriptsProcessedController : Controller
         }
     }
 
-    // NEW: Debug endpoint to check database state
-    [HttpGet]
-    public async Task<JsonResult> DebugDatabase()
-    {
-        try
-        {
-            var doctors = await _context.Doctors
-                .Select(d => new { d.DoctorID, d.Name, d.Surname })
-                .ToListAsync();
-
-            var medications = await _context.Medications
-                .Select(m => new { m.MedcationID, m.MedicationName })
-                .Take(10)
-                .ToListAsync();
-
-            return Json(new
-            {
-                doctors = doctors,
-                medications = medications
-            });
-        }
-        catch (Exception ex)
-        {
-            return Json(new { error = ex.Message });
-        }
-    }
-
     // Helper method to reload ViewBags
     private async Task ReloadViewBags()
     {
@@ -514,8 +446,8 @@ public class ScriptsProcessedController : Controller
         {
             var processedPrescriptions = await _context.Prescriptions
                 .Include(p => p.ApplicationUser)
-                .Include(p => p.Doctors) // Include doctor information
-                .Include(p => p.scriptLines) // Include script lines to check processing status
+                .Include(p => p.Doctors)
+                .Include(p => p.scriptLines)
                 .Where(p => p.Status == "Processed" || p.Status == "Partially Processed" || p.Status == "Rejected")
                 .OrderByDescending(p => p.DateIssued)
                 .ToListAsync();
@@ -547,7 +479,6 @@ public class ScriptsProcessedController : Controller
                 return RedirectToAction(nameof(ProcessedScripts));
             }
 
-            // Create a view model similar to CustomerScriptsVM but for view-only
             var viewModel = new ProcessedPrescriptionVM
             {
                 PrescriptionID = prescription.PrescriptionID,
