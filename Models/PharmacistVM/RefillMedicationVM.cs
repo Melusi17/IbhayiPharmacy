@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace IbhayiPharmacy.Models.PharmacistVM
 {
@@ -16,5 +17,22 @@ namespace IbhayiPharmacy.Models.PharmacistVM
         public DateTime LastRefillDate { get; set; }
         public int CurrentPrice { get; set; }
         public string Schedule { get; set; } = string.Empty;
+
+        // Added for prescription grouping
+        public DateTime PrescriptionDate { get; set; }
+    }
+
+    public class PrescriptionRefillVM
+    {
+        public int PrescriptionID { get; set; }
+        public string DoctorName { get; set; } = string.Empty;
+        public DateTime PrescriptionDate { get; set; }
+        public List<RefillMedicationVM> Medications { get; set; } = new();
+
+        // Helper property for display
+        public string FormattedDate => PrescriptionDate.ToString("yyyy-MM-dd");
+
+        // Helper property to check if any medications have repeats
+        public bool HasAvailableRefills => Medications.Any(m => m.RepeatsLeft > 0);
     }
 }

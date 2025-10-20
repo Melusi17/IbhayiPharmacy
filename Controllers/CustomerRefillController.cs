@@ -19,7 +19,7 @@ namespace IbhayiPharmacy.Controllers
             _context = context;
         }
 
-        // GET: Manage refills - shows medications with repeats available
+        // GET: Manage refills - shows medications with repeats available GROUPED BY PRESCRIPTION
         public async Task<IActionResult> ManageRepeats()
         {
             var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -44,14 +44,28 @@ namespace IbhayiPharmacy.Controllers
                     DoctorName = $"{sl.Prescriptions.Doctors.Name} {sl.Prescriptions.Doctors.Surname}",
                     LastRefillDate = sl.ApprovedDate ?? sl.Prescriptions.DateIssued,
                     CurrentPrice = sl.Medications.CurrentPrice,
-                    Schedule = sl.Medications.Schedule
+                    Schedule = sl.Medications.Schedule,
+                    PrescriptionDate = sl.Prescriptions.DateIssued
                 })
                 .ToListAsync();
 
-            return View(refillScriptLines);
+            // Group by prescription for the view
+            var prescriptionsGrouped = refillScriptLines
+                .GroupBy(x => new { x.PrescriptionID, x.DoctorName, x.PrescriptionDate })
+                .Select(g => new PrescriptionRefillVM
+                {
+                    PrescriptionID = g.Key.PrescriptionID,
+                    DoctorName = g.Key.DoctorName,
+                    PrescriptionDate = g.Key.PrescriptionDate,
+                    Medications = g.ToList()
+                })
+                .OrderByDescending(x => x.PrescriptionDate)
+                .ToList();
+
+            return View(prescriptionsGrouped);
         }
 
-        // GET: Refill history for a specific medication - FIXED VERSION
+        // GET: Refill history for a specific medication
         [HttpGet]
         public async Task<JsonResult> GetRefillHistory(int scriptLineId)
         {
@@ -69,13 +83,11 @@ namespace IbhayiPharmacy.Controllers
                     return Json(new { success = false, message = "Medication not found" });
                 }
 
-                // Get ALL dispensed order lines for this script line
+                // Get dispensed order lines for this script line
                 var dispensedOrders = await _context.OrderLines
                     .Include(ol => ol.Order)
-                    .Where(ol => ol.ScriptLineID == scriptLineId &&
-                                ol.Order.Customer.ApplicationUserId == currentUserId &&
-                                ol.Status == "Dispensed")
-                    .OrderBy(ol => ol.Order.OrderDate) // Oldest first
+                    .Where(ol => ol.ScriptLineID == scriptLineId && ol.Status == "Dispensed")
+                    .OrderBy(ol => ol.Order.OrderDate)
                     .ToListAsync();
 
                 var dispensingHistory = new List<object>();
@@ -89,27 +101,28 @@ namespace IbhayiPharmacy.Controllers
 
                     dispensingHistory.Add(new
                     {
-                        Date = orderLine.Order.OrderDate.ToString("yyyy-MM-dd"),
-                        OrderNumber = orderLine.Order.OrderNumber,
-                        RepeatsLeft = repeatsLeftAfter,
-                        Status = "Dispensed"
+                        date = orderLine.Order.OrderDate.ToString("yyyy-MM-dd"),
+                        orderNumber = orderLine.Order.OrderNumber ?? "N/A",
+                        repeatsLeft = repeatsLeftAfter,
+                        status = "Dispensed"
                     });
                 }
 
                 // Add current available state
                 dispensingHistory.Add(new
                 {
-                    Date = DateTime.Now.ToString("yyyy-MM-dd"),
-                    OrderNumber = "New Order",
-                    RepeatsLeft = currentScriptLine.RepeatsLeft,
-                    Status = "Available"
+                    date = DateTime.Now.ToString("yyyy-MM-dd"),
+                    orderNumber = "Available for Refill",
+                    repeatsLeft = currentScriptLine.RepeatsLeft,
+                    status = "Available"
                 });
 
                 return Json(new
                 {
                     success = true,
                     history = dispensingHistory,
-                    currentRepeats = currentScriptLine.RepeatsLeft
+                    currentRepeats = currentScriptLine.RepeatsLeft,
+                    medicationName = currentScriptLine.Medications.MedicationName
                 });
             }
             catch (Exception ex)
@@ -168,7 +181,7 @@ namespace IbhayiPharmacy.Controllers
                     };
 
                     _context.Orders.Add(order);
-                    await _context.SaveChangesAsync(); // Get OrderID
+                    await _context.SaveChangesAsync();
 
                     // Decrement repeats
                     scriptLine.RepeatsLeft--;
@@ -198,7 +211,8 @@ namespace IbhayiPharmacy.Controllers
                         success = true,
                         message = "Refill requested successfully!",
                         orderNumber = orderNumber,
-                        repeatsLeft = scriptLine.RepeatsLeft
+                        repeatsLeft = scriptLine.RepeatsLeft,
+                        scriptLineId = scriptLineId
                     });
                 }
                 catch (Exception ex)
@@ -223,7 +237,6 @@ namespace IbhayiPharmacy.Controllers
 
             do
             {
-                // Format: ORD-Refill-XXXX (XXXX = 4 random digits)
                 string randomPart = _random.Next(1000, 10000).ToString();
                 orderNumber = $"ORD-Refill-{randomPart}";
 
