@@ -281,16 +281,65 @@
                     background-color: #2980b9;
                 }
 
+        /* ===== CUSTOMER CARDS ===== */
+        .customer-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .customer-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: all 0.2s;
+            border-left: 4px solid #3498db;
+        }
+
+            .customer-card:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            }
+
+            .customer-card.active {
+                background: #f0f7fc;
+                border-left: 4px solid #27ae60;
+            }
+
+        .customer-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .customer-id {
+            font-size: 13px;
+            color: #7f8c8d;
+            margin-bottom: 10px;
+        }
+
+        .order-count {
+            font-size: 12px;
+            color: #3498db;
+            margin-top: 5px;
+        }
+
         /* ===== ORDERS LIST ===== */
         .orders-list {
             background: white;
             border-radius: 10px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             overflow: hidden;
+            margin-top: 20px;
+            display: none;
         }
 
         .order-card {
-            padding: 25px;
+            padding: 20px;
             border-bottom: 1px solid #eee;
             transition: all 0.2s;
             cursor: pointer;
@@ -311,9 +360,9 @@
             margin-bottom: 15px;
         }
 
-        .order-patient {
+        .order-number {
             font-weight: 600;
-            font-size: 1.1rem;
+            font-size: 1rem;
             color: #2c3e50;
         }
 
@@ -344,11 +393,6 @@
             color: #0c5460;
         }
 
-        .order-repeat {
-            color: #d35400;
-            font-weight: 600;
-        }
-
         .order-actions {
             display: flex;
             gap: 10px;
@@ -359,11 +403,11 @@
         .action-btn {
             color: white;
             border: none;
-            padding: 10px 20px;
+            padding: 8px 16px;
             border-radius: 5px;
             cursor: pointer;
             transition: all 0.2s;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 500;
         }
 
@@ -389,8 +433,8 @@
 
         .order-details {
             display: none;
-            margin-top: 20px;
-            padding: 20px;
+            margin-top: 15px;
+            padding: 15px;
             background: white;
             border-radius: 8px;
             border: 1px solid #eee;
@@ -598,21 +642,35 @@
 
         <!-- Filters and Search -->
         <div class="filter-container">
-            <button class="filter-btn active" onclick="filterOrders('all')">All Orders</button>
-            <button class="filter-btn" onclick="filterOrders('ready')">Ready for Collection</button>
-            <button class="filter-btn" onclick="filterOrders('collected')">Collected</button>
+            <button class="filter-btn active" onclick="filterCustomers('all')">All Customers</button>
+            <button class="filter-btn" onclick="filterCustomers('ready')">Ready for Collection</button>
+            <button class="filter-btn" onclick="filterCustomers('collected')">Collected</button>
         </div>
 
         <div class="search-container">
             <div class="search-bar">
-                <input type="text" placeholder="Search by patient name, ID, or order number..." id="searchInput">
-                <button onclick="searchOrders()"><i class="fas fa-search"></i> Search</button>
+                <input type="text" placeholder="Search by patient name or ID..." id="searchInput">
+                <button onclick="searchCustomers()"><i class="fas fa-search"></i> Search</button>
             </div>
         </div>
 
-        <!-- Orders List -->
-        <div class="orders-list" id="ordersList">
-            @if (!Model.Orders.Any())
+        <!-- Customer Cards -->
+        <div class="customer-cards" id="customerCards">
+            @{
+                // Group orders by customer
+                var customersGrouped = Model.Orders
+                .GroupBy(o => o.CustomerID)
+                .Select(g => new
+                {
+                    Customer = g.First().Customer,
+                    Orders = g.ToList(),
+                    ReadyCount = g.Count(o => o.Status == "Ready for Collection"),
+                    CollectedCount = g.Count(o => o.Status == "Collected")
+                })
+                .ToList();
+            }
+
+            @if (!customersGrouped.Any())
             {
                 <div class="no-orders">
                     <i class="fas fa-box-open"></i>
@@ -622,86 +680,74 @@
             }
             else
             {
-                @foreach (var order in Model.Orders)
+                @foreach (var customerGroup in customersGrouped)
                 {
-                    var customer = order.Customer?.ApplicationUser;
-                    var hasRepeats = order.OrderLines?.Any(ol => ol.ScriptLine?.RepeatsLeft > 0) == true;
-                    var repeatsLeft = order.OrderLines?.Max(ol => ol.ScriptLine?.RepeatsLeft) ?? 0;
+                    var customer = customerGroup.Customer;
+                    var orders = customerGroup.Orders;
+                    var readyCount = customerGroup.ReadyCount;
+                    var collectedCount = customerGroup.CollectedCount;
 
-                    <div class="order-card" data-status="@order.Status.ToLower().Replace(" ", "-")" data-order-id="@order.OrderID">
-                        <div class="order-header">
-                            <div>
-                                <div class="order-patient">
-                                    <i class="fas fa-user"></i> Patient: @customer?.Name @customer?.Surname
-                                </div>
-                                <div class="order-meta">
-                                    <span><i class="fas fa-hashtag"></i> Order: @order.OrderNumber</span>
-                                    <span><i class="fas fa-calendar"></i> Date: @order.OrderDate.ToString("yyyy-MM-dd")</span>
-                                    <span><i class="fas fa-id-card"></i> ID: @customer?.IDNumber</span>
-                                    @if (hasRepeats)
-                                    {
-                                        <span class="order-repeat"><i class="fas fa-redo"></i> Repeat (@repeatsLeft remaining)</span>
-                                    }
-                                </div>
-                            </div>
-                            <span class="order-status @(order.Status == "Ready for Collection" ? "status-ready" : "status-collected")">
-                                <i class="fas @(order.Status == "Ready for Collection" ? "fa-box" : "fa-check-circle")"></i>
-                                @order.Status
-                            </span>
+                    <div class="customer-card"
+                         data-customer-id="@customer.CustormerID"
+                         data-customer-name="@customer.ApplicationUser?.Name @customer.ApplicationUser?.Surname"
+                         data-customer-idnumber="@customer.ApplicationUser?.IDNumber"
+                         data-ready-count="@readyCount"
+                         data-collected-count="@collectedCount">
+
+                        <div class="customer-name">
+                            <i class="fas fa-user"></i> @customer.ApplicationUser?.Name @customer.ApplicationUser?.Surname
+                        </div>
+                        <div class="customer-id">ID: @customer.ApplicationUser?.IDNumber</div>
+                        <div class="order-count">
+                            <span style="color: #28a745;">@readyCount Ready</span> •
+                            <span style="color: #17a2b8;">@collectedCount Collected</span> •
+                            <span style="color: #3498db;">@orders.Count Total Orders</span>
                         </div>
 
-                        <div class="order-actions">
-                            <button class="action-btn email-btn" onclick="sendCollectionEmail(@order.OrderID, this)">
-                                <i class="fas fa-envelope"></i> Email Patient
-                            </button>
-                            @if (order.Status == "Ready for Collection")
+                        <!-- Hidden orders data -->
+                        <div class="orders-data" style="display: none;">
+                            @foreach (var order in orders)
                             {
-                                <button class="action-btn collect-btn" onclick="markAsCollected(@order.OrderID, this)">
-                                    <i class="fas fa-check"></i> Mark as Collected
-                                </button>
-                            }
-                        </div>
-
-                        <div class="order-details">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Medication</th>
-                                        <th>Dosage Form</th>
-                                        <th>Qty</th>
-                                        <th>Schedule</th>
-                                        <th>Price (ZAR)</th>
-                                        <th>Instructions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
+                                <div class="order-item"
+                                     data-order-id="@order.OrderID"
+                                     data-order-number="@order.OrderNumber"
+                                     data-order-date="@order.OrderDate.ToString("yyyy-MM-dd")"
+                                     data-total-due="@order.TotalDue"
+                                     data-status="@order.Status"
+                                     data-pharmacist="@order.Pharmacist?.ApplicationUser?.Name"
+                                     data-vat="@order.VAT">
                                     @foreach (var orderLine in order.OrderLines)
                                     {
                                         var medication = orderLine.Medications;
-                                        <tr>
-                                            <td><strong>@medication?.MedicationName</strong></td>
-                                            <td>@medication?.DosageForm?.DosageFormName</td>
-                                            <td>@orderLine.Quantity</td>
-                                            <td>
-                                                <span class="med-badge badge-s@(medication?.Schedule?.LastOrDefault() ?? '0')">
-                                                    S@(medication?.Schedule?.LastOrDefault() ?? '0')
-                                                </span>
-                                            </td>
-                                            <td>R @orderLine.ItemPrice.ToString("F2")</td>
-                                            <td>@orderLine.ScriptLine?.Instructions</td>
-                                        </tr>
+                                        <div class="orderline-item"
+                                             data-medication="@medication?.MedicationName"
+                                             data-dosage="@medication?.DosageForm?.DosageFormName"
+                                             data-quantity="@orderLine.Quantity"
+                                             data-schedule="@medication?.Schedule"
+                                             data-price="@orderLine.ItemPrice"
+                                             data-instructions="@orderLine.ScriptLine?.Instructions">
+                                        </div>
                                     }
-                                </tbody>
-                            </table>
-                            <div style="margin-top: 15px; padding: 15px; background: #f8f9fa; border-radius: 5px; border-left: 4px solid #3498db;">
-                                <strong>Total: R @order.TotalDue</strong> |
-                                <strong>VAT: @order.VAT%</strong> |
-                                <strong>Dispensed by: @order.Pharmacist?.ApplicationUser?.Name</strong>
-                            </div>
+                                </div>
+                            }
                         </div>
                     </div>
                 }
             }
+        </div>
+
+        <!-- Orders List (Hidden by default) -->
+        <div class="orders-list" id="ordersList">
+            <h3 id="selectedCustomerName" style="padding: 20px; margin: 0; border-bottom: 1px solid #eee;"></h3>
+            <div id="ordersListContent">
+                <!-- Orders will be dynamically inserted here -->
+            </div>
+        </div>
+
+        <!-- NO RESULTS MESSAGE -->
+        <div class="no-results" id="noResults" style="display: none;">
+            <i class="fas fa-search" style="font-size: 24px; margin-bottom: 10px;"></i>
+            <p>No customers match your search criteria</p>
         </div>
     </div>
 
@@ -721,36 +767,213 @@
             }
         }
 
-        // Toggle order details on card click
-        document.querySelectorAll('.order-card').forEach(card => {
-            card.addEventListener('click', function(e) {
-                // Don't toggle if clicking on buttons
-                if (!e.target.classList.contains('action-btn')) {
-                    this.classList.toggle('expanded');
-                }
-            });
-        });
+        // Show/hide orders for selected customer
+        function showOrders(customerCard) {
+            const customerName = customerCard.getAttribute('data-customer-name');
+            const ordersList = document.getElementById('ordersList');
+            const isCurrentlyActive = customerCard.classList.contains('active');
 
-        // Filter orders by status
-        function filterOrders(status) {
+            // Remove active class from all cards
+            document.querySelectorAll('.customer-card').forEach(card => {
+                card.classList.remove('active');
+            });
+
+            // If clicking the same card that was already active, hide the orders list
+            if (isCurrentlyActive) {
+                ordersList.style.display = 'none';
+                return;
+            }
+
+            // Add active class to clicked card
+            customerCard.classList.add('active');
+
+            document.getElementById('selectedCustomerName').textContent = `Orders for ${customerName}`;
+
+            // Get orders from hidden data
+            const orderItems = customerCard.querySelectorAll('.order-item');
+            const orders = Array.from(orderItems).map(item => {
+                const orderlines = Array.from(item.querySelectorAll('.orderline-item')).map(ol => ({
+                    medication: ol.getAttribute('data-medication'),
+                    dosage: ol.getAttribute('data-dosage'),
+                    quantity: ol.getAttribute('data-quantity'),
+                    schedule: ol.getAttribute('data-schedule'),
+                    price: ol.getAttribute('data-price'),
+                    instructions: ol.getAttribute('data-instructions')
+                }));
+
+                return {
+                    orderId: item.getAttribute('data-order-id'),
+                    orderNumber: item.getAttribute('data-order-number'),
+                    orderDate: item.getAttribute('data-order-date'),
+                    totalDue: item.getAttribute('data-total-due'),
+                    status: item.getAttribute('data-status'),
+                    pharmacist: item.getAttribute('data-pharmacist'),
+                    vat: item.getAttribute('data-vat'),
+                    orderlines: orderlines
+                };
+            });
+
+            // Populate orders list
+            const ordersListContent = document.getElementById('ordersListContent');
+            ordersListContent.innerHTML = '';
+
+            if (orders.length === 0) {
+                ordersListContent.innerHTML = `
+                    <div style="padding: 40px; text-align: center; color: #95a5a6;">
+                        <i class="fas fa-box-open" style="font-size: 3rem; margin-bottom: 15px;"></i>
+                        <p>No orders found for this customer</p>
+                    </div>
+                `;
+            } else {
+                // Sort orders by date (newest first)
+                orders.sort((a, b) => new Date(b.orderDate) - new Date(a.orderDate));
+
+                orders.forEach(order => {
+                    const orderCard = document.createElement('div');
+                    orderCard.className = 'order-card';
+                    orderCard.setAttribute('data-status', order.status.toLowerCase().replace(' ', '-'));
+                    orderCard.setAttribute('data-order-id', order.orderId);
+
+                    // Format date
+                    let formattedDate = 'Invalid Date';
+                    try {
+                        const orderDate = new Date(order.orderDate);
+                        if (!isNaN(orderDate)) {
+                            formattedDate = `${orderDate.getDate().toString().padStart(2, '0')}/${(orderDate.getMonth() + 1).toString().padStart(2, '0')}/${orderDate.getFullYear()}`;
+                        }
+                    } catch (e) {
+                        console.error('Date parsing error:', e);
+                    }
+
+                    orderCard.innerHTML = `
+                        <div class="order-header">
+                            <div>
+                                <div class="order-number">
+                                    <i class="fas fa-receipt"></i> ${order.orderNumber || 'N/A'}
+                                </div>
+                                <div class="order-meta">
+                                    <span><i class="fas fa-calendar"></i> ${formattedDate}</span>
+                                    <span><i class="fas fa-money-bill"></i> ${order.totalDue || 'N/A'}</span>
+                                    <span><i class="fas fa-user-md"></i> ${order.pharmacist || 'N/A'}</span>
+                                </div>
+                            </div>
+                            <span class="order-status ${order.status === 'Ready for Collection' ? 'status-ready' : 'status-collected'}">
+                                <i class="fas ${order.status === 'Ready for Collection' ? 'fa-box' : 'fa-check-circle'}"></i>
+                                ${order.status}
+                            </span>
+                        </div>
+
+                        <div class="order-actions">
+                            <button class="action-btn email-btn" onclick="sendCollectionEmail(${order.orderId}, this)">
+                                <i class="fas fa-envelope"></i> Email Patient
+                            </button>
+                            ${order.status === 'Ready for Collection' ? `
+                                <button class="action-btn collect-btn" onclick="markAsCollected(${order.orderId}, this)">
+                                    <i class="fas fa-check"></i> Mark as Collected
+                                </button>
+                            ` : ''}
+                        </div>
+
+                        <div class="order-details">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Medication</th>
+                                        <th>Dosage Form</th>
+                                        <th>Qty</th>
+                                        <th>Schedule</th>
+                                        <th>Price (ZAR)</th>
+                                        <th>Instructions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${order.orderlines.map(ol => `
+                                        <tr>
+                                            <td><strong>${ol.medication || 'N/A'}</strong></td>
+                                            <td>${ol.dosage || 'N/A'}</td>
+                                            <td>${ol.quantity || 'N/A'}</td>
+                                            <td>
+                                                <span class="med-badge badge-s${ol.schedule?.charAt(ol.schedule.length - 1) || '0'}">
+                                                    S${ol.schedule?.charAt(ol.schedule.length - 1) || '0'}
+                                                </span>
+                                            </td>
+                                            <td>R ${parseFloat(ol.price || 0).toFixed(2)}</td>
+                                            <td>${ol.instructions || 'Take as directed'}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                            <div style="margin-top: 15px; padding: 15px; background: #f8f9fa; border-radius: 5px; border-left: 4px solid #3498db;">
+                                <strong>Total: ${order.totalDue || 'N/A'}</strong> |
+                                <strong>VAT: ${order.vat || 'N/A'}%</strong> |
+                                <strong>Dispensed by: ${order.pharmacist || 'N/A'}</strong>
+                            </div>
+                        </div>
+                    `;
+                    ordersListContent.appendChild(orderCard);
+                });
+
+                // Add click event to order cards for expanding details
+                ordersListContent.querySelectorAll('.order-card').forEach(card => {
+                    card.addEventListener('click', function(e) {
+                        if (!e.target.classList.contains('action-btn')) {
+                            this.classList.toggle('expanded');
+                        }
+                    });
+                });
+            }
+
+            // Show orders list
+            ordersList.style.display = 'block';
+            document.getElementById('noResults').style.display = 'none';
+        }
+
+        // Filter customers by status
+        function filterCustomers(status) {
             // Update active filter button
             document.querySelectorAll('.filter-btn').forEach(btn => {
                 btn.classList.remove('active');
             });
             event.target.classList.add('active');
 
-            const cards = document.querySelectorAll('.order-card');
+            const customerCards = document.querySelectorAll('.customer-card');
 
-            cards.forEach(card => {
+            customerCards.forEach(card => {
+                const readyCount = parseInt(card.getAttribute('data-ready-count'));
+                const collectedCount = parseInt(card.getAttribute('data-collected-count'));
+
                 if (status === 'all') {
                     card.style.display = 'block';
+                } else if (status === 'ready' && readyCount > 0) {
+                    card.style.display = 'block';
+                } else if (status === 'collected' && collectedCount > 0) {
+                    card.style.display = 'block';
                 } else {
-                    card.style.display = card.dataset.status === status ? 'block' : 'none';
+                    card.style.display = 'none';
                 }
             });
         }
 
-        // Mark order as collected - UPDATED to match new controller method
+        // Search customers
+        function searchCustomers() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const customerCards = document.querySelectorAll('.customer-card');
+            let hasVisibleCards = false;
+
+            customerCards.forEach(card => {
+                const customerName = card.getAttribute('data-customer-name').toLowerCase();
+                const customerId = card.getAttribute('data-customer-idnumber').toLowerCase();
+                const shouldShow = customerName.includes(searchTerm) || customerId.includes(searchTerm);
+
+                card.style.display = shouldShow ? 'block' : 'none';
+                if (shouldShow) hasVisibleCards = true;
+            });
+
+            document.getElementById('noResults').style.display = hasVisibleCards ? 'none' : 'block';
+            document.getElementById('ordersList').style.display = 'none';
+        }
+
+        // Mark order as collected
         async function markAsCollected(orderId, button) {
             console.log('Marking order as collected:', orderId);
 
@@ -802,7 +1025,7 @@
             }
         }
 
-        // Send collection email - UPDATED to match new controller method
+        // Send collection email
         async function sendCollectionEmail(orderId, button) {
             console.log('Sending email for order:', orderId);
 
@@ -839,37 +1062,7 @@
             }
         }
 
-        // Search orders
-        function searchOrders() {
-            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-            const cards = document.querySelectorAll('.order-card');
-            let visibleCount = 0;
-
-            cards.forEach(card => {
-                const patientText = card.querySelector('.order-patient').textContent.toLowerCase();
-                const orderNumber = card.querySelector('.order-meta span:first-child').textContent.toLowerCase();
-                const idNumber = card.querySelector('.order-meta span:nth-child(3)').textContent.toLowerCase();
-                const shouldShow = patientText.includes(searchTerm) || orderNumber.includes(searchTerm) || idNumber.includes(searchTerm);
-
-                card.style.display = shouldShow ? 'block' : 'none';
-                if (shouldShow) visibleCount++;
-            });
-
-            // Show no results message if needed
-            const noOrdersElement = document.querySelector('.no-orders');
-            if (visibleCount === 0 && !noOrdersElement) {
-                const ordersList = document.getElementById('ordersList');
-                ordersList.innerHTML = `
-                    <div class="no-orders">
-                        <i class="fas fa-search"></i>
-                        <h3>No Orders Found</h3>
-                        <p>No orders match your search criteria.</p>
-                    </div>
-                `;
-            }
-        }
-
-        // Update stats (simplified - would need actual API call for real-time updates)
+        // Update stats (simplified)
         function updateStats() {
             const readyCards = document.querySelectorAll('.order-card[data-status="ready-for-collection"]');
             const collectedCards = document.querySelectorAll('.order-card[data-status="collected"]');
@@ -895,18 +1088,22 @@
         // Make search work on Enter key
         document.getElementById('searchInput').addEventListener('keyup', function(event) {
             if (event.key === 'Enter') {
-                searchOrders();
+                searchCustomers();
             }
         });
 
-        // Add anti-forgery token for AJAX requests
+        // Add click event listeners to customer cards
         document.addEventListener('DOMContentLoaded', function() {
-            const token = document.querySelector('input[name="__RequestVerificationToken"]');
-            if (!token) {
-                const form = document.createElement('form');
-                form.style.display = 'none';
-                form.innerHTML = '@Html.AntiForgeryToken()';
-                document.body.appendChild(form);
+            document.querySelectorAll('.customer-card').forEach(card => {
+                card.addEventListener('click', function() {
+                    showOrders(this);
+                });
+            });
+
+            // Auto-click the first customer card if available
+            const firstCustomerCard = document.querySelector('.customer-card');
+            if (firstCustomerCard) {
+                firstCustomerCard.click();
             }
         });
     </script>
