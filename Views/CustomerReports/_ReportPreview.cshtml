@@ -9,8 +9,16 @@
     }
     else
     {
+        <!-- Dynamic title based on grouping -->
         <div class="report-header mb-4">
-            <h4 class="text-primary">DISPENSED PRESCRIPTIONS BY @Model.GroupBy.ToUpper()</h4>
+            @if (Model.GroupBy == "Doctor")
+            {
+                <h4 class="text-primary">DISPENSED PRESCRIPTIONS BY DOCTOR</h4>
+            }
+            else
+            {
+                <h4 class="text-primary">DISPENSED PRESCRIPTIONS BY MEDICATION</h4>
+            }
             <p class="text-muted">@Model.StartDate.ToString("dd/MM/yyyy") – @Model.EndDate.ToString("dd/MM/yyyy")</p>
         </div>
 

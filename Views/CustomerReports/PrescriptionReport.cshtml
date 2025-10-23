@@ -20,6 +20,7 @@
         }
 
         <form id="reportForm" method="post" asp-action="GenerateReport">
+            <!-- Date Selection Row -->
             <div class="form-row">
                 <div class="form-group">
                     <label asp-for="StartDate" class="form-label"></label>
@@ -31,7 +32,11 @@
                     <input asp-for="EndDate" type="date" class="form-control" required />
                     <span asp-validation-for="EndDate" class="text-danger"></span>
                 </div>
-                <div class="form-group">
+            </div>
+
+            <!-- Group By Selection Row -->
+            <div class="form-row">
+                <div class="form-group full-width">
                     <label asp-for="GroupBy" class="form-label"></label>
                     <select asp-for="GroupBy" class="form-control">
                         <option value="Doctor">Doctor</option>
@@ -45,7 +50,7 @@
                 <button type="button" class="btn btn-preview" id="previewBtn">
                     <div class="btn-content">
                         <i class="fas fa-eye"></i>
-                        <span>Preview Report</span>
+                        <span>Generate Report</span>
                     </div>
                 </button>
                 <button type="submit" class="btn btn-download" id="downloadBtn" style="display:none;">
@@ -100,6 +105,11 @@
         display: flex;
         flex-direction: column;
     }
+
+        .form-group.full-width {
+            flex: 1 1 100%;
+            min-width: 100%;
+        }
 
     .form-label {
         font-weight: 600;
@@ -211,10 +221,10 @@
             color: white;
         }
 
-    /* Loading animation */
+    /* /* Loading animation */
     .fa-spinner {
         animation: spin 1s linear infinite;
-    }
+    } */
 
     @@keyframes spin {
         0% {
@@ -304,6 +314,10 @@
         .form-group {
             min-width: 100%;
         }
+
+            .form-group.full-width {
+                min-width: 100%;
+            }
 
         .form-actions {
             flex-direction: column;

@@ -19,8 +19,13 @@ public static class ReportGenerator
         var textFont = FontFactory.GetFont(FontFactory.HELVETICA, 10);
         var boldFont = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 10);
 
+        // Dynamic title based on grouping
+        string reportTitle = report.GroupBy == "Doctor"
+            ? "DISPENSED PRESCRIPTIONS BY DOCTOR"
+            : "DISPENSED PRESCRIPTIONS BY MEDICATION";
+
         // Title and Date Range
-        var title = new Paragraph("DISPENSED PRESCRIPTIONS REPORT", titleFont)
+        var title = new Paragraph(reportTitle, titleFont)
         {
             Alignment = Element.ALIGN_CENTER,
             SpacingAfter = 10f
@@ -43,16 +48,30 @@ public static class ReportGenerator
             };
             doc.Add(groupHeader);
 
-            // Create table with 4 columns
-            PdfPTable table = new PdfPTable(4);
+            // Create table with dynamic columns based on grouping
+            int columnCount = report.GroupBy == "Medication" ? 5 : 4;
+            PdfPTable table = new PdfPTable(columnCount);
             table.WidthPercentage = 100;
-            table.SetWidths(new float[] { 25, 45, 15, 15 });
+
+            if (report.GroupBy == "Medication")
+            {
+                table.SetWidths(new float[] { 20, 35, 10, 10, 25 }); // Date, Medication, Qty, Repeats, Doctor
+            }
+            else
+            {
+                table.SetWidths(new float[] { 20, 45, 15, 20 }); // Date, Medication, Qty, Repeats
+            }
 
             // Table headers
             table.AddCell(new PdfPCell(new Phrase("Date", boldFont)) { Padding = 5 });
             table.AddCell(new PdfPCell(new Phrase("Medication", boldFont)) { Padding = 5 });
             table.AddCell(new PdfPCell(new Phrase("Qty", boldFont)) { Padding = 5 });
             table.AddCell(new PdfPCell(new Phrase("Repeats", boldFont)) { Padding = 5 });
+
+            if (report.GroupBy == "Medication")
+            {
+                table.AddCell(new PdfPCell(new Phrase("Doctor", boldFont)) { Padding = 5 });
+            }
 
             // Table rows
             foreach (var record in group.Records)
@@ -61,12 +80,17 @@ public static class ReportGenerator
                 table.AddCell(new PdfPCell(new Phrase(record.Medication, textFont)) { Padding = 5 });
                 table.AddCell(new PdfPCell(new Phrase(record.Quantity.ToString(), textFont)) { Padding = 5 });
                 table.AddCell(new PdfPCell(new Phrase(record.Repeats.ToString(), textFont)) { Padding = 5 });
+
+                if (report.GroupBy == "Medication")
+                {
+                    table.AddCell(new PdfPCell(new Phrase(record.DoctorName, textFont)) { Padding = 5 });
+                }
             }
 
             doc.Add(table);
 
             // Subtotal
-            var subtotal = new Paragraph($"Sub-total: {group.Subtotal}", boldFont)
+            var subtotal = new Paragraph($"Sub-total: {group.Subtotal} items", boldFont)
             {
                 SpacingBefore = 10f,
                 SpacingAfter = 20f
@@ -77,7 +101,7 @@ public static class ReportGenerator
         // Grand Total
         if (report.Groups.Count > 0)
         {
-            var grandTotal = new Paragraph($"GRAND TOTAL: {report.GrandTotal}", titleFont)
+            var grandTotal = new Paragraph($"GRAND TOTAL: {report.GrandTotal} items", titleFont)
             {
                 SpacingBefore = 20f,
                 Alignment = Element.ALIGN_RIGHT
