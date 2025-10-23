@@ -3,6 +3,7 @@ using IbhayiPharmacy.Models;
 using IbhayiPharmacy.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Identity;
 
 
 namespace PharmMan.Controllers
@@ -10,7 +11,7 @@ namespace PharmMan.Controllers
     public class PharmacyManagerController : Controller
     {
         private readonly ApplicationDbContext _db;
-
+        private readonly UserManager<ApplicationUser> _userManager;
         public PharmacyManagerController(ApplicationDbContext db)
         {
             _db = db;
@@ -22,12 +23,27 @@ namespace PharmMan.Controllers
         }
         public IActionResult PharmacyInfo()
         {
-            IEnumerable<Pharmacy> obj = _db.Pharmacies;
-            return View(obj);
+            var pharmacies = _db.Pharmacies
+           .Include(p => p.Pharmacist)
+           .ThenInclude(ph => ph.ApplicationUser)
+           .ToList();
+            return View(pharmacies);
         }
         [HttpGet]
         public IActionResult AddPharmacyInfo()
         {
+            var pharmacists = _db.Pharmacists
+            .Include(p => p.ApplicationUser)
+            .Select(p => new
+            {
+                p.PharmacistID,
+                FullName = p.ApplicationUser != null
+                    ? (p.ApplicationUser.Name + " " + p.ApplicationUser.Surname)
+                    : "Unknown User"
+            })
+            .ToList();
+
+            ViewBag.Pharmacists = new SelectList(pharmacists, "PharmacistID", "FullName");
             return View();
         }
         [HttpPost]
@@ -41,6 +57,62 @@ namespace PharmMan.Controllers
                 return RedirectToAction("PharmacyInfo");
             }
             return View(model);
+        }
+        // GET: Pharmacy/EditPharmacyInfo/5
+        public IActionResult EditPharmacyInfo(int id)
+        {
+            var pharmacy = _db.Pharmacies
+                .Include(p => p.Pharmacist)
+                .ThenInclude(ph => ph.ApplicationUser)
+                .FirstOrDefault(p => p.PharmacyID == id);
+
+            if (pharmacy == null)
+            {
+                return NotFound();
+            }
+
+            var pharmacists = _db.Pharmacists
+                .Include(p => p.ApplicationUser)
+                .Select(p => new
+                {
+                    p.PharmacistID,
+                    FullName = p.ApplicationUser != null
+                        ? (p.ApplicationUser.Name + " " + p.ApplicationUser.Surname)
+                        : "Unknown"
+                })
+                .ToList();
+
+            ViewBag.Pharmacists = new SelectList(pharmacists, "PharmacistID", "FullName", pharmacy.PharmacistID);
+
+            return View(pharmacy);
+        }
+
+        // POST: Pharmacy/EditPharmacyInfo
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult EditPharmacyInfo(Pharmacy model)
+        {
+            
+                _db.Pharmacies.Update(model);
+                _db.SaveChanges();
+                TempData["Success"] = "Pharmacy information updated successfully!";
+            
+    
+
+            // Repopulate dropdown if validation fails
+            var pharmacists = _db.Pharmacists
+                .Include(p => p.ApplicationUser)
+                .Select(p => new
+                {
+                    p.PharmacistID,
+                    FullName = p.ApplicationUser != null
+                        ? (p.ApplicationUser.Name + " " + p.ApplicationUser.Surname)
+                        : "Unknown"
+                })
+                .ToList();
+
+            ViewBag.Pharmacists = new SelectList(pharmacists, "PharmacistID", "FullName", model.PharmacistID);
+            return RedirectToAction("PharmacyInfo");
         }
 
 
@@ -199,6 +271,7 @@ namespace PharmMan.Controllers
             IEnumerable<Doctor> doctors = _db.Doctors;
             return View(doctors);
         }
+        [HttpGet]
         public IActionResult AddDoctor()
         {
             return View();
@@ -216,7 +289,53 @@ namespace PharmMan.Controllers
             return View(doc);
         }
 
+        public IActionResult EditDoctor(int id)
+        {
+            var doctor = _db.Doctors.FirstOrDefault(d => d.DoctorID == id);
+            if (doctor == null)
+            {
+                return NotFound();
+            }
+            return View(doctor);
+        }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult EditDoctor(Doctor doc)
+        {
+            if (ModelState.IsValid)
+            {
+                _db.Doctors.Update(doc);
+                _db.SaveChanges();
+                return RedirectToAction("ManageDoctor");
+            }
+            return View(doc);
+        }
+
+        public IActionResult DeleteDoctor(int id)
+        {
+            var doctor = _db.Doctors.FirstOrDefault(d => d.DoctorID == id);
+            if (doctor == null)
+            {
+                return NotFound();
+            }
+            return View(doctor);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult DeleteConfirmed(Doctor doc)
+        {
+            
+            var doctor = _db.Doctors.FirstOrDefault(d => d.DoctorID == doc.DoctorID);
+            if (doctor != null)
+            {
+                _db.Doctors.Remove(doctor);
+                _db.SaveChanges();
+                return RedirectToAction("ManageDoctor");
+            }
+            return View(doc);
+        }
 
 
 
@@ -244,6 +363,44 @@ namespace PharmMan.Controllers
 
         }
 
+        public IActionResult EditPharmacist(int id)
+        {
+            var pharmacist = _db.Pharmacists
+                                .Include(p => p.ApplicationUser)
+                                .FirstOrDefault(p => p.PharmacistID == id);
+            if (pharmacist == null) return NotFound();
+
+            return View(pharmacist);
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult EditPharmacist(Pharmacist pham)
+        {
+            if (!ModelState.IsValid) return View(pham);
+
+            if (ModelState.IsValid)
+            {
+                _db.Pharmacists.Update(pham);
+                _db.SaveChanges();
+                return RedirectToAction("ManageDoctor");
+            }
+
+            _db.SaveChanges();
+            return RedirectToAction("ManagePharmacists");
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         //Orders
         public IActionResult ManageOrders()
@@ -259,18 +416,158 @@ namespace PharmMan.Controllers
 
             return View(orders);
         }
+
+
+
+
+
+
+
+
+
+
+
+
+        [HttpGet]
         public IActionResult Orders()
         {
+            ViewBag.Suppliers = _db.Suppliers.ToList();
+            ViewBag.Medications = _db.Medications.ToList();
+
             return View();
         }
-      
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Orders(Order order, List<OrderLine> OrderLines)
+        {
+            order.OrderDate = DateTime.Now;
+            order.Status = "Ordered";
+            if (ModelState.IsValid)
+            {
+                foreach (var line in OrderLines)
+                {
+                    if (line.MedicationID != 0 && line.Quantity > 0)
+                        order.OrderLines.Add(line);
+                }
 
+                order.OrderDate = DateTime.Now;
+                order.Status = "Ordered";
+                order.OrderNumber = $"ORD-{DateTime.Now:yyyyMMdd}-{Guid.NewGuid().ToString().Substring(0, 4)}";
+
+                _db.Orders.Add(order);
+                _db.SaveChanges();
+                return RedirectToAction("ManageOrders");
+            }
+
+            ViewBag.Customers = new SelectList(_db.Customers, "CustomerID", "FullName");
+            ViewBag.Pharmacists = new SelectList(_db.Pharmacists, "PharmacistID", "FullName");
+            ViewBag.Medications = _db.Medications.ToList();
+            return View(order);
+        }
+
+        public IActionResult StockManagement()
+        {
+            var meds = _db.Medications
+            .Include(m => m.DosageForm)
+            .ToList();
+
+            return View(meds);
+        }
+        [HttpPost]
+        public IActionResult UpdateStock(int id, int? newStock, int? increment)
+        {
+            var med = _db.Medications.FirstOrDefault(m => m.MedcationID == id);
+            if (med == null)
+                return NotFound();
+
+            if (newStock.HasValue)
+                med.QuantityOnHand = newStock.Value;
+            else if (increment.HasValue)
+                med.QuantityOnHand += increment.Value;
+
+            _db.SaveChanges();
+            return RedirectToAction("StockManagement");
+        }
+        [HttpGet]
         public IActionResult Reports()
         {
-            return View();
+            var model = new MedicationReportVM
+            {
+                GroupBy = "", // default
+                Groups = new List<MedicationGroup>() // initialize to avoid null
+            };
+            return View(model);
         }
+            [HttpPost]
+        public IActionResult Reports(string groupBy)
+        {
+            var medications = _db.Medications
+                .Include(m => m.Supplier)
+                .Include(m => m.DosageForm)
+                .ToList();
 
+            var model = new MedicationReportVM
+            {
+                GroupBy = groupBy
+            };
 
+            if (string.IsNullOrEmpty(groupBy))
+            {
+                model.Groups.Add(new MedicationGroup
+                {
+                    GroupName = "All Medications",
+                    Medications = medications
+                });
+            }
+            else
+            {
+                switch (groupBy.ToLower())
+                {
+                    case "dosageform":
+                        model.Groups = medications
+                            .GroupBy(m => m.DosageForm.DosageFormName)
+                            .Select(g => new MedicationGroup
+                            {
+                                GroupName = g.Key,
+                                Medications = g.ToList()
+                            })
+                            .ToList();
+                        break;
+
+                    case "schedule":
+                        model.Groups = medications
+                            .GroupBy(m => m.Schedule)
+                            .Select(g => new MedicationGroup
+                            {
+                                GroupName = g.Key,
+                                Medications = g.ToList()
+                            })
+                            .ToList();
+                        break;
+
+                    case "supplier":
+                        model.Groups = medications
+                            .GroupBy(m => m.Supplier.SupplierName)
+                            .Select(g => new MedicationGroup
+                            {
+                                GroupName = g.Key,
+                                Medications = g.ToList()
+                            })
+                            .ToList();
+                        break;
+
+                    default:
+                        model.Groups.Add(new MedicationGroup
+                        {
+                            GroupName = "All Medications",
+                            Medications = medications
+                        });
+                        break;
+                }
+            }
+
+            return View(model);
+        }
 
     }
 }

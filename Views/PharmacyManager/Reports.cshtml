@@ -1,71 +1,67 @@
-﻿
-@{
-    ViewData["Title"] = "Stock Take Reports";
-    Layout = "~/Views/Shared/_ManagerLayout.cshtml";
+﻿@model IbhayiPharmacy.Models.MedicationReportVM
 
+@{
+    ViewData["Title"] = "Medication Stock Report";
 }
 
 <div class="container mt-4">
-    <h2 class="mb-2">Stock Take Reports</h2>
+    <h2>Medication Stock Report</h2>
 
-    <!-- Report Filter Options -->
-    <div class="card mb-4">
-        <h5 class="card-header">Generate Report</h5>
-        <div class="card-body">
-            <form>
-                <div class="mb-3">
-                    <label for="groupBy" class="form-label">Group By</label>
-                    <select class="form-select" id="groupBy">
-                        <option selected disabled>Select grouping</option>
-                        <option value="dosage">Dosage Form</option>
-                        <option value="schedule">Schedule</option>
-                        <option value="supplier">Supplier</option>
-                    </select>
+    <form method="get" asp-action="Reports">
+        <label><strong>Group By:</strong></label>
+        <select name="groupBy" class="form-select d-inline-block" style="width:250px;">
+            <option value="">-- All Medications --</option>
+            <option value="DosageForm" selected="@(Model.GroupBy == "DosageForm")">Dosage Form</option>
+            <option value="Schedule" selected="@(Model.GroupBy == "Schedule")">Schedule</option>
+            <option value="Supplier" selected="@(Model.GroupBy == "Supplier")">Supplier</option>
+        </select>
+        <button type="submit" class="btn btn-primary ms-2">Filter</button>
+    </form>
+
+    <hr />
+
+    @if (Model.Groups.Any())
+    {
+        foreach (var group in Model.Groups)
+        {
+            <div class="card mb-4 shadow-sm">
+                <div class="card-header bg-secondary text-white">
+                    <h5>@group.GroupName</h5>
                 </div>
-                <button type="submit" class="btn btn-primary">Generate PDF</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- Sample Report Preview -->
-    <div class="card p-3">
-        <h6 class="title-underline">Sample Report Preview</h6>
-        <div class="card-body">
-            <table class="table table-hover table-borderless">
-                <thead class="table-light" style=" color: #2c3e50;">
-                    <tr>
-                        <th>Medication</th>
-                        <th>Dosage Form</th>
-                        <th>Schedule</th>
-                        <th>Supplier</th>
-                        <th>Qty on Hand</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @* Dummy preview data *@
-                    <tr>
-                        <td>Panado</td>
-                        <td>Tablet</td>
-                        <td>0</td>
-                        <td>MedLife Distributors</td>
-                        <td>120</td>
-                    </tr>
-                    <tr>
-                        <td>Myprodol</td>
-                        <td>Capsule</td>
-                        <td>3</td>
-                        <td>PharmaDirect</td>
-                        <td>60</td>
-                    </tr>
-                    <tr>
-                        <td>Allergex</td>
-                        <td>Syrup</td>
-                        <td>1</td>
-                        <td>MedLife Distributors</td>
-                        <td>35</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
+                <div class="card-body p-0">
+                    <table class="table table-bordered table-striped mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Medication Name</th>
+                                <th>Schedule</th>
+                                <th>Dosage Form</th>
+                                <th>Supplier</th>
+                                <th>Reorder Level</th>
+                                <th>Quantity On Hand</th>
+                                <th>Current Price</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in group.Medications)
+                            {
+                                <tr>
+                                    <td>@item.MedicationName</td>
+                                    <td>@item.Schedule</td>
+                                    <td>@item.DosageForm.DosageFormName</td>
+                                    <td>@item.Supplier.SupplierName</td>
+                                    <td>@item.ReOrderLevel</td>
+                                    <td>@item.QuantityOnHand</td>
+                                    <td>R @item.CurrentPrice</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <p>No medications found.</p>
+    }
 </div>

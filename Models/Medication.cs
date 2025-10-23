@@ -41,4 +41,16 @@ namespace IbhayiPharmacy.Models
         public int Active_IngredientID { get; set; }
         public string Strength { get; set; }
     }
+    public class MedicationReportVM
+    {
+        public string GroupBy { get; set; } // DosageForm, Schedule, Supplier, or All
+
+        public List<MedicationGroup> Groups { get; set; } = new List<MedicationGroup>();
+    }
+
+    public class MedicationGroup
+    {
+        public string GroupName { get; set; }
+        public List<Medication> Medications { get; set; } = new List<Medication>();
+    }
 }

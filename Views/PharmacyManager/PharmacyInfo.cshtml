@@ -24,7 +24,9 @@
         margin-bottom: 20px;
     }
 </style>
-
+<a asp-controller="PharmacyManager" asp-action="AddPharmacyInfo" class="btn btn-primary mt-3">
+    Add Pharmacy Details
+</a>
 <br />
 <div class="mt-4">
     <div class="card">
@@ -57,8 +59,18 @@
                         </dd>
 
                         <dt class="col-sm-4">Responsible Pharmacist</dt>
-                        <dd class="col-sm-8">@item.PharmacistID</dd>
+                        <dd class="col-sm-8">
+                            @(item.Pharmacist?.ApplicationUser != null
+                                ? item.Pharmacist.ApplicationUser.Name + " " + item.Pharmacist.ApplicationUser.Surname
+                                : "Unknown")
+                        </dd>
                     </dl>
+
+
+                    <a asp-controller="PharmacyManager" asp-action="EditPharmacyInfo" asp-route-id="@item.PharmacyID" class="btn btn-primary mt-3">
+                        Edit Information
+                    </a>
+
                 }
             }
             else
@@ -66,9 +78,7 @@
                 <p class="text-muted">No pharmacy information available.</p>
             }
 
-            <a asp-controller="PharmacyManager" asp-action="EditPharmacyInfo" class="btn btn-primary mt-3">
-                Edit Information
-            </a>
+        
         </div>
     </div>
 </div>

@@ -1,14 +1,12 @@
-﻿@{
+﻿@model IEnumerable<IbhayiPharmacy.Models.Medication>
+
+@{
     ViewData["Title"] = "Stock Management";
     Layout = "~/Views/Shared/_ManagerLayout.cshtml";
-
 }
 
-
-<div class="container ">
-     
-
-    <!-- Search or Filter (optional future feature) -->
+<div class="container">
+    <!-- Search / Header -->
     <div class="card p-3 mb-4">
         <h5 class="title-underline">Stock Management</h5>
         <input type="text" class="form-control" placeholder="Search medication...">
@@ -17,11 +15,10 @@
     <!-- Stock Table -->
     <div class="card p-3">
         <h6 class="title-underline">Medication Stock Levels</h6>
-       
-        <table class="table table-hover table-borderless">
-            <thead class="table-light" style=" color: #2c3e50;">
+
+        <table class="table table-hover table-borderless align-middle">
+            <thead class="table-light" style="color: #2c3e50;">
                 <tr>
-                        
                     <th>Medication</th>
                     <th>Dosage Form</th>
                     <th>Quantity on Hand</th>
@@ -32,57 +29,29 @@
                 </tr>
             </thead>
             <tbody>
-                @* Dummy data *@
-                <tr>
-                       
-                    <td>Panado</td>
-                    <td>Tablet</td>
-                    <td>120</td>
-                    <td>15</td>
-                    <td style="width: 120px;">
-                        <input type="number" class="form-control form-control-sm" placeholder="e.g. 150">
-                    </td>
-                    <td style="width: 120px;">
-                        <input type="number" class="form-control form-control-sm" placeholder="e.g. 20">
-                    </td>
-                    <td>
-                        <button class="btn btn-sm btn-success me-2">Apply</button>
-                    </td>
-                </tr>
-                <tr>
-                        
-                    <td>Myprodol</td>
-                    <td>Capsule</td>
-                    <td>60</td>
-                    <td>25</td>
-                    <td>
-                        <input type="number" class="form-control form-control-sm" placeholder="e.g. 80">
-                    </td>
-                    <td>
-                        <input type="number" class="form-control form-control-sm" placeholder="e.g. 10">
-                    </td>
-                    <td>
-                        <button class="btn btn-sm btn-success me-2">Apply</button>
-                    </td>
-                </tr>
-                <tr>
-                        
-                    <td>Allergex</td>
-                    <td>Syrup</td>
-                    <td>35</td>
-                    <td>10</td>
-                    <td>
-                        <input type="number" class="form-control form-control-sm" placeholder="e.g. 40">
-                    </td>
-                    <td>
-                        <input type="number" class="form-control form-control-sm" placeholder="e.g. 5">
-                    </td>
-                    <td>
-                        <button class="btn btn-sm btn-success me-2">Apply</button>
-                    </td>
-                </tr>
+                @foreach (var med in Model)
+                {
+                    <tr>
+                        <td>@med.MedicationName</td>
+                        <td>@med.DosageForm?.DosageFormName</td>
+                        <td>@med.QuantityOnHand</td>
+                        <td>@med.ReOrderLevel</td>
+                        <td style="width: 120px;">
+                            <input type="number" class="form-control form-control-sm" name="NewStock_@med.MedcationID" placeholder="e.g. 150">
+                        </td>
+                        <td style="width: 120px;">
+                            <input type="number" class="form-control form-control-sm" name="Increment_@med.MedcationID" placeholder="e.g. 20">
+                        </td>
+                        <td>
+                            <form asp-action="UpdateStock" method="post" class="d-inline">
+                                <input type="hidden" name="id" value="@med.MedcationID" />
+                                <input type="hidden" name="newStock" value="" />
+                                <button type="submit" class="btn btn-sm btn-success">Apply</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
             </tbody>
         </table>
-     
     </div>
 </div>

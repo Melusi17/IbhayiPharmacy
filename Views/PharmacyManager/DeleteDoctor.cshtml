@@ -1,0 +1,16 @@
+﻿@model IbhayiPharmacy.Models.Doctor
+@{
+    ViewData["Title"] = "Delete Doctor";
+    Layout = "~/Views/Shared/_ManagerLayout.cshtml";
+}
+
+<div class="card p-3">
+    <h5 class="title-underline">Delete Doctor</h5>
+    <p>Are you sure you want to delete <strong>@Model.Name @Model.Surname</strong>?</p>
+
+    <form asp-action="DeleteConfirmed" method="post">
+        <input type="hidden" asp-for="DoctorID" />
+        <button type="submit"  class="btn btn-danger">Delete</button>
+        <a asp-action="ManageDoctor" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>

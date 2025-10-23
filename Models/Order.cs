@@ -31,4 +31,9 @@ namespace IbhayiPharmacy.Models
         // Add this navigation property
         public virtual ICollection<OrderLine> OrderLines { get; set; } = new List<OrderLine>();
     }
+    public class OrderViewModel
+    {
+        public Order Order { get; set; }
+        public List<OrderLine> OrderLines { get; set; } = new List<OrderLine>();
+    }
 }
