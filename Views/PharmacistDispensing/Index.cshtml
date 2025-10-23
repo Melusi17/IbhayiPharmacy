@@ -181,10 +181,6 @@
                 border-left-color: #f39c12;
             }
 
-            .stat-card.ready {
-                border-left-color: #27ae60;
-            }
-
             .stat-card.waiting {
                 border-left-color: #e74c3c;
             }
@@ -332,11 +328,6 @@
             color: #856404;
         }
 
-        .status-ready {
-            background: #d1ecf1;
-            color: #0c5460;
-        }
-
         .status-waiting {
             background: #f8d7da;
             color: #721c24;
@@ -446,18 +437,18 @@
 </head>
 <body>
     <!-- SIDEBAR -->
-    <div class="sidebar">
+    <div class="sidebar" id="sidebar">
+        <button class="toggle-sidebar" onclick="toggleSidebar()">
+            <i class="fas fa-chevron-left" id="sidebarIcon"></i>
+        </button>
         <div class="sidebar-header">
-            <h2><i class="fas fa-prescription-bottle-alt"></i> Pharmacist Panel</h2>
-            <button class="toggle-sidebar" onclick="toggleSidebar()">
-                <i class="fas fa-chevron-left"></i>
-            </button>
+            <h2><i class="fas fa-prescription-bottle-alt"></i> <span>Pharmacist Panel</span></h2>
             <small style="color: #bdc3c7;">Dedicated Dictionary</small>
         </div>
         <nav class="sidebar-nav">
-            <a href="#"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <a href="@Url.Action("Index", "PharmacistDispensing")"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
             <a href="LoadPrescriptions.html"><i class="fas fa-tachometer-alt"></i> Walk In Prescription</a>
-            <a href="#" class="active"><i class="fas fa-clipboard-list"></i> Orders</a>
+            <a href="@Url.Action("Index", "PharmacistDispensing")"><i class="fas fa-clipboard-list"></i> Orders</a>
             <a href="unprocessedScripts.html"><i class="fas fa-file-prescription"></i> Unprocessed Scritps</a>
             <a href="processedScripts.html"><i class="fas fa-boxes"></i> Processed Scripts</a>
             <a href="TrackOrders.html"><i class="fas fa-boxes"></i> Track Orders</a>
@@ -470,7 +461,7 @@
 
     <!-- TOPBAR -->
     <div class="topbar">
-        <span>Orders Management</span>
+        <span>Active Orders - Require Processing</span>
         <div>Welcome, <strong>Pharmacist</strong></div>
     </div>
 
@@ -502,10 +493,6 @@
                 <div class="stat-number">@Model.PendingOrders.Count</div>
                 <div class="stat-label">Pending Orders</div>
             </div>
-            <div class="stat-card ready">
-                <div class="stat-number">@Model.ReadyForCollection.Count</div>
-                <div class="stat-label">Ready for Collection</div>
-            </div>
             <div class="stat-card waiting">
                 <div class="stat-number">@Model.WaitingCustomerAction.Count</div>
                 <div class="stat-label">Waiting Customer Action</div>
@@ -527,14 +514,13 @@
         <!-- PATIENT CARDS -->
         <div class="patient-cards" id="patientCards">
             @{
-                // Create a list of all orders from all status categories
-                var allOrders = Model.PendingOrders
-                .Concat(Model.ReadyForCollection)
+                // Create a list of only active orders that need processing
+                var activeOrders = Model.PendingOrders
                 .Concat(Model.WaitingCustomerAction)
                 .ToList();
 
                 // Group orders by customer
-                var patientsGrouped = allOrders
+                var patientsGrouped = activeOrders
                 .GroupBy(o => o.CustomerID)
                 .Select(g => new
                 {
@@ -597,7 +583,7 @@
         <!-- NO RESULTS MESSAGE (HIDDEN BY DEFAULT) -->
         <div class="no-results" id="noResults" style="display: none;">
             <i class="fas fa-search" style="font-size: 24px; margin-bottom: 10px;"></i>
-            <p>No orders found</p>
+            <p>No active orders requiring processing</p>
         </div>
     </div>
 
@@ -659,7 +645,7 @@
             // Add active class to clicked card
             patientCard.classList.add('active');
 
-            document.getElementById('selectedPatientName').textContent = `Orders for ${patientName}`;
+            document.getElementById('selectedPatientName').textContent = `Active Orders for ${patientName}`;
 
             // Get orders from hidden data
             const orderItems = patientCard.querySelectorAll('.order-item');
@@ -679,7 +665,7 @@
                 tableBody.innerHTML = `
                     <tr>
                         <td colspan="5" style="text-align: center; color: #95a5a6; font-style: italic;">
-                            No orders found for this patient
+                            No active orders found for this patient
                         </td>
                     </tr>
                 `;
@@ -694,9 +680,7 @@
                     let statusClass = 'status-ordered';
                     let statusText = order.status;
 
-                    if (order.status === 'Ready for Collection') {
-                        statusClass = 'status-ready';
-                    } else if (order.status === 'Waiting Customer Action') {
+                    if (order.status === 'Waiting Customer Action') {
                         statusClass = 'status-waiting';
                     } else if (order.status === 'Ordered') {
                         statusClass = 'status-ordered';

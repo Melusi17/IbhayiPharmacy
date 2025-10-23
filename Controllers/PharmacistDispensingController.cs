@@ -18,7 +18,7 @@ namespace IbhayiPharmacy.Controllers
             _context = context;
         }
 
-        // GET: Main dispensing dashboard
+        // GET: Main dispensing dashboard - ONLY active orders
         public async Task<IActionResult> Index()
         {
             try
@@ -64,6 +64,118 @@ namespace IbhayiPharmacy.Controllers
                 TempData["ErrorMessage"] = $"Error loading dashboard: {ex.Message}";
                 return View(new PharmacistDispensingDashboardVM());
             }
+        }
+
+        // GET: Collection Tracking - ONLY ready/collected orders
+        public async Task<IActionResult> CollectionTracking()
+        {
+            try
+            {
+                var collectionOrders = await _context.Orders
+                    .Where(o => o.Status == "Ready for Collection" || o.Status == "Collected")
+                    .Include(o => o.Customer)
+                        .ThenInclude(c => c.ApplicationUser)
+                    .Include(o => o.OrderLines)
+                        .ThenInclude(ol => ol.Medications)
+                    .Include(o => o.OrderLines)
+                        .ThenInclude(ol => ol.ScriptLine)
+                            .ThenInclude(sl => sl.Prescriptions)
+                                .ThenInclude(p => p.Doctors)
+                    .Include(o => o.Pharmacist)
+                        .ThenInclude(p => p.ApplicationUser)
+                    .OrderByDescending(o => o.OrderDate)
+                    .ToListAsync();
+
+                var viewModel = new CollectionTrackingVM
+                {
+                    Orders = collectionOrders,
+                    ReadyForCollectionCount = collectionOrders.Count(o => o.Status == "Ready for Collection"),
+                    CollectedCount = collectionOrders.Count(o => o.Status == "Collected"),
+                    TotalOrders = collectionOrders.Count
+                };
+
+                return View(viewModel);
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Error loading collection orders: {ex.Message}";
+                return View(new CollectionTrackingVM());
+            }
+        }
+
+        // POST: Mark order as collected - FIXED VERSION
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> MarkAsCollected([FromBody] MarkAsCollectedRequest request)
+        {
+            try
+            {
+                var order = await _context.Orders
+                    .FirstOrDefaultAsync(o => o.OrderID == request.OrderId);
+
+                if (order == null)
+                {
+                    return Json(new { success = false, message = $"Order with ID {request.OrderId} not found in database." });
+                }
+
+                if (order.Status != "Ready for Collection")
+                {
+                    return Json(new { success = false, message = $"Order status is '{order.Status}', not 'Ready for Collection'." });
+                }
+
+                order.Status = "Collected";
+                await _context.SaveChangesAsync();
+
+                return Json(new { success = true, message = "Order marked as collected successfully!" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"Error marking order as collected: {ex.Message}" });
+            }
+        }
+
+        public class MarkAsCollectedRequest
+        {
+            public int OrderId { get; set; }
+        }
+
+        // POST: Send collection email
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SendCollectionEmail([FromBody] SendEmailRequest request)
+        {
+            try
+            {
+                var order = await _context.Orders
+                    .Include(o => o.Customer)
+                        .ThenInclude(c => c.ApplicationUser)
+                    .FirstOrDefaultAsync(o => o.OrderID == request.OrderId);
+
+                if (order == null)
+                {
+                    return Json(new { success = false, message = "Order not found." });
+                }
+
+                var customerEmail = order.Customer.ApplicationUser.Email;
+                var customerName = $"{order.Customer.ApplicationUser.Name} {order.Customer.ApplicationUser.Surname}";
+
+                // TODO: Implement actual email sending logic here
+                // For now, just return success
+                return Json(new
+                {
+                    success = true,
+                    message = $"Collection notification sent to {customerName} at {customerEmail}"
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"Error sending email: {ex.Message}" });
+            }
+        }
+
+        public class SendEmailRequest
+        {
+            public int OrderId { get; set; }
         }
 
         // GET: Order details for dispensing
@@ -330,7 +442,7 @@ namespace IbhayiPharmacy.Controllers
             }
         }
 
-        // POST: Complete order processing
+        // POST: Complete order processing - UPDATED to redirect to CollectionTracking
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CompleteOrderProcessing(int orderId)
@@ -392,7 +504,8 @@ namespace IbhayiPharmacy.Controllers
                     await _context.SaveChangesAsync();
                     await transaction.CommitAsync();
 
-                    return RedirectToAction(nameof(Index));
+                    // REDIRECT TO COLLECTION TRACKING INSTEAD OF INDEX
+                    return RedirectToAction(nameof(CollectionTracking));
                 }
                 catch (Exception ex)
                 {

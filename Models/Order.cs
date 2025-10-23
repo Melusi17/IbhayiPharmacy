@@ -36,4 +36,9 @@ namespace IbhayiPharmacy.Models
         public virtual ICollection<OrderLine> OrderLines { get; set; } = new List<OrderLine>();
         public virtual ICollection<Doctor> Doctors { get; set; } = new List<Doctor>();
     }
+    public class OrderViewModel
+    {
+        public Order Order { get; set; }
+        public List<OrderLine> OrderLines { get; set; } = new List<OrderLine>();
+    }
 }
