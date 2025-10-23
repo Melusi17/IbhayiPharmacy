@@ -1,0 +1,42 @@
+﻿@using IbhayiPharmacy.Models.PharmacistVM
+@model PrescriptionReportVM
+
+<div class="preview-table">
+    @if (!Model.Groups.Any())
+    {
+        <p>No records found for the selected date range.</p>
+    }
+    else
+    {
+        foreach (var group in Model.Groups)
+        {
+            <h5>@Model.GroupBy: @group.GroupName</h5>
+            <table class="table table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Medication</th>
+                        <th>Quantity</th>
+                        <th>Repeats</th>
+                        <th>Doctor</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in group.Records)
+                    {
+                        <tr>
+                            <td>@item.Date.ToString("yyyy-MM-dd")</td>
+                            <td>@item.Medication</td>
+                            <td>@item.Quantity</td>
+                            <td>@item.Repeats</td>
+                            <td>@(Model.GroupBy == "Doctor" ? item.Instructions : item.DoctorName)</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <p><strong>Sub-total: @group.Subtotal</strong></p>
+            <hr />
+        }
+        <h5>Grand Total: @Model.GrandTotal</h5>
+    }
+</div>
