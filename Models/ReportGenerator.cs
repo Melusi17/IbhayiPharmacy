@@ -1,7 +1,7 @@
-﻿using IbhayiPharmacy.Models.PharmacistVM;
-using iTextSharp.text;
+﻿using iTextSharp.text;
 using iTextSharp.text.pdf;
 using System.IO;
+using IbhayiPharmacy.Models.PharmacistVM;
 
 public static class ReportGenerator
 {
@@ -15,42 +15,85 @@ public static class ReportGenerator
         doc.Open();
 
         var titleFont = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 16);
-        var textFont = FontFactory.GetFont(FontFactory.HELVETICA, 11);
+        var headerFont = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 12);
+        var textFont = FontFactory.GetFont(FontFactory.HELVETICA, 10);
+        var boldFont = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 10);
 
-        doc.Add(new Paragraph("DISPENSED PRESCRIPTIONS REPORT", titleFont));
-        doc.Add(new Paragraph($"{report.StartDate:d} – {report.EndDate:d}", textFont));
-        doc.Add(Chunk.NEWLINE);
+        // Title and Date Range
+        var title = new Paragraph("DISPENSED PRESCRIPTIONS REPORT", titleFont)
+        {
+            Alignment = Element.ALIGN_CENTER,
+            SpacingAfter = 10f
+        };
+        doc.Add(title);
+
+        var dateRange = new Paragraph($"{report.StartDate:dd/MM/yyyy} – {report.EndDate:dd/MM/yyyy}", textFont)
+        {
+            Alignment = Element.ALIGN_CENTER,
+            SpacingAfter = 20f
+        };
+        doc.Add(dateRange);
 
         foreach (var group in report.Groups)
         {
-            doc.Add(new Paragraph($"{report.GroupBy.ToUpper()}: {group.GroupName}", titleFont));
-            doc.Add(Chunk.NEWLINE);
+            // Group Header
+            var groupHeader = new Paragraph($"{report.GroupBy.ToUpper()}: {group.GroupName}", headerFont)
+            {
+                SpacingAfter = 10f
+            };
+            doc.Add(groupHeader);
 
-            PdfPTable table = new PdfPTable(5);
+            // Create table with 4 columns
+            PdfPTable table = new PdfPTable(4);
             table.WidthPercentage = 100;
-            table.SetWidths(new float[] { 15, 30, 10, 10, 35 }); // Adjust column widths
+            table.SetWidths(new float[] { 25, 45, 15, 15 });
 
-            table.AddCell("Date");
-            table.AddCell("Medication");
-            table.AddCell("Qty");
-            table.AddCell("Repeats");
-            table.AddCell("Instructions / Doctor");
+            // Table headers
+            table.AddCell(new PdfPCell(new Phrase("Date", boldFont)) { Padding = 5 });
+            table.AddCell(new PdfPCell(new Phrase("Medication", boldFont)) { Padding = 5 });
+            table.AddCell(new PdfPCell(new Phrase("Qty", boldFont)) { Padding = 5 });
+            table.AddCell(new PdfPCell(new Phrase("Repeats", boldFont)) { Padding = 5 });
 
+            // Table rows
             foreach (var record in group.Records)
             {
-                table.AddCell(record.Date.ToString("yyyy-MM-dd"));
-                table.AddCell(record.Medication);
-                table.AddCell(record.Quantity.ToString());
-                table.AddCell(record.Repeats.ToString());
-                table.AddCell(report.GroupBy == "Doctor" ? record.Instructions : record.DoctorName);
+                table.AddCell(new PdfPCell(new Phrase(record.Date.ToString("yyyy-MM-dd"), textFont)) { Padding = 5 });
+                table.AddCell(new PdfPCell(new Phrase(record.Medication, textFont)) { Padding = 5 });
+                table.AddCell(new PdfPCell(new Phrase(record.Quantity.ToString(), textFont)) { Padding = 5 });
+                table.AddCell(new PdfPCell(new Phrase(record.Repeats.ToString(), textFont)) { Padding = 5 });
             }
 
             doc.Add(table);
-            doc.Add(new Paragraph($"Sub-total: {group.Subtotal}", textFont));
-            doc.Add(Chunk.NEWLINE);
+
+            // Subtotal
+            var subtotal = new Paragraph($"Sub-total: {group.Subtotal}", boldFont)
+            {
+                SpacingBefore = 10f,
+                SpacingAfter = 20f
+            };
+            doc.Add(subtotal);
         }
 
-        doc.Add(new Paragraph($"GRAND TOTAL: {report.GrandTotal}", titleFont));
+        // Grand Total
+        if (report.Groups.Count > 0)
+        {
+            var grandTotal = new Paragraph($"GRAND TOTAL: {report.GrandTotal}", titleFont)
+            {
+                SpacingBefore = 20f,
+                Alignment = Element.ALIGN_RIGHT
+            };
+            doc.Add(grandTotal);
+        }
+        else
+        {
+            var noData = new Paragraph("No data found for the selected period.", textFont)
+            {
+                Alignment = Element.ALIGN_CENTER,
+                SpacingBefore = 20f
+            };
+            doc.Add(noData);
+        }
+
         doc.Close();
         return ms.ToArray();
     }
@@ -67,10 +110,17 @@ public class PdfHeaderFooter : PdfPageEventHelper
 
     public override void OnEndPage(PdfWriter writer, Document document)
     {
-        PdfPTable footer = new PdfPTable(2);
+        var footerFont = FontFactory.GetFont(FontFactory.HELVETICA, 8);
+
+        var footer = new PdfPTable(1);
         footer.TotalWidth = document.PageSize.Width - document.LeftMargin - document.RightMargin;
-        footer.AddCell(new PdfPCell(new Phrase($"Generated: {_report.GeneratedOn:g}", FontFactory.GetFont(FontFactory.HELVETICA, 9))) { Border = 0 });
-        footer.AddCell(new PdfPCell(new Phrase($"Page {writer.PageNumber}", FontFactory.GetFont(FontFactory.HELVETICA, 9))) { Border = 0, HorizontalAlignment = Element.ALIGN_RIGHT });
-        footer.WriteSelectedRows(0, -1, document.LeftMargin, document.BottomMargin + 20, writer.DirectContent);
+
+        var cell = new PdfPCell(new Phrase($"Generated on: {DateTime.Now:dd/MM/yyyy HH:mm} | Page {writer.PageNumber}", footerFont));
+        cell.Border = 0;
+        cell.HorizontalAlignment = Element.ALIGN_CENTER;
+        cell.Padding = 5;
+
+        footer.AddCell(cell);
+        footer.WriteSelectedRows(0, -1, document.LeftMargin, document.BottomMargin, writer.DirectContent);
     }
 }

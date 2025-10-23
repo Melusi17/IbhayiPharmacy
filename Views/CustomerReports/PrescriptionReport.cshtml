@@ -1,37 +1,59 @@
-﻿@{
-    ViewData["Title"] = "Prescription Reports";
+﻿@model IbhayiPharmacy.Models.PharmacistVM.PrescriptionReportVM
+@{
+    ViewData["Title"] = "My Prescription Reports";
     Layout = "~/Views/Shared/CustomerLayout/_CustomerLayout.cshtml";
 }
 
 <div class="container mt-5">
     <div class="report-panel">
         <div class="report-header text-center">
-            <h2>Dispensed Prescription Report</h2>
-            <p class="text-muted">Review your data before generating the PDF.</p>
+            <h2>My Dispensed Prescription Report</h2>
+            <p class="text-muted">View and download your prescription history for any date range.</p>
         </div>
+
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                @TempData["Error"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
 
         <form id="reportForm" method="post" asp-action="GenerateReport">
             <div class="form-row">
                 <div class="form-group">
-                    <label for="startDate">Start Date</label>
-                    <input type="date" id="startDate" name="startDate" class="form-control" required />
+                    <label asp-for="StartDate" class="form-label"></label>
+                    <input asp-for="StartDate" type="date" class="form-control" required />
+                    <span asp-validation-for="StartDate" class="text-danger"></span>
                 </div>
                 <div class="form-group">
-                    <label for="endDate">End Date</label>
-                    <input type="date" id="endDate" name="endDate" class="form-control" required />
+                    <label asp-for="EndDate" class="form-label"></label>
+                    <input asp-for="EndDate" type="date" class="form-control" required />
+                    <span asp-validation-for="EndDate" class="text-danger"></span>
                 </div>
                 <div class="form-group">
-                    <label for="groupBy">Group By</label>
-                    <select id="groupBy" name="groupBy" class="form-control">
+                    <label asp-for="GroupBy" class="form-label"></label>
+                    <select asp-for="GroupBy" class="form-control">
                         <option value="Doctor">Doctor</option>
                         <option value="Medication">Medication</option>
                     </select>
+                    <span asp-validation-for="GroupBy" class="text-danger"></span>
                 </div>
             </div>
 
             <div class="form-actions">
-                <button type="button" class="btn-main" id="previewBtn">Preview Report</button>
-                <button type="submit" class="btn-main" id="downloadBtn" style="display:none;">Download PDF</button>
+                <button type="button" class="btn btn-preview" id="previewBtn">
+                    <div class="btn-content">
+                        <i class="fas fa-eye"></i>
+                        <span>Preview Report</span>
+                    </div>
+                </button>
+                <button type="submit" class="btn btn-download" id="downloadBtn" style="display:none;">
+                    <div class="btn-content">
+                        <i class="fas fa-download"></i>
+                        <span>Download PDF</span>
+                    </div>
+                </button>
             </div>
         </form>
 
@@ -79,7 +101,7 @@
         flex-direction: column;
     }
 
-    label {
+    .form-label {
         font-weight: 600;
         color: #22586A;
         margin-bottom: 6px;
@@ -102,70 +124,259 @@
     .form-actions {
         text-align: center;
         margin-top: 10px;
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        flex-wrap: wrap;
     }
 
-    .btn-main {
-        background-color: #1f9f77;
-        color: white;
-        border: none;
-        padding: 12px 26px;
+    /* Unified button styles */
+    .btn {
+        padding: 12px 30px;
         border-radius: 8px;
         font-size: 15px;
         font-weight: 600;
         cursor: pointer;
-        transition: background-color 0.3s ease, transform 0.2s ease;
-        margin-right: 10px;
+        transition: all 0.3s ease;
+        border: none;
+        min-width: 180px;
+        height: 48px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        text-decoration: none;
+        user-select: none;
+        position: relative;
     }
 
-        .btn-main:hover {
-            background-color: #28bf96;
-            transform: translateY(-1px);
+    /* Force perfect centering of all content */
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .btn i,
+        .btn span {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            line-height: 1;
+            vertical-align: middle;
         }
 
-    /* Subtle table preview styling */
-    .preview-table table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 15px;
-        font-size: 14px;
+        .btn i {
+            font-size: 16px;
+            width: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn span {
+            font-weight: 600;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+    /* Preview button */
+    .btn-preview {
+        background-color: #6c757d;
+        color: white;
     }
 
-    .preview-table th, .preview-table td {
-        border: 1px solid #ccc;
-        padding: 10px 12px;
-        text-align: left;
+        .btn-preview:hover {
+            background-color: #5a6268;
+            color: white;
+        }
+
+        .btn-preview:disabled {
+            background-color: #8b939b;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+    /* Download button */
+    .btn-download {
+        background-color: #1f9f77;
+        color: white;
     }
 
-    .preview-table th {
-        background-color: #e0f2f1;
-        color: #004d40;
+        .btn-download:hover {
+            background-color: #28bf96;
+            color: white;
+        }
+
+    /* Loading animation */
+    .fa-spinner {
+        animation: spin 1s linear infinite;
+    }
+
+    @@keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+    /* Preview table styling */
+    .preview-table {
+        margin-top: 20px;
+    }
+
+        .preview-table table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            font-size: 14px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .preview-table th {
+            background-color: #e0f2f1;
+            color: #004d40;
+            font-weight: 600;
+            padding: 12px;
+            border: 1px solid #b2dfdb;
+        }
+
+        .preview-table td {
+            padding: 10px 12px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .preview-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .preview-table tr:hover {
+            background-color: #e6f5f1;
+        }
+
+    .group-section {
+        margin-bottom: 30px;
+        padding: 15px;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        background-color: #fafafa;
+    }
+
+    .group-title {
+        color: #00796b;
         font-weight: 600;
+        margin-bottom: 15px;
+        padding-bottom: 8px;
+        border-bottom: 2px solid #b2dfdb;
     }
 
-    .preview-table tr:nth-child(even) {
-        background-color: #f9f9f9;
+    .subtotal {
+        color: #1f9f77;
+        font-size: 16px;
+        margin-top: 10px;
+        text-align: right;
     }
 
-    .preview-table tr:hover {
-        background-color: #e6f5f1;
+    .grand-total-section {
+        margin-top: 30px;
+        padding-top: 20px;
+        border-top: 3px double #1f9f77;
+    }
+
+    /* Responsive design */
+    @@media (max-width: 768px) {
+        .report-panel {
+            padding: 20px;
+            margin: 10px;
+        }
+
+        .form-row {
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .form-group {
+            min-width: 100%;
+        }
+
+        .form-actions {
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .btn {
+            min-width: 200px;
+            width: 100%;
+            max-width: 250px;
+        }
+    }
+
+    @@media (max-width: 480px) {
+        .btn {
+            min-width: 180px;
+            padding: 10px 20px;
+        }
+
+            .btn i {
+                font-size: 14px;
+            }
+
+            .btn span {
+                font-size: 14px;
+            }
     }
 </style>
 
 @section Scripts {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <script src="https://kit.fontawesome.com/your-fontawesome-kit.js"></script>
+    <partial name="_ValidationScriptsPartial" />
+
     <script>
         $(document).ready(function(){
+            // Set default dates if not set
+            if (!$('#StartDate').val()) {
+                $('#StartDate').val('@DateTime.Now.AddMonths(-1).ToString("yyyy-MM-dd")');
+            }
+            if (!$('#EndDate').val()) {
+                $('#EndDate').val('@DateTime.Now.ToString("yyyy-MM-dd")');
+            }
+
             $('#previewBtn').click(function(){
                 var data = {
-                    startDate: $('#startDate').val(),
-                    endDate: $('#endDate').val(),
-                    groupBy: $('#groupBy').val()
+                    startDate: $('#StartDate').val(),
+                    endDate: $('#EndDate').val(),
+                    groupBy: $('#GroupBy').val()
                 };
 
                 if(!data.startDate || !data.endDate){
                     alert('Please select both start and end dates.');
                     return;
                 }
+
+                if(new Date(data.startDate) > new Date(data.endDate)){
+                    alert('Start date cannot be after end date.');
+                    return;
+                }
+
+                var $previewBtn = $('#previewBtn');
+                var $icon = $previewBtn.find('i');
+                var $text = $previewBtn.find('span');
+
+                // Store original content
+                var originalIcon = $icon.attr('class');
+                var originalText = $text.text();
+
+                // Update to loading state
+                $icon.attr('class', 'fas fa-spinner fa-spin');
+                $text.text('Generating Preview...');
+                $previewBtn.prop('disabled', true);
 
                 $.ajax({
                     url: '@Url.Action("PreviewReport")',
@@ -174,11 +385,28 @@
                     success: function(result){
                         $('#previewContainer').html(result);
                         $('#downloadBtn').show();
+
+                        // Restore original content
+                        $icon.attr('class', originalIcon);
+                        $text.text(originalText);
+                        $previewBtn.prop('disabled', false);
                     },
-                    error: function(){
-                        alert('Failed to load preview. Try again.');
+                    error: function(xhr, status, error){
+                        alert('Failed to load preview. Please try again.');
+
+                        // Restore original content
+                        $icon.attr('class', originalIcon);
+                        $text.text(originalText);
+                        $previewBtn.prop('disabled', false);
+                        console.error('Preview error:', error);
                     }
                 });
+            });
+
+            // Clear preview when form inputs change
+            $('#StartDate, #EndDate, #GroupBy').change(function(){
+                $('#previewContainer').empty();
+                $('#downloadBtn').hide();
             });
         });
     </script>
