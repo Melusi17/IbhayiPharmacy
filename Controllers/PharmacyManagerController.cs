@@ -539,7 +539,7 @@ namespace PharmMan.Controllers
             _db.SaveChanges();
             return RedirectToAction("StockManagement");
         }
-        [HttpGet]
+       
         public IActionResult Reports()
         {
             var model = new MedicationReportVM
@@ -549,76 +549,8 @@ namespace PharmMan.Controllers
             };
             return View(model);
         }
-            [HttpPost]
-        public IActionResult Reports(string groupBy)
-        {
-            var medications = _db.Medications
-                .Include(m => m.Supplier)
-                .Include(m => m.DosageForm)
-                .ToList();
-
-            var model = new MedicationReportVM
-            {
-                GroupBy = groupBy
-            };
-
-            if (string.IsNullOrEmpty(groupBy))
-            {
-                model.Groups.Add(new MedicationGroup
-                {
-                    GroupName = "All Medications",
-                    Medications = medications
-                });
-            }
-            else
-            {
-                switch (groupBy.ToLower())
-                {
-                    case "dosageform":
-                        model.Groups = medications
-                            .GroupBy(m => m.DosageForm.DosageFormName)
-                            .Select(g => new MedicationGroup
-                            {
-                                GroupName = g.Key,
-                                Medications = g.ToList()
-                            })
-                            .ToList();
-                        break;
-
-                    case "schedule":
-                        model.Groups = medications
-                            .GroupBy(m => m.Schedule)
-                            .Select(g => new MedicationGroup
-                            {
-                                GroupName = g.Key,
-                                Medications = g.ToList()
-                            })
-                            .ToList();
-                        break;
-
-                    case "supplier":
-                        model.Groups = medications
-                            .GroupBy(m => m.Supplier.SupplierName)
-                            .Select(g => new MedicationGroup
-                            {
-                                GroupName = g.Key,
-                                Medications = g.ToList()
-                            })
-                            .ToList();
-                        break;
-
-                    default:
-                        model.Groups.Add(new MedicationGroup
-                        {
-                            GroupName = "All Medications",
-                            Medications = medications
-                        });
-                        break;
-                }
-            }
-
-            return View(model);
-        }
+           
+       
 
     }
 }
