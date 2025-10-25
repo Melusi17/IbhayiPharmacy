@@ -1,4 +1,5 @@
-﻿@model IEnumerable<Order>
+﻿@model IEnumerable<IbhayiPharmacy.Models.PharmacyManagerVM.StockOrderVM>
+
 @{
     ViewData["Title"] = "Manage Orders";
     Layout = "~/Views/Shared/_ManagerLayout.cshtml";
@@ -15,35 +16,37 @@
                         <th>Supplier</th>
                         <th>Medication</th>
                         <th>Quantity</th>
-                        <th>Order Status</th>
+                        <th>Status</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach (var order in Model)
                     {
-                        // Group order lines by supplier
-                        var supplierGroups = order.OrderLines.GroupBy(ol => ol.Medications.Supplier.SupplierName);
+                        // Group by supplier name
+                        var supplierGroups = order.OrderLines
+                        .GroupBy(ol => ol.Medication.Supplier.SupplierName);
 
                         foreach (var group in supplierGroups)
                         {
                             var lineCount = group.Count();
-                            var firstLine = group.First();
+                            bool first = true;
 
-                            bool isFirst = true;
                             foreach (var line in group)
                             {
                                 <tr>
-                                    @if (isFirst)
+                                    @if (first)
                                     {
-                                        <td rowspan="@lineCount">@order.OrderDate.ToShortDateString()</td>
+                                        <td rowspan="@lineCount">@order.StockOrder.OrderDate.ToShortDateString()</td>
                                         <td rowspan="@lineCount">@group.Key</td>
                                     }
-                                    <td>@line.Medications.MedicationName</td>
-                                    <td>@line.Quantity</td>
-                                    @if (isFirst)
+
+                                    <td>@line.Medication.MedicationName</td>
+                                    <td>@line.OrderQuantity</td>
+
+                                    @if (first)
                                     {
-                                        <td rowspan="@lineCount">@order.Status</td>
-                                        isFirst = false;
+                                        <td rowspan="@lineCount">@order.StockOrder.Status</td>
+                                        first = false;
                                     }
                                 </tr>
                             }

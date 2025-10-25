@@ -4,6 +4,10 @@ using IbhayiPharmacy.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Identity;
+using IbhayiPharmacy.Models.PharmacyManagerVM;
+using Microsoft.Extensions.Options;
+ 
+ 
 
 
 namespace PharmMan.Controllers
@@ -12,9 +16,11 @@ namespace PharmMan.Controllers
     {
         private readonly ApplicationDbContext _db;
         private readonly UserManager<ApplicationUser> _userManager;
-        public PharmacyManagerController(ApplicationDbContext db)
+        private readonly EmailService _email;
+        public PharmacyManagerController(ApplicationDbContext db, IOptions<SmtpSettings> smtpSettings, EmailService email)
         {
             _db = db;
+            _email = email;
         }
 
         public IActionResult Index()
@@ -230,7 +236,7 @@ namespace PharmMan.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult AddMedication(Medication med, List<MedicationIngredientVM> Ingredients)
         {
-            if (ModelState.IsValid)
+            if (med != null)
             {
                 foreach (var ing in Ingredients)
                 {
@@ -406,13 +412,17 @@ namespace PharmMan.Controllers
         public IActionResult ManageOrders()
         {
             // Include customer, pharmacist, and order lines with medications & suppliers
-            var orders = _db.Orders
-                .Include(o => o.OrderLines)
-                    .ThenInclude(ol => ol.Medications)
-                        .ThenInclude(m => m.Supplier)
-                .Include(o => o.Customer)
-                .OrderByDescending(o => o.OrderDate)
-                .ToList();
+            var orders = _db.StockOrders
+        .Select(o => new StockOrderVM
+        {
+            StockOrder = o,
+            OrderLines = _db.StockOrderDetails
+                .Where(d => d.StockOrderID == o.StockOrderID)
+                .Include(d => d.Medication)
+                .ThenInclude(m => m.Supplier)
+                .ToList()
+        })
+        .ToList();
 
             return View(orders);
         }
@@ -433,37 +443,78 @@ namespace PharmMan.Controllers
         {
             ViewBag.Suppliers = _db.Suppliers.ToList();
             ViewBag.Medications = _db.Medications.ToList();
-
             return View();
         }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Orders(Order order, List<OrderLine> OrderLines)
+        public IActionResult Orders(StockOrderVM order)
         {
-            order.OrderDate = DateTime.Now;
-            order.Status = "Ordered";
-            if (ModelState.IsValid)
+            ViewBag.Suppliers = _db.Suppliers.ToList();
+            ViewBag.Medications = _db.Medications.ToList();
+
+            if (order.OrderLines == null || !order.OrderLines.Any())
             {
-                foreach (var line in OrderLines)
-                {
-                    if (line.MedicationID != 0 && line.Quantity > 0)
-                        order.OrderLines.Add(line);
-                }
-
-                order.OrderDate = DateTime.Now;
-                order.Status = "Ordered";
-                order.OrderNumber = $"ORD-{DateTime.Now:yyyyMMdd}-{Guid.NewGuid().ToString().Substring(0, 4)}";
-
-                _db.Orders.Add(order);
-                _db.SaveChanges();
-                return RedirectToAction("ManageOrders");
+                ModelState.AddModelError("", "Please add at least one medication.");
             }
 
-            ViewBag.Customers = new SelectList(_db.Customers, "CustomerID", "FullName");
-            ViewBag.Pharmacists = new SelectList(_db.Pharmacists, "PharmacistID", "FullName");
-            ViewBag.Medications = _db.Medications.ToList();
-            return View(order);
+          
+       
+            order.StockOrder.OrderDate = DateTime.Now;
+            order.StockOrder.Status = "Ordered";
+
+            _db.StockOrders.Add(order.StockOrder);
+            _db.SaveChanges();
+
+            foreach (var line in order.OrderLines)
+            {
+                if (line.MedicationID != 0 && line.OrderQuantity > 0)
+                {
+                    line.StockOrderID = order.StockOrder.StockOrderID;
+                    _db.StockOrderDetails.Add(line);
+                }
+            }
+
+
+            var supplier = _db.Suppliers
+        .FirstOrDefault(s => s.SupplierID == order.StockOrder.SupplierID);
+
+            if (supplier != null && !string.IsNullOrEmpty(supplier.EmailAddress))
+            {
+                var receiver = supplier.EmailAddress; // ✅ use the email address
+                var subject = "Medication Order";
+
+                 
+
+
+                var message = "<h3>New Medication Order</h3>";
+                message += $"<p>Dear {supplier.SupplierName},</p>";
+                message += "<p>The following medications have been ordered:</p>";
+                message += "<ul>";
+
+                // Loop through medications
+                foreach (var line in order.OrderLines)
+                {
+                    var medication = _db.Medications.FirstOrDefault(m => m.MedcationID == line.MedicationID);
+                    if (medication != null)
+                    {
+                        message += $"<li>{medication.MedicationName} - Quantity: {line.OrderQuantity}</li>";
+                    }
+                }
+                message += "</ul>";
+                message += "<p>Please confirm and prepare the order for delivery.</p>";
+                message += "<p>Kind regards,<br/>Ibhayi Pharmacy</p>";
+
+                 _email.SendEmailAsync(receiver, subject, message);
+            }
+
+             
+
+            _db.SaveChanges();
+
+            return RedirectToAction("ManageOrders");
         }
+
 
         public IActionResult StockManagement()
         {
