@@ -19,6 +19,10 @@ namespace IbhayiPharmacy.Models
         [ValidateNever]
         public Pharmacist Pharmacist { get; set; } = null!;
 
+        public int? DoctorID { get; set; }
+        [ValidateNever]
+        public Doctor Doctor { get; set; } = null!;
+
         public string? OrderNumber { get; set; }//(e.g., "ORD-20251001-001")
         public DateTime OrderDate { get; set; }
 
@@ -30,6 +34,7 @@ namespace IbhayiPharmacy.Models
 
         // Add this navigation property
         public virtual ICollection<OrderLine> OrderLines { get; set; } = new List<OrderLine>();
+        public virtual ICollection<Doctor> Doctors { get; set; } = new List<Doctor>();
     }
     public class OrderViewModel
     {

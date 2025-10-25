@@ -4,6 +4,7 @@ using IbhayiPharmacy.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace IbhayiPharmacy.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251021082456_add3")]
+    partial class add3
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -967,6 +970,9 @@ namespace IbhayiPharmacy.Migrations
                     b.Property<int>("PharmacistID")
                         .HasColumnType("int");
 
+                    b.Property<int>("PharmacyManagerID")
+                        .HasColumnType("int");
+
                     b.Property<string>("PhoneNumber")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -976,8 +982,6 @@ namespace IbhayiPharmacy.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("PharmacyID");
-
-                    b.HasIndex("PharmacistID");
 
                     b.ToTable("Pharmacies");
                 });
@@ -1144,15 +1148,8 @@ namespace IbhayiPharmacy.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("StockOrderID"));
 
-                    b.Property<int>("MedicationID")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("OrderDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<string>("Quantity")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -1652,17 +1649,6 @@ namespace IbhayiPharmacy.Migrations
                         .IsRequired();
 
                     b.Navigation("ApplicationUser");
-                });
-
-            modelBuilder.Entity("IbhayiPharmacy.Models.Pharmacy", b =>
-                {
-                    b.HasOne("IbhayiPharmacy.Models.Pharmacist", "Pharmacist")
-                        .WithMany()
-                        .HasForeignKey("PharmacistID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Pharmacist");
                 });
 
             modelBuilder.Entity("IbhayiPharmacy.Models.PharmacyManager", b =>

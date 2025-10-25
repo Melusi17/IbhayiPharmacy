@@ -24,7 +24,7 @@
                         <a asp-controller="Customer" asp-action="placeOrder" class="sidebar-button">🛒 Place Orders</a>
                         <a asp-controller="Customer" asp-action="trackOrder" class="sidebar-button">📦 Track Orders</a>
                         <a asp-controller="Customer" asp-action="manageRepeats" class="sidebar-button">🔁 Manage Repeats</a>
-                        <a asp-controller="Customer" asp-action="viewReports" class="sidebar-button">📄 View Reports</a>
+                        <a asp-controller="CustomerReports" asp-action="PrescriptionReport" class="sidebar-button">📄 View Reports</a>
                         <a asp-controller="Home" asp-action="Index"
                            class="sidebar-button"
                            onclick="return confirm('Are you sure you want to log out?');">
@@ -71,5 +71,7 @@
     </div>
 
     <script src="~/js/Customer/CustomerDashboard.js"></script>
+
+    @RenderSection("Scripts", required: false)
 </body>
 </html>

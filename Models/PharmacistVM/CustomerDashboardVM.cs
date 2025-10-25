@@ -1,4 +1,6 @@
-﻿namespace IbhayiPharmacy.Models.PharmacistVM
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace IbhayiPharmacy.Models.PharmacistVM
 {
     // View Models
     public class CustomerDashboardVM
@@ -63,5 +65,74 @@
         public string Status { get; set; } = "Pending";
         public string? RejectionReason { get; set; }
         public string DoctorName { get; set; } = string.Empty; // For the table display
+    }
+
+    //Reports
+
+    //public class PrescriptionReportVM
+    //{
+    //    public DateTime StartDate { get; set; }
+    //    public DateTime EndDate { get; set; }
+    //    public DateTime GeneratedOn { get; set; } = DateTime.Now;
+    //    public string GroupBy { get; set; } = "Doctor"; // "Doctor" or "Medication"
+    //    public List<ReportGroup> Groups { get; set; } = new();
+    //    public int GrandTotal { get; set; }
+    //}
+
+    //public class ReportGroup
+    //{
+    //    public string GroupName { get; set; } = string.Empty; // Doctor Name or Medication Name
+    //    public List<PrescriptionItemVM> Records { get; set; } = new();
+    //    public int Subtotal { get; set; }
+    //}
+
+    //public class PrescriptionItemVM
+    //{
+    //    public DateTime Date { get; set; }
+    //    public string Medication { get; set; } = string.Empty;
+    //    public int Quantity { get; set; }
+    //    public int Repeats { get; set; }
+    //    public string DoctorName { get; set; } = string.Empty;
+    //    public string Instructions { get; set; } = string.Empty;
+    //}
+
+
+    // Reports View Models
+    public class PrescriptionReportVM
+    {
+        [Required]
+        [Display(Name = "Start Date")]
+        public DateTime StartDate { get; set; } = DateTime.Now.AddMonths(-1);
+
+        [Required]
+        [Display(Name = "End Date")]
+        public DateTime EndDate { get; set; } = DateTime.Now;
+
+        public DateTime GeneratedOn { get; set; } = DateTime.Now;
+
+        [Required]
+        [Display(Name = "Group By")]
+        public string GroupBy { get; set; } = "Doctor"; // "Doctor" or "Medication"
+
+        public List<ReportGroup> Groups { get; set; } = new();
+        public int GrandTotal { get; set; }
+    }
+
+    public class ReportGroup
+    {
+        public string GroupName { get; set; } = string.Empty;
+        public List<PrescriptionItemVM> Records { get; set; } = new();
+        public int Subtotal { get; set; }
+    }
+
+    public class PrescriptionItemVM
+    {
+        public DateTime Date { get; set; }
+        public string Medication { get; set; } = string.Empty;
+        public int Quantity { get; set; }
+        public int Repeats { get; set; }
+        public string DoctorName { get; set; } = string.Empty;
+        public string Instructions { get; set; } = string.Empty;
+
     }
 }
