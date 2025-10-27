@@ -15,13 +15,16 @@
             <option value="Schedule" selected="@(Model.GroupBy == "Schedule")">Schedule</option>
             <option value="Supplier" selected="@(Model.GroupBy == "Supplier")">Supplier</option>
         </select>
-        <button type="submit" class="btn btn-primary ms-2">Filter</button>
+        <button type="submit" class="btn btn-primary ms-2">Generate</button>
     </form>
 
     <hr />
 
     @if (Model.Groups.Any())
     {
+        
+        int grandTotal = 0;
+
         foreach (var group in Model.Groups)
         {
             <div class="card mb-4 shadow-sm">
@@ -42,8 +45,13 @@
                             </tr>
                         </thead>
                         <tbody>
+                            @{
+                                int subtotal = 0;
+                            }
+
                             @foreach (var item in group.Medications)
                             {
+                                subtotal += item.QuantityOnHand;
                                 <tr>
                                     <td>@item.MedicationName</td>
                                     <td>@item.Schedule</td>
@@ -54,14 +62,31 @@
                                     <td>R @item.CurrentPrice</td>
                                 </tr>
                             }
+
+                            <tr class="fw-bold table-secondary">
+                                <td colspan="5" class="text-end">Sub-total:</td>
+                                <td>@subtotal</td>
+                                <td></td>
+                            </tr>
+
+                           
+                            @{
+                                grandTotal += subtotal;
+                            }
                         </tbody>
                     </table>
                 </div>
             </div>
         }
+
+        
+        <div class="text-end mt-3 fw-bold">
+            GRAND TOTAL: @grandTotal
+        </div>
     }
     else
     {
         <p>No medications found.</p>
     }
+
 </div>
