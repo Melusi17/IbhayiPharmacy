@@ -1144,15 +1144,8 @@ namespace IbhayiPharmacy.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("StockOrderID"));
 
-                    b.Property<int>("MedicationID")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("OrderDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<string>("Quantity")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -1184,6 +1177,8 @@ namespace IbhayiPharmacy.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("StockOrderDetail_ID");
+
+                    b.HasIndex("MedicationID");
 
                     b.ToTable("StockOrderDetails");
                 });
@@ -1523,7 +1518,7 @@ namespace IbhayiPharmacy.Migrations
                     b.HasOne("IbhayiPharmacy.Models.ApplicationUser", "ApplicationUser")
                         .WithMany()
                         .HasForeignKey("ApplicationUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("ApplicationUser");
@@ -1534,13 +1529,13 @@ namespace IbhayiPharmacy.Migrations
                     b.HasOne("IbhayiPharmacy.Models.Active_Ingredient", "Active_Ingredient")
                         .WithMany()
                         .HasForeignKey("Active_IngredientID")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("IbhayiPharmacy.Models.Customer", "Customer")
                         .WithMany("CustomerAllergies")
                         .HasForeignKey("CustomerID")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Active_Ingredient");
@@ -1560,13 +1555,13 @@ namespace IbhayiPharmacy.Migrations
                     b.HasOne("IbhayiPharmacy.Models.DosageForm", "DosageForm")
                         .WithMany()
                         .HasForeignKey("DosageFormID")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("IbhayiPharmacy.Models.Supplier", "Supplier")
                         .WithMany()
                         .HasForeignKey("SupplierID")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("DosageForm");
@@ -1579,13 +1574,13 @@ namespace IbhayiPharmacy.Migrations
                     b.HasOne("IbhayiPharmacy.Models.Active_Ingredient", "Active_Ingredients")
                         .WithMany()
                         .HasForeignKey("Active_IngredientID")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("IbhayiPharmacy.Models.Medication", "Medications")
                         .WithMany("Medication_Ingredients")
                         .HasForeignKey("MedicationID")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Active_Ingredients");
@@ -1598,7 +1593,7 @@ namespace IbhayiPharmacy.Migrations
                     b.HasOne("IbhayiPharmacy.Models.Customer", "Customer")
                         .WithMany()
                         .HasForeignKey("CustomerID")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("IbhayiPharmacy.Models.Doctor", "Doctor")
@@ -1621,19 +1616,19 @@ namespace IbhayiPharmacy.Migrations
                     b.HasOne("IbhayiPharmacy.Models.Medication", "Medications")
                         .WithMany()
                         .HasForeignKey("MedicationID")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("IbhayiPharmacy.Models.Order", "Order")
                         .WithMany("OrderLines")
                         .HasForeignKey("OrderID")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("IbhayiPharmacy.Models.ScriptLine", "ScriptLine")
                         .WithMany()
                         .HasForeignKey("ScriptLineID")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Medications");
@@ -1648,7 +1643,7 @@ namespace IbhayiPharmacy.Migrations
                     b.HasOne("IbhayiPharmacy.Models.ApplicationUser", "ApplicationUser")
                         .WithMany()
                         .HasForeignKey("ApplicationUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("ApplicationUser");
@@ -1659,7 +1654,7 @@ namespace IbhayiPharmacy.Migrations
                     b.HasOne("IbhayiPharmacy.Models.Pharmacist", "Pharmacist")
                         .WithMany()
                         .HasForeignKey("PharmacistID")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Pharmacist");
@@ -1670,7 +1665,7 @@ namespace IbhayiPharmacy.Migrations
                     b.HasOne("IbhayiPharmacy.Models.ApplicationUser", "ApplicationUser")
                         .WithMany()
                         .HasForeignKey("ApplicationUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("ApplicationUser");
@@ -1681,7 +1676,7 @@ namespace IbhayiPharmacy.Migrations
                     b.HasOne("IbhayiPharmacy.Models.Medication", "Medications")
                         .WithMany()
                         .HasForeignKey("MedicationID")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("IbhayiPharmacy.Models.NewScript", null)
@@ -1691,7 +1686,7 @@ namespace IbhayiPharmacy.Migrations
                     b.HasOne("IbhayiPharmacy.Models.Prescription", "Prescriptions")
                         .WithMany()
                         .HasForeignKey("PrescriptionID")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Medications");
@@ -1704,7 +1699,7 @@ namespace IbhayiPharmacy.Migrations
                     b.HasOne("IbhayiPharmacy.Models.ApplicationUser", "ApplicationUser")
                         .WithMany()
                         .HasForeignKey("ApplicationUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("IbhayiPharmacy.Models.Doctor", "Doctors")
@@ -1721,13 +1716,13 @@ namespace IbhayiPharmacy.Migrations
                     b.HasOne("IbhayiPharmacy.Models.Medication", "Medications")
                         .WithMany()
                         .HasForeignKey("MedicationID")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("IbhayiPharmacy.Models.Prescription", "Prescriptions")
                         .WithMany("scriptLines")
                         .HasForeignKey("PrescriptionID")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Medications");
@@ -1735,12 +1730,23 @@ namespace IbhayiPharmacy.Migrations
                     b.Navigation("Prescriptions");
                 });
 
+            modelBuilder.Entity("IbhayiPharmacy.Models.StockOrderDetail", b =>
+                {
+                    b.HasOne("IbhayiPharmacy.Models.Medication", "Medication")
+                        .WithMany()
+                        .HasForeignKey("MedicationID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Medication");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
 
@@ -1749,7 +1755,7 @@ namespace IbhayiPharmacy.Migrations
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
 
@@ -1758,7 +1764,7 @@ namespace IbhayiPharmacy.Migrations
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
 
@@ -1767,13 +1773,13 @@ namespace IbhayiPharmacy.Migrations
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
 
@@ -1782,7 +1788,7 @@ namespace IbhayiPharmacy.Migrations
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
 
