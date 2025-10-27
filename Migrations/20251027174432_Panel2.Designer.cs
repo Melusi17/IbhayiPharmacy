@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace IbhayiPharmacy.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251027085954_newDB")]
-    partial class newDB
+    [Migration("20251027174432_Panel2")]
+    partial class Panel2
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
