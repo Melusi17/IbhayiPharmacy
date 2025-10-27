@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 
 namespace IbhayiPharmacy.Utility
 {
-    public class EmailSender : IEmailSender
+    public class EmailSenders : IEmailSender
     {
         public Task SendEmailAsync(string email, string subject, string htmlMessage)
         {

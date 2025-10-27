@@ -16,6 +16,8 @@ namespace IbhayiPharmacy.Models
         [ValidateNever]
         public ApplicationUser ApplicationUser { get; set; }
 
+        
+
         [Required]
         public string HealthCouncilRegNo { get; set; }
         

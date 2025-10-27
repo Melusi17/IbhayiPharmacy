@@ -13,6 +13,7 @@ namespace IbhayiPharmacy.Models
 
         [ForeignKey("MedicationID")]
         public int MedicationID { get; set; }
+        public virtual Medication Medication { get; set; }
 
         [Required]
         public int OrderQuantity { get; set; }

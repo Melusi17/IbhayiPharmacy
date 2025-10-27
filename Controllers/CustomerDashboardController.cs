@@ -111,7 +111,6 @@ namespace IbhayiPharmacy.Controllers
                 return Json(new { success = false, message = $"Error uploading prescription: {ex.Message}" });
             }
         }
-
         // Download Prescription
         public async Task<IActionResult> DownloadPrescription(int id)
         {
@@ -184,11 +183,11 @@ namespace IbhayiPharmacy.Controllers
             return View(repeats);
         }
 
-        // View Reports Section
-        public IActionResult ViewReports()
-        {
-            return View();
-        }
+        //// View Reports Section
+        //public IActionResult ViewReports()
+        //{
+        //    return View();
+        //}
 
         // API: Get medications for a specific prescription
         [HttpGet]
@@ -506,6 +505,134 @@ namespace IbhayiPharmacy.Controllers
 
             TempData["SuccessMessage"] = "Profile updated successfully!";
             return RedirectToAction("Profile");
+        }
+
+
+
+        // API: Get prescription details for editing - FIXED ROUTE
+        [HttpGet]
+        [Route("CustomerDashboard/GetPrescriptionDetails")]
+        public async Task<JsonResult> GetPrescriptionDetails(int id)
+        {
+            try
+            {
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var prescription = await _context.Prescriptions
+                    .FirstOrDefaultAsync(p => p.PrescriptionID == id && p.ApplicationUserId == userId);
+
+                if (prescription == null)
+                {
+                    return Json(new { success = false, message = "Prescription not found" });
+                }
+
+                return Json(new
+                {
+                    success = true,
+                    prescriptionId = prescription.PrescriptionID,
+                    dateIssued = prescription.DateIssued.ToString("yyyy-MM-dd"),
+                    status = prescription.Status ?? "Unprocessed",
+                    dispenseUponApproval = prescription.DispenseUponApproval,
+                    fileName = $"Prescription_{prescription.PrescriptionID.ToString("D3")}.pdf"
+                });
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                Console.WriteLine($"Error loading prescription details: {ex.Message}");
+                return Json(new { success = false, message = $"Error loading prescription: {ex.Message}" });
+            }
+        }
+
+        // API: Update prescription document - FIXED ROUTE
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("CustomerDashboard/UpdatePrescriptionDocument")]
+        public async Task<JsonResult> UpdatePrescriptionDocument(int id, IFormFile file, bool dispenseUponApproval)
+        {
+            try
+            {
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var prescription = await _context.Prescriptions
+                    .FirstOrDefaultAsync(p => p.PrescriptionID == id && p.ApplicationUserId == userId);
+
+                if (prescription == null)
+                {
+                    return Json(new { success = false, message = "Prescription not found" });
+                }
+
+                if (file != null && file.Length > 0)
+                {
+                    // Validate file type
+                    var fileExtension = Path.GetExtension(file.FileName).ToLower();
+                    if (fileExtension != ".pdf")
+                    {
+                        return Json(new { success = false, message = "Only PDF files are allowed." });
+                    }
+
+                    // Validate file size (optional: limit to 10MB)
+                    if (file.Length > 10 * 1024 * 1024) // 10MB
+                    {
+                        return Json(new { success = false, message = "File size must be less than 10MB." });
+                    }
+
+                    // Update file
+                    using (var ms = new MemoryStream())
+                    {
+                        await file.CopyToAsync(ms);
+                        prescription.Script = ms.ToArray();
+                    }
+                }
+
+                // Update other properties
+                prescription.DispenseUponApproval = dispenseUponApproval;
+                prescription.DateIssued = DateTime.Now; // Update timestamp when modified
+
+                await _context.SaveChangesAsync();
+
+                return Json(new
+                {
+                    success = true,
+                    message = "Prescription updated successfully!",
+                    date = prescription.DateIssued.ToString("yyyy-MM-dd"),
+                    dispense = prescription.DispenseUponApproval ? "Yes" : "No"
+                });
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                Console.WriteLine($"Error updating prescription: {ex.Message}");
+                return Json(new { success = false, message = $"Error updating prescription: {ex.Message}" });
+            }
+        }
+
+        // API: Delete prescription - FIXED ROUTE
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("CustomerDashboard/DeletePrescription")]
+        public async Task<JsonResult> DeletePrescription(int id)
+        {
+            try
+            {
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var prescription = await _context.Prescriptions
+                    .FirstOrDefaultAsync(p => p.PrescriptionID == id && p.ApplicationUserId == userId);
+
+                if (prescription == null)
+                {
+                    return Json(new { success = false, message = "Prescription not found" });
+                }
+
+                _context.Prescriptions.Remove(prescription);
+                await _context.SaveChangesAsync();
+
+                return Json(new { success = true, message = "Prescription deleted successfully!" });
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                Console.WriteLine($"Error deleting prescription: {ex.Message}");
+                return Json(new { success = false, message = $"Error deleting prescription: {ex.Message}" });
+            }
         }
     }
 }
