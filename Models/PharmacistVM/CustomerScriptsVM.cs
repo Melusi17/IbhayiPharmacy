@@ -41,6 +41,8 @@ namespace IbhayiPharmacy.Models.PharmacistVM
         // UI helper for doctor validation
         [System.Text.Json.Serialization.JsonIgnore]
         public bool HasDoctor => DoctorId.HasValue && DoctorId > 0;
+
+        public bool IsDispenseUponApproval { get; set; }
     }
 
     public class ScriptLineVM

@@ -1,6 +1,6 @@
 ﻿@model IbhayiPharmacy.Models.PharmacistVM.CustomerScriptsVM
 @{
-    ViewData["Title"] = "Process Prescription";
+    ViewData["Title"] = "Process and Dispense Prescription";
     var medicationsList = ViewBag.Medications as List<IbhayiPharmacy.Models.Medication>;
     var doctorsList = ViewBag.Doctors as List<IbhayiPharmacy.Models.Doctor>;
 }
@@ -309,9 +309,13 @@
                 background: #c0392b;
             }
 
-        .btn-done {
+        .btn-dispense {
             background: #9b59b6;
         }
+
+            .btn-dispense:hover {
+                background: #8e44ad;
+            }
 
         /* ===== MEDICATION TABLE ===== */
         .medication-table-container {
@@ -780,11 +784,11 @@
         </div>
         <nav class="sidebar-nav">
             <a href="#"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
-            <a href="LoadPrescriptions.html"><i class="fas fa-tachometer-alt"></i> Walk In Prescription</a>
-            <a href="Orders.html"><i class="fas fa-clipboard-list"></i> Orders</a>
-            <a href="unprocessedScripts.html"><i class="fas fa-file-prescription"></i> Unprocessed Scripts</a>
-            <a href="processedScripts.html"><i class="fas fa-boxes"></i> Processed Scripts</a>
-            <a href="TrackOrders.html"><i class="fas fa-boxes"></i> Track Orders</a>
+            <a href="@Url.Action("Create", "WalkInPrescription")"><i class="fas fa-tachometer-alt"></i> Walk In Prescription</a>
+            <a href="@Url.Action("Index", "PharmacistDispensing")"><i class="fas fa-clipboard-list"></i> Orders</a>
+            <a href="@Url.Action("Index", "ScriptsProcessed")"><i class="fas fa-file-prescription"></i> Unprocessed Scripts</a>
+            <a href="@Url.Action("ProcessedScripts", "ScriptsProcessed")"><i class="fas fa-boxes"></i> Processed Scripts</a>
+            <a href="@Url.Action("CollectionTracking", "PharmacistDispensing")"><i class="fas fa-boxes"></i> Track Orders</a>
             <a href="#"><i class="fas fa-sign-out-alt"></i> Logout</a>
         </nav>
         <div class="sidebar-footer">
@@ -794,7 +798,7 @@
 
     <!-- TOPBAR -->
     <div class="topbar">
-        <span>Process Prescription</span>
+        <span>Process and Dispense Prescription</span>
         <div>
             <button class="btn btn-add" onclick="toggleSidebar()" style="margin-right: 15px;">
                 <i class="fas fa-bars"></i> Toggle Sidebar
@@ -825,9 +829,12 @@
             </div>
         }
 
-        <form asp-action="Edit" method="post" id="prescriptionForm">
+        <!-- KEY FIX: Form submits to ProcessAndDispense action which creates order and redirects to DispenseOrder -->
+        <form asp-action="ProcessAndDispense" method="post" id="prescriptionForm">
             @Html.AntiForgeryToken()
             <input type="hidden" asp-for="Prescr" />
+
+            <!-- CRITICAL FIX: Ensure DoctorId is properly bound -->
             <input type="hidden" asp-for="DoctorId" id="prescriptionDoctorId" />
 
             <div class="form-container">
@@ -906,7 +913,7 @@
                 <div class="card meds-card">
                     <h3>
                         <i class="fas fa-pills"></i> Medication Management
-                        <span style="font-size: 14px; color: #7f8c8d; font-weight: normal;">- Process and manage prescription medications</span>
+                        <span style="font-size: 14px; color: #7f8c8d; font-weight: normal;">- Process and dispense prescription medications</span>
                     </h3>
 
                     <div class="medication-table-container">
@@ -1023,7 +1030,7 @@
                                         </td>
                                         <td>
                                             <div class="approval-buttons">
-                                                <button type="button" class="approve-btn" id="approve-btn-@i" onclick="approveMedication(@i)" title="Approve Medication" @(!Model.HasDoctor ? "disabled" : "")>
+                                                <button type="button" class="approve-btn" id="approve-btn-@i" onclick="approveMedication(@i)" title="Approve Medication" @(!Model.DoctorId.HasValue ? "disabled" : "")>
                                                     <i class="fas fa-check-circle"></i>
                                                 </button>
                                                 <button type="button" class="decline-btn" onclick="openRejectionModal(@i)" title="Reject Medication">
@@ -1057,8 +1064,9 @@
                             <i class="fas fa-exclamation-triangle"></i> Check All Interactions
                         </button>
                         <div class="form-footer-right">
-                            <button type="submit" class="btn btn-add" onclick="return validateBeforeSubmit()">
-                                <i class="fas fa-save"></i> Save & Process Prescription
+                            <!-- KEY FIX: This button now submits to ProcessAndDispense which creates order and redirects to DispenseOrder -->
+                            <button type="submit" class="btn btn-dispense" onclick="return validateBeforeSubmit()">
+                                <i class="fas fa-shopping-cart"></i> Save & Create Order for Dispensing
                             </button>
                         </div>
                     </div>
@@ -1124,6 +1132,9 @@
         let selectedDoctorId = @(Model.DoctorId.HasValue? Model.DoctorId.Value : "null");
 
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('ProcessAndDispense view loaded');
+            console.log('Initial DoctorId:', selectedDoctorId);
+
             document.getElementById('addDoctorBtn').addEventListener('click', function() {
                 document.getElementById('doctorModal').style.display = 'flex';
             });
@@ -1144,6 +1155,21 @@
                 otherContainer.style.display = this.value === 'Other' ? 'block' : 'none';
             });
 
+            // DEBUG: Add form submission logging
+            document.getElementById('prescriptionForm').addEventListener('submit', function(e) {
+                console.log('=== FORM SUBMISSION DEBUG ===');
+                console.log('DoctorId value:', document.getElementById('prescriptionDoctorId').value);
+                console.log('SelectedDoctorId:', selectedDoctorId);
+
+                // Log all script lines
+                for (let i = 0; i < rowCounter; i++) {
+                    const medId = document.getElementById(`medId-${i}`)?.value;
+                    const status = document.getElementById(`status-hidden-${i}`)?.value;
+                    console.log(`Row ${i}: MedId=${medId}, Status=${status}`);
+                }
+                console.log('=== END DEBUG ===');
+            });
+
             initializeExistingRows();
             validateDoctorSelection();
             updateApprovalButtons();
@@ -1152,23 +1178,25 @@
         function initializeExistingRows() {
             @for (int i = 0; i < Model.ScriptLines.Count; i++)
             {
-                            var scriptLine = Model.ScriptLines[i];
-                            <text>
-                            const statusElement@(i) = document.getElementById('status-@i');
-                            if (statusElement@(i)) {
-                                if ('@scriptLine.Status' === 'Approved') {
-                                    statusElement@(i).className = "status-indicator approved";
-                                } else if ('@scriptLine.Status' === 'Rejected') {
-                                    statusElement@(i).className = "status-indicator declined";
-                                }
-                            }
-                            </text>
+                    var scriptLine = Model.ScriptLines[i];
+                    <text>
+                    const statusElement@(i) = document.getElementById('status-@i');
+                    if (statusElement@(i)) {
+                        if ('@scriptLine.Status' === 'Approved') {
+                            statusElement@(i).className = "status-indicator approved";
+                        } else if ('@scriptLine.Status' === 'Rejected') {
+                            statusElement@(i).className = "status-indicator declined";
+                        }
+                    }
+                    </text>
             }
         }
 
         function handleDoctorChange() {
             const doctorSelect = document.getElementById('doctorSelect');
             const doctorValue = doctorSelect.value.trim();
+
+            console.log('Doctor change detected:', doctorValue);
 
             if (!doctorValue) {
                 selectedDoctorId = null;
@@ -1199,7 +1227,11 @@
             }
 
             selectedDoctorId = parseInt(doctorId);
+            // CRITICAL FIX: Ensure the hidden field gets the correct value
             document.getElementById('prescriptionDoctorId').value = selectedDoctorId;
+
+            console.log('Doctor selected - ID:', selectedDoctorId, 'Hidden field value:', document.getElementById('prescriptionDoctorId').value);
+
             validateDoctorSelection();
             updateApprovalButtons();
         }
@@ -1442,6 +1474,7 @@
                     allergyAlert.style.display = 'none';
                 }
             } catch (error) {
+                console.error('Error checking allergies:', error);
             }
         }
 
@@ -1455,17 +1488,14 @@
                     const medication = await response.json();
 
                     if (medication && !medication.error) {
-                        // Create details HTML without overwriting the stock alert
                         let detailsHtml = `
                             <small><strong>Active:</strong> ${medication.activeIngredients || 'Not specified'}</small><br>
                             <small><strong>Stock:</strong> ${medication.stock}</small><br>
                             <small><strong>Reorder:</strong> ${medication.reorderLevel}</small>
                         `;
 
-                        // Update the main details content
                         detailsDiv.innerHTML = detailsHtml;
 
-                        // Now handle the stock alert separately
                         if (medication.stockStatus === "OutOfStock") {
                             stockAlert.className = "stock-alert-out";
                             stockAlert.style.display = 'block';
@@ -1663,7 +1693,6 @@
                 return;
             }
 
-            // Split name into first name and surname
             const nameParts = nameInput.split(' ');
             const firstName = nameParts[0];
             const surname = nameParts.slice(1).join(' ') || firstName;
@@ -1686,7 +1715,6 @@
                 const result = await response.json();
 
                 if (result.success) {
-                    // Add to dropdown with actual database ID
                     const datalist = document.getElementById('doctors-list');
                     const newOption = document.createElement('option');
                     newOption.value = `${result.doctorId}|${result.doctorName}`;
@@ -1694,12 +1722,10 @@
                     newOption.setAttribute('data-id', result.doctorId);
                     datalist.appendChild(newOption);
 
-                    // Set the selected value
                     document.getElementById('doctorSelect').value = `${result.doctorId}|${result.doctorName}`;
                     handleDoctorChange();
                     closeModal('doctorModal');
 
-                    // Clear form
                     document.getElementById('doctorName').value = '';
                     document.getElementById('doctorEmail').value = '';
                     document.getElementById('practiceNumber').value = '';
