@@ -361,9 +361,38 @@ namespace PharmMan.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult AddPharmacists(Pharmacist pham)
         {
+            pham.ApplicationUser.UserName = pham.ApplicationUser.Email;
 
             _db.Pharmacists.Add(pham);
             _db.SaveChanges();
+
+
+
+
+                var pharmacist = _db.Pharmacists
+            .FirstOrDefault(s => s.PharmacistID == pham.PharmacistID);
+
+            if (pharmacist != null && !string.IsNullOrEmpty(pharmacist.ApplicationUser.Email))
+            {
+                var receiver = pharmacist.ApplicationUser.Email;
+                var subject = "PHARMACIST LOGIN DETAILS";
+
+
+
+
+                var message = "<h3>Temporary Password:</h3>";
+                message += $"<p>Dear {pharmacist.ApplicationUser.Name},</p>";
+                message += $"<p>Your new temporary password is: {pharmacist.ApplicationUser.PasswordHash}</p>";
+                message += $"</br>";
+                message += $"<p>Best regards</p>";
+
+                _email.SendEmailAsync(receiver, subject, message);
+            }
+
+
+
+
+
             return RedirectToAction("ManagePharmacists");
 
 
@@ -539,18 +568,73 @@ namespace PharmMan.Controllers
             _db.SaveChanges();
             return RedirectToAction("StockManagement");
         }
-       
-        public IActionResult Reports()
+        [HttpGet]
+        public IActionResult Reports(string groupBy = "")
         {
+            // Retrieve all medication data
+            var medications = _db.Medications
+                .Include(m => m.Supplier)
+                .Include(m => m.DosageForm)
+                .ToList();
+
             var model = new MedicationReportVM
             {
-                GroupBy = "", // default
-                Groups = new List<MedicationGroup>() // initialize to avoid null
+                GroupBy = groupBy,
+                Groups = new List<MedicationGroup>()
             };
+
+            if (!string.IsNullOrEmpty(groupBy))
+            {
+                switch (groupBy)
+                {
+                    case "Supplier":
+                        model.Groups = medications
+                            .GroupBy(m => m.Supplier.SupplierName)
+                            .Select(g => new MedicationGroup
+                            {
+                                GroupName = g.Key,
+                                Medications = g.ToList()
+                            }).ToList();
+                        break;
+
+                    case "DosageForm":
+                        model.Groups = medications
+                            .GroupBy(m => m.DosageForm.DosageFormName)
+                            .Select(g => new MedicationGroup
+                            {
+                                GroupName = g.Key,
+                                Medications = g.ToList()
+                            }).ToList();
+                        break;
+
+                    case "Schedule":
+                        model.Groups = medications
+                            .GroupBy(m => m.Schedule)
+                            .Select(g => new MedicationGroup
+                            {
+                                GroupName = g.Key,
+                                Medications = g.ToList()
+                            }).ToList();
+                        break;
+
+                    default:
+                        model.Groups = new List<MedicationGroup>
+                {
+                    new MedicationGroup
+                    {
+                        GroupName = "All Medications",
+                        Medications = medications
+                    }
+                };
+                        break;
+                }
+            }
+
             return View(model);
         }
-           
-       
+
+
+
 
     }
 }

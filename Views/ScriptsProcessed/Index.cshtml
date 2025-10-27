@@ -249,6 +249,24 @@
             color: #0c5460;
         }
 
+        .dispense-yes {
+            background: #d4edda;
+            color: #155724;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .dispense-no {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
         .action-buttons {
             display: flex;
             gap: 8px;
@@ -270,6 +288,11 @@
             color: white;
         }
 
+        .btn-dispense {
+            background: #27ae60;
+            color: white;
+        }
+
         .btn-download {
             background: #6c757d;
             color: white;
@@ -277,6 +300,7 @@
 
         .btn:hover {
             opacity: 0.9;
+            transform: translateY(-1px);
         }
 
         /* ===== NO RESULTS ===== */
@@ -318,6 +342,16 @@
 
             .search-container {
                 flex-direction: column;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                gap: 5px;
+            }
+
+            .btn {
+                text-align: center;
+                padding: 8px 12px;
             }
         }
     </style>
@@ -370,9 +404,10 @@
                     <tr>
                         <th width="15%">Patient Name</th>
                         <th width="15%">ID Number</th>
-                        <th width="20%">Email</th>
+                        <th width="15%">Email</th>
                         <th width="15%">Date Issued</th>
-                        <th width="15%">Status</th>
+                        <th width="10%">Status</th>
+                        <th width="10%">Dispense Upon Approval</th>
                         <th width="20%">Actions</th>
                     </tr>
                 </thead>
@@ -398,6 +433,16 @@
                                 <span class="status-badge @statusClass">@status</span>
                             </td>
                             <td>
+                                @if (prescription.DispenseUponApproval)
+                                {
+                                    <span class="dispense-yes">Yes</span>
+                                }
+                                else
+                                {
+                                    <span class="dispense-no">No</span>
+                                }
+                            </td>
+                            <td>
                                 <div class="action-buttons">
                                     @if (prescription.Script != null && prescription.Script.Length > 0)
                                     {
@@ -405,12 +450,27 @@
                                             <i class="fas fa-download"></i> Download
                                         </a>
                                     }
-                                    <a asp-controller="ScriptsProcessed"
-                                       asp-action="Edit"
-                                       asp-route-id="@prescription.PrescriptionID"
-                                       class="btn btn-process">
-                                        <i class="fas fa-edit"></i> Process
-                                    </a>
+
+                                    @if (prescription.DispenseUponApproval)
+                                    {
+                                        <!-- Process And Dispense Button - Goes to ProcessAndDispense View -->
+                                        <a asp-controller="ScriptsProcessed"
+                                           asp-action="ProcessAndDispense"
+                                           asp-route-id="@prescription.PrescriptionID"
+                                           class="btn btn-dispense">
+                                            <i class="fas fa-cogs"></i> Process & Dispense
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <!-- Regular Process Button - Goes to Edit View -->
+                                        <a asp-controller="ScriptsProcessed"
+                                           asp-action="Edit"
+                                           asp-route-id="@prescription.PrescriptionID"
+                                           class="btn btn-process">
+                                            <i class="fas fa-edit"></i> Process
+                                        </a>
+                                    }
                                 </div>
                             </td>
                         </tr>

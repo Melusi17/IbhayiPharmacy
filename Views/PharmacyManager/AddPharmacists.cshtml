@@ -28,8 +28,8 @@
             </div>
 
             <div class="mb-3">
-                <label asp-for="ApplicationUser.PhoneNumber" class="form-label">Cellphone Number</label>
-                <input asp-for="ApplicationUser.PhoneNumber" class="form-control" placeholder="e.g. 082 123 4567" />
+                <label asp-for="ApplicationUser.CellphoneNumber" class="form-label">Cellphone Number</label>
+                <input asp-for="ApplicationUser.CellphoneNumber" class="form-control" placeholder="e.g. 082 123 4567" />
             </div>
 
             <div class="mb-3">
@@ -46,7 +46,7 @@
             <div class="mb-3">
                 <label class="form-label">Initial Password</label>
                 <div class="input-group">
-                    <input type="text" id="generatedPassword" name="GeneratedPassword" class="form-control" readonly>
+                    <input asp-for="ApplicationUser.PasswordHash" type="text" id="generatedPassword"   class="form-control" readonly>
                     <button type="button" class="btn btn-outline-secondary" onclick="generatePassword()">Regenerate</button>
                 </div>
                 <small class="text-muted">Password will be auto-generated and sent to the pharmacist.</small>
