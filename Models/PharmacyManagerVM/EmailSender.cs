@@ -24,12 +24,12 @@ public class EmailService
         if (string.IsNullOrWhiteSpace(body))
             body = "(Empty message)";
 
-        var senderEmail = from ?? _smtpSettings.SenderEmail ?? "mbasamajila001@gmail.com";
+        var senderEmail = from ?? _smtpSettings.SenderEmail ?? "ibhayipharmacy0414@gmail.com";
 
         using var smtpClient = new SmtpClient(_smtpSettings.Host ?? "smtp.gmail.com", _smtpSettings.Port == 0 ? 587 : _smtpSettings.Port)
         {
-            Credentials = new NetworkCredential(_smtpSettings.SenderEmail ?? "mbasamajila001@gmail.com",
-                                                _smtpSettings.Password ?? "udyt gpxe olkx mjxd"),
+            Credentials = new NetworkCredential(_smtpSettings.SenderEmail ?? "ibhayipharmacy0414@gmail.com",
+                                                _smtpSettings.Password ?? "wkfy phvj znru clyr"),
             EnableSsl = true
         };
 

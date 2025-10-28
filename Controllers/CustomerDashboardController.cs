@@ -183,11 +183,11 @@ namespace IbhayiPharmacy.Controllers
             return View(repeats);
         }
 
-        //// View Reports Section
-        //public IActionResult ViewReports()
-        //{
-        //    return View();
-        //}
+        // View Reports Section
+        public IActionResult ViewReports()
+        {
+            return View();
+        }
 
         // API: Get medications for a specific prescription
         [HttpGet]

@@ -6,8 +6,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Identity;
 using IbhayiPharmacy.Models.PharmacyManagerVM;
 using Microsoft.Extensions.Options;
- 
- 
+using SmtpSettings = IbhayiPharmacy.Models.PharmacyManagerVM.SmtpSettings;
+
 
 
 namespace PharmMan.Controllers
@@ -17,7 +17,9 @@ namespace PharmMan.Controllers
         private readonly ApplicationDbContext _db;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly EmailService _email;
-        public PharmacyManagerController(ApplicationDbContext db, IOptions<SmtpSettings> smtpSettings, EmailService email)
+
+        //public PharmacyManagerController(ApplicationDbContext db, IOptions<SmtpSettings> smtpSettings, EmailService email) //old version cauese error
+        public PharmacyManagerController(ApplicationDbContext db, IOptions<IbhayiPharmacy.Models.SmtpSettings> smtpSettings, EmailService email)
         {
             _db = db;
             _email = email;
@@ -380,9 +382,9 @@ namespace PharmMan.Controllers
 
 
 
-                var message = "<h3>Temporary Password:</h3>";
+                var message = "<h3>Temporary Password</h3>";
                 message += $"<p>Dear {pharmacist.ApplicationUser.Name},</p>";
-                message += $"<p>Your new temporary password is: {pharmacist.ApplicationUser.PasswordHash}</p>";
+                message += $"<p>Your temporary password is: {pharmacist.ApplicationUser.PasswordHash}</p>";
                 message += $"</br>";
                 message += $"<p>Best regards</p>";
 
@@ -397,7 +399,7 @@ namespace PharmMan.Controllers
 
 
         }
-
+        [HttpGet]
         public IActionResult EditPharmacist(int id)
         {
             var pharmacist = _db.Pharmacists
@@ -424,7 +426,18 @@ namespace PharmMan.Controllers
             return RedirectToAction("ManagePharmacists");
         }
 
+        public IActionResult DeletePharmacist(int id)
+        {
 
+            var doctor = _db.Pharmacists.FirstOrDefault(d => d.PharmacistID == id);
+            if (doctor != null)
+            {
+                _db.Pharmacists.Remove(doctor);
+                _db.SaveChanges();
+                return RedirectToAction("ManagePharmacists");
+            }
+            return View("ManagePharmacists");
+        }
 
 
 

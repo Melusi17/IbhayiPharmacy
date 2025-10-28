@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace IbhayiPharmacy.Migrations
 {
     /// <inheritdoc />
-    public partial class newDB : Migration
+    public partial class Panel : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

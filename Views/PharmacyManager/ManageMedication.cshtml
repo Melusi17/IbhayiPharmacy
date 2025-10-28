@@ -6,53 +6,55 @@
 }
 
 <div class="container mt-4">
-    <h2 class="text-center mb-4">Manage Medications</h2>
 
-    <div class="text-end mb-3">
+    <div class=" mb-3">
         <a asp-action="AddMedication" class="btn btn-success">+ Add New Medication</a>
     </div>
-
-    <table class="table table-bordered table-striped">
-        <thead class="table-dark">
-            <tr>
-                <th>Medication Name</th>
-                <th>Schedule</th>
-                <th>Price</th>
-                <th>Re-Order Level</th>
-                <th>Quantity On Hand</th>
-                <th>Dosage Form</th>
-                <th>Supplier</th>
-                <th>Ingredients</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var med in Model)
-            {
+    <div class="card p-3">
+   
+        <h5 class="title-underline mb-3">Existing Pharmacists</h5>
+        <table class="table table-hover table-borderless table-striped p-2">
+            <thead class="text-dark">
                 <tr>
-                    <td>@med.MedicationName</td>
-                    <td>@med.Schedule</td>
-                    <td>R @med.CurrentPrice</td>
-                    <td>@med.ReOrderLevel</td>
-                    <td>@med.QuantityOnHand</td>
-                    <td>@med.DosageForm?.DosageFormName</td>
-                    <td>@med.Supplier?.SupplierName</td>
-                    <td>
-                        @if (med.Medication_Ingredients.Any())
-                        {
-                            <ul class="mb-0">
-                                @foreach (var ing in med.Medication_Ingredients)
-                                {
-                                    <li>@ing.Active_Ingredients.Name - @ing.Strength</li>
-                                }
-                            </ul>
-                        }
-                        else
-                        {
-                            <span class="text-muted">No ingredients</span>
-                        }
-                    </td>
+                    <th>Medication Name</th>
+                    <th>Schedule</th>
+                    <th>Price</th>
+                    <th>Re-Order Level</th>
+                    <th>Quantity On Hand</th>
+                    <th>Dosage Form</th>
+                    <th>Supplier</th>
+                    <th>Ingredients</th>
                 </tr>
-            }
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                @foreach (var med in Model)
+                {
+                    <tr>
+                        <td>@med.MedicationName</td>
+                        <td>@med.Schedule</td>
+                        <td>R @med.CurrentPrice</td>
+                        <td>@med.ReOrderLevel</td>
+                        <td>@med.QuantityOnHand</td>
+                        <td>@med.DosageForm?.DosageFormName</td>
+                        <td>@med.Supplier?.SupplierName</td>
+                        <td>
+                            @if (med.Medication_Ingredients.Any())
+                            {
+                                <ul class="mb-0">
+                                    @foreach (var ing in med.Medication_Ingredients)
+                                    {
+                                        <li>@ing.Active_Ingredients.Name - @ing.Strength</li>
+                                    }
+                                </ul>
+                            }
+                            else
+                            {
+                                <span class="text-muted">No ingredients</span>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 </div>
