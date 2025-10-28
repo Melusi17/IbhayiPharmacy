@@ -1,0 +1,106 @@
+﻿@using IbhayiPharmacy.Models.PharmacistVM
+@model CustomerNotificationViewModel
+
+<div class="notifications" style="background-color: #ffffff; border: 1px solid #dcdcdc; padding: 20px; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.05); margin: 20px 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+    <h4 style="font-size: 18px; margin-bottom: 15px; color: #333; display: flex; align-items: center; gap: 8px;">
+        🔔 Notifications
+        @if (Model.AvailableForOrderingCount > 0 || Model.ReadyForCollectionCount > 0 || Model.RejectedMedicationsCount > 0)
+        {
+            <span style="background: #ff4444; color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold;">
+                @(Model.AvailableForOrderingCount + Model.ReadyForCollectionCount + Model.RejectedMedicationsCount)
+            </span>
+        }
+    </h4>
+
+    <ul style="list-style-type: none; padding: 0; margin: 0;">
+        <!-- Available for Ordering -->
+        <li style="padding: 12px 0; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 10px;">
+            <span style="font-size: 18px;">📥</span>
+            <div>
+                <div style="font-size: 15px; color: #555;">
+                    <strong>@Model.AvailableForOrderingCount medications</strong> available for ordering
+                </div>
+                @if (Model.AvailableForOrderingCount > 0)
+                {
+                    <div style="font-size: 12px; color: #888; margin-top: 4px;">
+                        You have approved prescriptions ready to order
+                    </div>
+                }
+            </div>
+        </li>
+
+        <!-- Available for Refills -->
+        @if (Model.AvailableForRefillsCount > 0)
+        {
+            <li style="padding: 12px 0; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 10px;">
+                <span style="font-size: 18px;">🔄</span>
+                <div>
+                    <div style="font-size: 15px; color: #555;">
+                        <strong>@Model.AvailableForRefillsCount medications</strong> available for refills
+                    </div>
+                    <div style="font-size: 12px; color: #888; margin-top: 4px;">
+                        You have repeats left on your prescriptions
+                    </div>
+                </div>
+            </li>
+        }
+
+        <!-- Ready for Collection -->
+        @if (Model.ReadyForCollectionCount > 0)
+        {
+            <li style="padding: 12px 0; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 10px;">
+                <span style="font-size: 18px;">✅</span>
+                <div>
+                    <div style="font-size: 15px; color: #27ae60;">
+                        <strong>@Model.ReadyForCollectionCount medications</strong> ready for collection
+                    </div>
+                    <div style="font-size: 12px; color: #888; margin-top: 4px;">
+                        Visit the pharmacy to collect your order
+                    </div>
+                </div>
+            </li>
+        }
+
+        <!-- Pending Orders -->
+        @if (Model.PendingOrdersCount > 0)
+        {
+            <li style="padding: 12px 0; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 10px;">
+                <span style="font-size: 18px;">⏳</span>
+                <div>
+                    <div style="font-size: 15px; color: #f39c12;">
+                        <strong>@Model.PendingOrdersCount orders</strong> being processed
+                    </div>
+                    <div style="font-size: 12px; color: #888; margin-top: 4px;">
+                        We're preparing your medications
+                    </div>
+                </div>
+            </li>
+        }
+
+        <!-- Rejected Medications -->
+        @if (Model.RejectedMedicationsCount > 0)
+        {
+            <li style="padding: 12px 0; display: flex; align-items: center; gap: 10px;">
+                <span style="font-size: 18px;">❌</span>
+                <div>
+                    <div style="font-size: 15px; color: #e74c3c;">
+                        <strong>@Model.RejectedMedicationsCount medications</strong> require attention
+                    </div>
+                    <div style="font-size: 12px; color: #888; margin-top: 4px;">
+                        Check order details for more information
+                    </div>
+                </div>
+            </li>
+        }
+
+        <!-- No notifications -->
+        @if (Model.AvailableForOrderingCount == 0 && Model.AvailableForRefillsCount == 0 &&
+        Model.ReadyForCollectionCount == 0 && Model.PendingOrdersCount == 0 &&
+        Model.RejectedMedicationsCount == 0)
+        {
+            <li style="padding: 12px 0; text-align: center; color: #888; font-style: italic;">
+                No new notifications
+            </li>
+        }
+    </ul>
+</div>
