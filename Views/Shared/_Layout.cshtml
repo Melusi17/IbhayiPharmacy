@@ -33,27 +33,18 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="CustomerDashboard" asp-action="UploadPrescription">This Is The Customer Dashboard check it out</a>
                         </li>
-                       @*  @if (User.IsInRole(SD.Role_Customer))
-                        { *@
+                      
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Prescription" asp-action="Index">Script</a>
                             </li>
-
-                      @*   }
-                        else if(User.IsInRole(SD.Role_Phamacist))
-                        {
-                            *@
-
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="ScriptsProcessed" asp-action="Index">Prescriptin</a>
                             </li>
-                      @*   }
-                        else
-                        { *@
+                     
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="User" asp-action="Index">Users</a>
                             </li>
-                      @*   } *@
+                     
 
                     </ul>
                     <partial name="_LoginPartial" />
