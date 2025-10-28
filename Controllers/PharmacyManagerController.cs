@@ -6,8 +6,9 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Identity;
 using IbhayiPharmacy.Models.PharmacyManagerVM;
 using Microsoft.Extensions.Options;
- 
- 
+using SmtpSettings = IbhayiPharmacy.Models.PharmacyManagerVM.SmtpSettings;
+
+
 
 
 namespace PharmMan.Controllers
@@ -386,7 +387,7 @@ namespace PharmMan.Controllers
                 message += $"</br>";
                 message += $"<p>Best regards</p>";
 
-                _email.SendEmail(receiver, subject, message);
+                _email.SendEmailAsync(receiver, subject, message);
             }
 
 
@@ -545,7 +546,7 @@ namespace PharmMan.Controllers
                 message += "<p>Please confirm and prepare the order for delivery.</p>";
                 message += "<p>Kind regards,<br/>Ibhayi Pharmacy</p>";
 
-                 _email.SendEmail(receiver, subject, message);
+                 _email.SendEmailAsync(receiver, subject, message);
             }
 
              

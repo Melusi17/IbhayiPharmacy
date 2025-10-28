@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Options;
-using IbhayiPharmacy.Models;
+using IbhayiPharmacy.Models.PharmacyManagerVM;
 using System.Net;
 using System.Net.Mail;
 using System.Threading.Tasks;
@@ -13,7 +13,7 @@ public class EmailService
         _smtpSettings = smtpSettings.Value;
     }
 
-    public void SendEmail(string to, string subject, string body, string from = null)
+    public void SendEmailAsync(string to, string subject, string body, string from = null)
     {
         if (string.IsNullOrWhiteSpace(to))
             throw new ArgumentException("Recipient email address cannot be null or empty.", nameof(to));
@@ -24,14 +24,12 @@ public class EmailService
         if (string.IsNullOrWhiteSpace(body))
             body = "(Empty message)";
 
-        string senderEmail = from ?? _smtpSettings.Username ?? "mbasamajila001@gmail.com";
+        var senderEmail = from ?? _smtpSettings.SenderEmail ?? "mbasamajila001@gmail.com";
 
-        using var smtpClient = new SmtpClient(_smtpSettings.Server ?? "smtp.gmail.com", _smtpSettings.Port == 0 ? 587 : _smtpSettings.Port)
+        using var smtpClient = new SmtpClient(_smtpSettings.Host ?? "smtp.gmail.com", _smtpSettings.Port == 0 ? 587 : _smtpSettings.Port)
         {
-            Credentials = new NetworkCredential(
-                _smtpSettings.Username ?? "mbasamajila001@gmail.com",
-                _smtpSettings.Password ?? "rwfv yxkc uits lgel"
-            ),
+            Credentials = new NetworkCredential(_smtpSettings.SenderEmail ?? "mbasamajila@gmail.com",
+                                                _smtpSettings.Password ?? "rwfv yxkc uits lgel"),
             EnableSsl = true
         };
 

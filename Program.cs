@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using IbhayiPharmacy.Models.PharmacyManagerVM;
 using IbhayiPharmacy.Services;
+using SmtpSettings = IbhayiPharmacy.Models.PharmacyManagerVM.SmtpSettings;
 
 var builder = WebApplication.CreateBuilder(args);
 
