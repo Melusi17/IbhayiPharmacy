@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Identity;
 using IbhayiPharmacy.Models.PharmacyManagerVM;
 using Microsoft.Extensions.Options;
  
- 
 
 
 namespace PharmMan.Controllers
@@ -17,7 +16,9 @@ namespace PharmMan.Controllers
         private readonly ApplicationDbContext _db;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly EmailService _email;
-        public PharmacyManagerController(ApplicationDbContext db, IOptions<SmtpSettings> smtpSettings, EmailService email)
+
+        //public PharmacyManagerController(ApplicationDbContext db, IOptions<SmtpSettings> smtpSettings, EmailService email) //old version cauese error
+        public PharmacyManagerController(ApplicationDbContext db, IOptions<IbhayiPharmacy.Models.SmtpSettings> smtpSettings, EmailService email)
         {
             _db = db;
             _email = email;
