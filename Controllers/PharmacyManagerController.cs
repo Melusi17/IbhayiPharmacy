@@ -381,9 +381,9 @@ namespace PharmMan.Controllers
 
 
 
-                var message = "<h3>Temporary Password:</h3>";
+                var message = "<h3>Temporary Password</h3>";
                 message += $"<p>Dear {pharmacist.ApplicationUser.Name},</p>";
-                message += $"<p>Your new temporary password is: {pharmacist.ApplicationUser.PasswordHash}</p>";
+                message += $"<p>Your temporary password is: {pharmacist.ApplicationUser.PasswordHash}</p>";
                 message += $"</br>";
                 message += $"<p>Best regards</p>";
 
