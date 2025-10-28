@@ -221,13 +221,6 @@ namespace IbhayiPharmacy.Controllers
                 // Create order lines and update script lines
                 foreach (var scriptLine in validScriptLines)
                 {
-                    // IMPORTANT: Only decrement repeats if it actually has repeats
-                    // For one-time medications (Repeats = 0), don't touch RepeatsLeft
-                    if (scriptLine.Repeats > 0 && scriptLine.RepeatsLeft > 0)
-                    {
-                        scriptLine.RepeatsLeft--;
-                    }
-
                     // Create order line
                     var orderLine = new OrderLine
                     {

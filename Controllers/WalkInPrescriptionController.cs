@@ -294,22 +294,37 @@ namespace IbhayiPharmacy.Controllers
         }
 
         // NEW: Update overall prescription status based on script line statuses
+        // UPDATED: Prescription stays as "WalkIn" unless ALL medications are rejected
         private void UpdatePrescriptionStatus(Prescription prescription)
         {
             var approvedLines = prescription.scriptLines.Count(sl => sl.Status == "Approved");
             var rejectedLines = prescription.scriptLines.Count(sl => sl.Status == "Rejected");
-            var pendingLines = prescription.scriptLines.Count(sl => sl.Status == "Pending");
+            var totalLines = prescription.scriptLines.Count;
 
-            if (approvedLines > 0 && rejectedLines > 0)
-                prescription.Status = "Partially Processed";
-            else if (approvedLines > 0)
-                prescription.Status = "Processed";
-            else if (rejectedLines > 0)
+            // Only change status if ALL medications are rejected
+            if (rejectedLines == totalLines && totalLines > 0)
+            {
                 prescription.Status = "Rejected";
-            else if (pendingLines > 0)
-                prescription.Status = "Pending";
+            }
             else
+            {
+                // Otherwise, keep it as "WalkIn" regardless of approval mix
                 prescription.Status = "WalkIn";
+            }
+
+            // Optional: You could also do this if you want to track partial processing:
+            // if (approvedLines > 0 && rejectedLines > 0)
+            // {
+            //     prescription.Status = "WalkIn - Partially Processed";
+            // }
+            // else if (approvedLines > 0)
+            // {
+            //     prescription.Status = "WalkIn - Processed";
+            // }
+            // else
+            // {
+            //     prescription.Status = "WalkIn"; // This covers pending or empty
+            // }
         }
 
         // AJAX: Search customers

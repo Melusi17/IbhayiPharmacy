@@ -40,7 +40,7 @@ namespace IbhayiPharmacy.Controllers
 
                 ProcessedPrescriptions = await _context.Prescriptions
                     .Where(p => p.ApplicationUserId == userId &&
-                           (p.Status == "Processed" || p.Status == "Partially Processed"))
+                           (p.Status == "Processed" || p.Status == "Partially Processed" || p.Status == "WalkIn"))
                     .Include(p => p.Doctors)
                     .OrderByDescending(p => p.DateIssued)
                     .ToListAsync()
@@ -111,6 +111,7 @@ namespace IbhayiPharmacy.Controllers
                 return Json(new { success = false, message = $"Error uploading prescription: {ex.Message}" });
             }
         }
+
         // Download Prescription
         public async Task<IActionResult> DownloadPrescription(int id)
         {
@@ -304,7 +305,7 @@ namespace IbhayiPharmacy.Controllers
             }
         }
 
-        // API: Submit order - UPDATED WITH ORDER NUMBER GENERATION
+        // API: Submit order - UPDATED WITH SHORTER ORDER NUMBER FORMAT
         [HttpPost]
         public async Task<JsonResult> SubmitOrder([FromBody] OrderSubmissionVM orderData)
         {
@@ -373,12 +374,12 @@ namespace IbhayiPharmacy.Controllers
             }
         }
 
-        // Generate unique order number
+        // Generate unique order number - UPDATED SHORTER FORMAT
         private async Task<string> GenerateUniqueOrderNumber()
         {
             string orderNumber;
             bool isUnique;
-            int maxAttempts = 5; // Prevent infinite loop
+            int maxAttempts = 5;
             int attempts = 0;
 
             do
@@ -394,10 +395,10 @@ namespace IbhayiPharmacy.Controllers
 
             } while (!isUnique && attempts < maxAttempts);
 
-            // If we still don't have a unique number after max attempts, use a fallback
+            // Fallback if we still don't have a unique number
             if (!isUnique)
             {
-                string timestamp = DateTime.Now.ToString("yyyyMMddHHmmss");
+                string timestamp = DateTime.Now.ToString("yyyyMMddHHmmssfff");
                 orderNumber = $"ORD-{timestamp}";
             }
 
@@ -506,8 +507,6 @@ namespace IbhayiPharmacy.Controllers
             TempData["SuccessMessage"] = "Profile updated successfully!";
             return RedirectToAction("Profile");
         }
-
-
 
         // API: Get prescription details for editing - FIXED ROUTE
         [HttpGet]
