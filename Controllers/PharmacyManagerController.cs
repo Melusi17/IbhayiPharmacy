@@ -6,7 +6,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Identity;
 using IbhayiPharmacy.Models.PharmacyManagerVM;
 using Microsoft.Extensions.Options;
- 
+using SmtpSettings = IbhayiPharmacy.Models.PharmacyManagerVM.SmtpSettings;
+
 
 
 namespace PharmMan.Controllers
@@ -398,7 +399,7 @@ namespace PharmMan.Controllers
 
 
         }
-
+        [HttpGet]
         public IActionResult EditPharmacist(int id)
         {
             var pharmacist = _db.Pharmacists
@@ -425,7 +426,18 @@ namespace PharmMan.Controllers
             return RedirectToAction("ManagePharmacists");
         }
 
+        public IActionResult DeletePharmacist(int id)
+        {
 
+            var doctor = _db.Pharmacists.FirstOrDefault(d => d.PharmacistID == id);
+            if (doctor != null)
+            {
+                _db.Pharmacists.Remove(doctor);
+                _db.SaveChanges();
+                return RedirectToAction("ManagePharmacists");
+            }
+            return View("ManagePharmacists");
+        }
 
 
 

@@ -28,8 +28,8 @@ public class EmailService
 
         using var smtpClient = new SmtpClient(_smtpSettings.Host ?? "smtp.gmail.com", _smtpSettings.Port == 0 ? 587 : _smtpSettings.Port)
         {
-            Credentials = new NetworkCredential(_smtpSettings.SenderEmail ?? "mbasamajila001@gmail.com",
-                                                _smtpSettings.Password ?? "udyt gpxe olkx mjxd"),
+            Credentials = new NetworkCredential(_smtpSettings.SenderEmail ?? "mbasamajila@gmail.com",
+                                                _smtpSettings.Password ?? "rwfv yxkc uits lgel"),
             EnableSsl = true
         };
 
