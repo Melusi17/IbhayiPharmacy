@@ -386,7 +386,7 @@ namespace PharmMan.Controllers
                 message += $"</br>";
                 message += $"<p>Best regards</p>";
 
-                _email.SendEmailAsync(receiver, subject, message);
+                _email.SendEmail(receiver, subject, message);
             }
 
 
@@ -397,7 +397,7 @@ namespace PharmMan.Controllers
 
 
         }
-
+        [HttpGet]
         public IActionResult EditPharmacist(int id)
         {
             var pharmacist = _db.Pharmacists
@@ -424,7 +424,18 @@ namespace PharmMan.Controllers
             return RedirectToAction("ManagePharmacists");
         }
 
+        public IActionResult DeletePharmacist(int id)
+        {
 
+            var doctor = _db.Pharmacists.FirstOrDefault(d => d.PharmacistID == id);
+            if (doctor != null)
+            {
+                _db.Pharmacists.Remove(doctor);
+                _db.SaveChanges();
+                return RedirectToAction("ManagePharmacists");
+            }
+            return View("ManagePharmacists");
+        }
 
 
 
@@ -534,7 +545,7 @@ namespace PharmMan.Controllers
                 message += "<p>Please confirm and prepare the order for delivery.</p>";
                 message += "<p>Kind regards,<br/>Ibhayi Pharmacy</p>";
 
-                 _email.SendEmailAsync(receiver, subject, message);
+                 _email.SendEmail(receiver, subject, message);
             }
 
              
