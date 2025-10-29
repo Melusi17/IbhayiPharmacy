@@ -41,26 +41,85 @@
         <main class="main-content" id="mainContent">
             @RenderBody()
         </main>
-
-        <!-- Right Sidebar with dynamic data -->
-        <!-- Right Sidebar -->
-        <aside class="sidebar sidebar-right">
-            <div class="profile-container">
-                <div class="profile-icon" onclick="toggleProfileMenu()">
-                    <img src="~/css/img/Customer_img/Profile.png" alt="Profile" />
+            <!-- Right Sidebar -->
+            <aside class="sidebar sidebar-right">
+                <div class="profile-container">
+                    <div class="profile-icon" id="profileIcon">
+                        <img src="~/css/img/Customer_img/Profile.png" alt="Profile" />
+                    </div>
+                    <div id="profileMenu" class="profile-menu hidden">
+                        <a asp-controller="Customer" asp-action="profile" class="sidebar-button">👤 Account</a>
+                        <a asp-controller="Home" asp-action="Index" class="sidebar-button">🚪 Logout</a>
+                    </div>
                 </div>
-                <div id="profileMenu" class="profile-menu hidden">
-                    <a asp-controller="Customer" asp-action="profile" class="sidebar-button">👤 Account</a>
-                    <a asp-controller="Home" asp-action="Index" class="sidebar-button">🚪 Logout</a>
+
+                <!-- Medical-Themed Notification Card -->
+                <div class="medical-notification-card" id="medicalNotificationCard" onclick="toggleNotificationsModal()">
+                    <div class="medical-card-header">
+                        <div class="medical-card-title">
+                            <span>💊</span>
+                            Medication Status
+                        </div>
+                        <div class="medical-badge" id="medicalBadge">All Clear</div>
+                    </div>
+
+                    <div class="medical-card-content" id="medicalCardContent">
+                        Your medications are up to date and managed properly.
+                    </div>
+
+                    <div class="medical-card-stats">
+                        <div class="stat-item">
+                            <div class="stat-number" id="statReady">0</div>
+                            <div class="stat-label">Ready</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number" id="statPending">0</div>
+                            <div class="stat-label">Pending</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number" id="statRefills">0</div>
+                            <div class="stat-label">Refills</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number" id="statAttention">0</div>
+                            <div class="stat-label">Needs Attention</div>
+                        </div>
+                    </div>
+
+                    <div class="medical-card-footer">
+                        <div class="medical-card-action">
+                            View Details
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Notifications Modal -->
+            <div id="notificationsModal" class="modal hidden">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3>💊Medication Alerts</h3>
+                        <span class="close" onclick="closeNotificationsModal()">&times;</span>
+                    </div>
+                    <div class="modal-body">
+                        @await Component.InvokeAsync("CustomerNotifications")
+                    </div>
                 </div>
             </div>
 
-            <!-- Dynamic Notifications -->
-            @await Component.InvokeAsync("CustomerNotifications")
-        </aside>
-    </div>
+    <script src="~/js/Customer/CustomerDashboard.js"></script>
 
-   @*  <script src="~/js/Customer/CustomerDashboard.js"></script> *@
+        @* <script>
+            // Temporary test
+            document.addEventListener('DOMContentLoaded', function() {
+                console.log('=== NOTIFICATION SYSTEM TEST ===');
+                console.log('1. Bell element:', document.querySelector('.notification-bell'));
+                console.log('2. Modal element:', document.getElementById('notificationsModal'));
+                console.log('3. Badge element:', document.getElementById('notificationBadge'));
+                console.log('4. Notification items:', document.querySelectorAll('.notification-item').length);
+                console.log('=== TEST COMPLETE ===');
+            });
+        </script> *@
 
     @RenderSection("Scripts", required: false)
 </body>

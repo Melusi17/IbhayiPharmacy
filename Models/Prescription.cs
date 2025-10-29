@@ -30,6 +30,11 @@ namespace IbhayiPharmacy.Models
         public string? Status { get; set; } = "Unprocessed";
         public List<ScriptLine>? scriptLines { get; set; } = new List<ScriptLine>();
 
+        [NotMapped]
+        public bool IsFullyOrdered { get; set; }
+
+        [NotMapped]
+        public bool IsPartiallyOrdered { get; set; }
 
     }
 }

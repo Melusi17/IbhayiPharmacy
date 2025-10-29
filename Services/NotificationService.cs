@@ -1,4 +1,5 @@
 ﻿using IbhayiPharmacy.Data;
+using IbhayiPharmacy.Models;
 using IbhayiPharmacy.Models.PharmacistVM;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,71 +14,108 @@ namespace IbhayiPharmacy.Services
             _context = context;
         }
 
-        public async Task<CustomerNotificationViewModel> GetCustomerNotificationsAsync(string customerId)
+        public async Task<CustomerNotificationViewModel> GetCustomerNotificationsAsync(string applicationUserId)
         {
+            Console.WriteLine($"🔔 [Service] Starting notification retrieval for user: {applicationUserId}");
+
             var notifications = new CustomerNotificationViewModel();
 
             try
             {
-                // Convert customerId to int if your CustomerID is int-based
-                // If CustomerID is string, remove this conversion
-                if (int.TryParse(customerId, out int customerIdInt))
+                // Find the customer using ApplicationUserId
+                var customer = await _context.Customers
+                    .FirstOrDefaultAsync(c => c.ApplicationUserId == applicationUserId);
+
+                if (customer == null)
                 {
-                    // 1. Medications available for ordering (Active prescriptions with script lines)
-                    notifications.AvailableForOrderingCount = await _context.Prescriptions
-                        .Where(p => p.ApplicationUserId == customerId &&
-                                   p.Status == "Approved" &&
-                                   p.scriptLines.Any(sl => sl.Quantity > 0))
-                        .SelectMany(p => p.scriptLines)
-                        .CountAsync();
-
-                    // 2. Medications available for refills (ScriptLines with RepeatsLeft > 0)
-                    notifications.AvailableForRefillsCount = await _context.ScriptLines
-                        .Where(sl => sl.Prescriptions.ApplicationUserId == customerId &&
-                                    sl.RepeatsLeft > 0 &&
-                                    sl.Quantity > 0)
-                        .CountAsync();
-
-                    // 3. Medications ready for collection (Orders with status "Ready for Collection")
-                    notifications.ReadyForCollectionCount = await _context.Orders
-                        .Where(o => o.CustomerID == customerIdInt &&
-                                   o.Status == "Ready for Collection")
-                        .SelectMany(o => o.OrderLines)
-                        .CountAsync(ol => ol.Status == "Approved");
-
-                    // 4. Rejected medications (OrderLines with rejected status)
-                    notifications.RejectedMedicationsCount = await _context.OrderLines
-                        .Where(ol => ol.Order.CustomerID == customerIdInt &&
-                                    ol.Status == "Rejected")
-                        .CountAsync();
-
-                    // 5. Pending orders (Orders with pending status)
-                    notifications.PendingOrdersCount = await _context.Orders
-                        .Where(o => o.CustomerID == customerIdInt &&
-                                   (o.Status == "Pending" || o.Status == "Processing"))
-                        .CountAsync();
+                    Console.WriteLine($"❌ [Service] No customer found for ApplicationUserId: {applicationUserId}");
+                    return notifications; // Return empty notifications
                 }
-                else
-                {
-                    // Handle case where customerId is not an integer (use string comparison)
-                    notifications.AvailableForOrderingCount = await _context.Prescriptions
-                        .Where(p => p.ApplicationUserId == customerId &&
-                                   p.Status == "Approved" &&
-                                   p.scriptLines.Any(sl => sl.Quantity > 0))
-                        .SelectMany(p => p.scriptLines)
-                        .CountAsync();
 
-                    // For other counts that require CustomerID (int), they will remain 0
-                    // You might need to adjust your database relationships if CustomerID should be string
-                }
+                int customerId = customer.CustormerID;
+                Console.WriteLine($"🔔 [Service] Found customer ID: {customerId}");
+
+                // 1. MEDICATIONS AVAILABLE FOR ORDERING
+                // Approved ScriptLines that haven't been ordered yet
+                notifications.AvailableForOrderingCount = await _context.ScriptLines
+                    .Where(sl => sl.Prescriptions.ApplicationUserId == applicationUserId &&
+                                sl.Status == "Approved" &&
+                                sl.Quantity > 0 &&
+                                !_context.OrderLines.Any(ol => ol.ScriptLineID == sl.ScriptLineID)) // Not yet ordered
+                    .CountAsync();
+
+                Console.WriteLine($"🔔 [Service] Available for ordering: {notifications.AvailableForOrderingCount}");
+
+                // 2. MEDICATIONS AVAILABLE FOR REFILLS
+                // ScriptLines with repeats left (only count if they have repeats available)
+                notifications.AvailableForRefillsCount = await _context.ScriptLines
+                    .Where(sl => sl.Prescriptions.ApplicationUserId == applicationUserId &&
+                                sl.RepeatsLeft > 0 &&
+                                sl.Status == "Approved" &&
+                                sl.Quantity > 0)
+                    .CountAsync();
+
+                Console.WriteLine($"🔔 [Service] Available for refills: {notifications.AvailableForRefillsCount}");
+
+                // 3. READY FOR COLLECTION
+                // Orders with ready status and their order lines
+                var readyOrders = await _context.Orders
+                    .Where(o => o.CustomerID == customerId &&
+                               (o.Status == "Ready" || o.Status == "Ready for Collection" || o.Status == "Completed"))
+                    .ToListAsync();
+
+                notifications.ReadyForCollectionCount = readyOrders
+                    .SelectMany(o => o.OrderLines)
+                    .Where(ol => ol.Status == "Approved" || ol.Status == "Completed")
+                    .Count();
+
+                Console.WriteLine($"🔔 [Service] Ready for collection: {notifications.ReadyForCollectionCount}");
+
+                // 4. REJECTED MEDICATIONS
+                // Count both rejected ScriptLines and OrderLines
+                var rejectedScriptLines = await _context.ScriptLines
+                    .Where(sl => sl.Prescriptions.ApplicationUserId == applicationUserId &&
+                                sl.Status == "Rejected")
+                    .CountAsync();
+
+                var rejectedOrderLines = await _context.OrderLines
+                    .Where(ol => ol.Order.CustomerID == customerId &&
+                                ol.Status == "Rejected")
+                    .CountAsync();
+
+                notifications.RejectedMedicationsCount = rejectedScriptLines + rejectedOrderLines;
+                Console.WriteLine($"🔔 [Service] Rejected medications: {notifications.RejectedMedicationsCount}");
+
+                // 5. PENDING ORDERS
+                // Orders that are being processed (count orders, not order lines)
+                notifications.PendingOrdersCount = await _context.Orders
+                    .Where(o => o.CustomerID == customerId &&
+                               (o.Status == "Ordered" || o.Status == "Pending" || o.Status == "Processing"))
+                    .CountAsync();
+
+                Console.WriteLine($"🔔 [Service] Pending orders: {notifications.PendingOrdersCount}");
+
+                // Calculate total active notifications for debugging
+                var totalActive = notifications.AvailableForOrderingCount +
+                                 notifications.AvailableForRefillsCount +
+                                 notifications.ReadyForCollectionCount +
+                                 notifications.RejectedMedicationsCount;
+
+                Console.WriteLine($"✅ [Service] Total active notifications: {totalActive}");
+                Console.WriteLine($"✅ [Service] All queries completed successfully");
+
             }
             catch (Exception ex)
             {
-                // Log the exception (you can use ILogger here)
-                Console.WriteLine($"Error retrieving notifications: {ex.Message}");
+                Console.WriteLine($"💥 [Service] ERROR: {ex.Message}");
+                Console.WriteLine($"💥 [Service] StackTrace: {ex.StackTrace}");
 
-                // Return default values in case of error
-                return new CustomerNotificationViewModel();
+                // Return zeros instead of test data for production
+                notifications.AvailableForOrderingCount = 0;
+                notifications.AvailableForRefillsCount = 0;
+                notifications.ReadyForCollectionCount = 0;
+                notifications.RejectedMedicationsCount = 0;
+                notifications.PendingOrdersCount = 0;
             }
 
             return notifications;
