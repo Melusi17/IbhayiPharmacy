@@ -354,7 +354,7 @@ namespace IbhayiPharmacy.Controllers
             }
         }
 
-        // UPDATED: API: Submit order with anti-forgery token
+        // API: Submit order - UPDATED WITH ORDER NUMBER GENERATION
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<JsonResult> SubmitOrder([FromBody] OrderSubmissionVM orderData)
@@ -424,12 +424,12 @@ namespace IbhayiPharmacy.Controllers
             }
         }
 
-        // Generate unique order number
+        // Generate unique order number - UPDATED SHORTER FORMAT
         private async Task<string> GenerateUniqueOrderNumber()
         {
             string orderNumber;
             bool isUnique;
-            int maxAttempts = 5; // Prevent infinite loop
+            int maxAttempts = 5;
             int attempts = 0;
 
             do
@@ -445,10 +445,10 @@ namespace IbhayiPharmacy.Controllers
 
             } while (!isUnique && attempts < maxAttempts);
 
-            // If we still don't have a unique number after max attempts, use a fallback
+            // Fallback if we still don't have a unique number
             if (!isUnique)
             {
-                string timestamp = DateTime.Now.ToString("yyyyMMddHHmmss");
+                string timestamp = DateTime.Now.ToString("yyyyMMddHHmmssfff");
                 orderNumber = $"ORD-{timestamp}";
             }
 

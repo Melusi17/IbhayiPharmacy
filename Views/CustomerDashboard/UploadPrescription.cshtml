@@ -368,98 +368,11 @@
         margin-top: 20px;
         font-size: 16px;
         font-weight: bold;
-        background: #f8f9fa;
-        padding: 15px;
-        border-radius: 8px;
-    }
-
-    .vat-breakdown {
-        font-size: 14px;
-        color: #666;
-        margin-top: 5px;
     }
 
     /* Utility Classes */
     .hidden {
         display: none;
-    }
-
-    /* Updated Toast Notification */
-    .toast-notification {
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%) scale(0.8);
-        background: #1f9f77;
-        color: white;
-        padding: 20px 30px;
-        border-radius: 12px;
-        box-shadow: 0 8px 25px rgba(0,0,0,0.3);
-        z-index: 10000;
-        display: flex;
-        align-items: center;
-        gap: 15px;
-        opacity: 0;
-        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        min-width: 300px;
-        max-width: 500px;
-        text-align: center;
-    }
-
-        .toast-notification.show {
-            opacity: 1;
-            transform: translate(-50%, -50%) scale(1);
-        }
-
-    .toast-icon {
-        font-size: 24px;
-        flex-shrink: 0;
-    }
-
-    .toast-message {
-        font-weight: 600;
-        font-size: 16px;
-        line-height: 1.4;
-    }
-
-    .toast-notification.error {
-        background: #e74c3c;
-    }
-
-    .toast-notification.warning {
-        background: #f39c12;
-    }
-
-    .toast-notification.success {
-        background: #1f9f77;
-    }
-
-    /* Backdrop for toast */
-    .toast-backdrop {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0,0,0,0.5);
-        z-index: 9999;
-        opacity: 0;
-        transition: opacity 0.3s ease;
-        pointer-events: none;
-    }
-
-        .toast-backdrop.show {
-            opacity: 1;
-            pointer-events: all;
-        }
-
-    .rejected-row {
-        background-color: #ffeaea;
-    }
-
-    .rejected-price {
-        color: #e74c3c;
-        text-decoration: line-through;
     }
 </style>
 
@@ -591,91 +504,11 @@
                 </div>
             </div>
 
-            <!-- Processed Prescriptions -->
-            <div style="margin-top: 40px;">
-                <h2>✅ Processed Prescriptions</h2>
-                <div id="processedPrescriptions">
-                    @if (Model.ProcessedPrescriptions.Any(p => !p.IsFullyOrdered))
-                    {
-                        <table class="prescription-table">
-                            <thead>
-                                <tr>
-                                    <th>Filename</th>
-                                    <th>Date</th>
-                                    <th>Doctor</th>
-                                    <th>Status</th>
-                                    <th>Order Status</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="processedPrescriptionsBody">
-                                @foreach (var prescription in Model.ProcessedPrescriptions.Where(p => !p.IsFullyOrdered))
-                                {
-                                    <tr id="processed-prescription-@prescription.PrescriptionID">
-                                        <td class="filename-cell">Prescription_@(prescription.PrescriptionID.ToString("D3"))</td>
-                                        <td>@prescription.DateIssued.ToString("yyyy-MM-dd")</td>
-                                        <td>@(prescription.Doctors?.Name ?? "Not Assigned")</td>
-                                        <td>
-                                            @if (prescription.Status == "Processed")
-                                            {
-                                                <span class="status-badge status-approved">Processed</span>
-                                            }
-                                            else if (prescription.Status == "Partially Processed")
-                                            {
-                                                <span class="status-badge status-pending">Partially Processed</span>
-                                            }
-                                            else if (prescription.Status == "Rejected")
-                                            {
-                                                <span class="status-badge status-rejected">Rejected</span>
-                                            }
-                                            else
-                                            {
-                                                @prescription.Status
-                                            }
-                                        </td>
-                                        <td>
-                                            @if (prescription.IsFullyOrdered)
-                                            {
-                                                <span class="status-badge status-ordered">All Ordered</span>
-                                            }
-                                            else if (prescription.IsPartiallyOrdered)
-                                            {
-                                                <span class="status-badge status-pending">Partially Ordered</span>
-                                            }
-                                            else
-                                            {
-                                                <span class="status-badge">Not Ordered</span>
-                                            }
-                                        </td>
-                                        <td>
-                                            <div class="action-buttons">
-                                                <button class="btn-upload" onclick="openOrderModal('@prescription.DateIssued.ToString("yyyy-MM-dd")', '@(prescription.Doctors?.Name ?? "Not Assigned")', @prescription.PrescriptionID)">Order</button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                    }
-                    else
-                    {
-                        <div class="info-message">
-                            <p>📝 No prescriptions available for ordering.</p>
-                            <p>All your processed prescriptions have been fully ordered. Check your order history or upload new prescriptions.</p>
-                        </div>
-                    }
-                </div>
-            </div>
-
-            <!-- Fully Ordered Prescriptions (Hidden by default, can be expanded) -->
-            @if (Model.ProcessedPrescriptions.Any(p => p.IsFullyOrdered))
-            {
-                <div style="margin-top: 20px;">
-                    <details>
-                        <summary style="cursor: pointer; font-weight: bold; color: #1f9f77;">
-                            📦 Fully Ordered Prescriptions (@Model.ProcessedPrescriptions.Count(p => p.IsFullyOrdered))
-                        </summary>
-                        <div style="margin-top: 15px;">
+                    <!-- Processed Prescriptions -->
+                    <div style="margin-top: 40px;">
+                        <h2>✅ Processed Prescriptions</h2>
+                        @if (Model.ProcessedPrescriptions.Any())
+                        {
                             <table class="prescription-table">
                                 <thead>
                                     <tr>
@@ -683,32 +516,52 @@
                                         <th>Date</th>
                                         <th>Doctor</th>
                                         <th>Status</th>
-                                        <th>Order Status</th>
+                                        <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach (var prescription in Model.ProcessedPrescriptions.Where(p => p.IsFullyOrdered))
+                                    @foreach (var prescription in Model.ProcessedPrescriptions)
                                     {
                                         <tr>
                                             <td class="filename-cell">Prescription_@(prescription.PrescriptionID.ToString("D3"))</td>
                                             <td>@prescription.DateIssued.ToString("yyyy-MM-dd")</td>
                                             <td>@(prescription.Doctors?.Name ?? "Not Assigned")</td>
                                             <td>
-                                                <span class="status-badge status-approved">Processed</span>
+                                                @if (prescription.Status == "Processed")
+                                                {
+                                                    <span class="status-badge status-approved">Processed</span>
+                                                }
+                                                else if (prescription.Status == "Partially Processed")
+                                                {
+                                                    <span class="status-badge status-pending">Partially Processed</span>
+                                                }
+                                                else if (prescription.Status == "Rejected")
+                                                {
+                                                    <span class="status-badge status-rejected">Rejected</span>
+                                                }
+                                                else
+                                                {
+                                                    @prescription.Status
+                                                }
                                             </td>
                                             <td>
-                                                <span class="status-badge status-ordered">All Ordered</span>
+                                                <div class="action-buttons">
+                                                   @*  <a href="@Url.Action("DownloadPrescription", "CustomerDashboard", new { id = prescription.PrescriptionID })" class="btn-upload btn-download">Download</a> *@
+                                                    <button class="btn-upload" onclick="openOrderModal('@prescription.DateIssued.ToString("yyyy-MM-dd")', '@(prescription.Doctors?.Name ?? "Not Assigned")', @prescription.PrescriptionID)">Order</button>
+                                                </div>
                                             </td>
                                         </tr>
                                     }
                                 </tbody>
                             </table>
-                        </div>
-                    </details>
+                        }
+                        else
+                        {
+                            <p>No processed prescriptions found.</p>
+                        }
+                    </div>
                 </div>
             }
-        </div>
-    }
 
     <!-- Place Order Section -->
     @if (ViewContext.RouteData.Values["action"].ToString() == "PlaceOrder")
@@ -720,17 +573,17 @@
         </div>
     }
 
-    <!-- Other Sections -->
-    @if (ViewContext.RouteData.Values["action"].ToString() == "TrackOrder" ||
-    ViewContext.RouteData.Values["action"].ToString() == "ManageRepeats" ||
-    ViewContext.RouteData.Values["action"].ToString() == "PrescriptionReport" ||
-    ViewContext.RouteData.Values["action"].ToString() == "Profile")
-    {
-        <div class="upload-prescription-panel">
-            <h2>Redirecting...</h2>
-            <p>Please use the navigation menu to access this feature.</p>
-            <p>If you're not redirected automatically, <a href="@Url.Action("Index", "CustomerDashboard")">click here</a> to return to the dashboard.</p>
-        </div>
+            <!-- Other Sections -->
+            @if (ViewContext.RouteData.Values["action"].ToString() == "TrackOrder" ||
+            ViewContext.RouteData.Values["action"].ToString() == "ManageRepeats" ||
+            ViewContext.RouteData.Values["action"].ToString() == "PrescriptionReport" ||
+            ViewContext.RouteData.Values["action"].ToString() == "Profile")
+            {
+                <div class="upload-prescription-panel">
+                    <h2>Redirecting...</h2>
+                    <p>Please use the navigation menu to access this feature.</p>
+                    <p>If you're not redirected automatically, <a href="@Url.Action("Index", "CustomerDashboard")">click here</a> to return to the dashboard.</p>
+                </div>
 
         <script>
             window.location.href = '@Url.Action(ViewContext.RouteData.Values["action"].ToString(), "CustomerDashboard")';
@@ -766,11 +619,9 @@
             </tbody>
         </table>
 
-        <div class="total-summary">
-            <p><strong>Subtotal: R</strong><span id="subtotalAmount">0.00</span></p>
-            <p class="vat-breakdown"><strong>VAT (15%): R</strong><span id="vatAmount">0.00</span></p>
-            <p><strong>Total Due: R</strong><span id="totalDue">0.00</span></p>
-        </div>
+            <div class="total-summary">
+                <p><strong>Total (incl. VAT): R</strong><span id="totalDue">0.00</span></p>
+            </div>
 
         <div class="modal-buttons">
             <button class="btn-upload" onclick="placeMedicationOrder()">Place Order</button>

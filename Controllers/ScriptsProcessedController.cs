@@ -13,10 +13,12 @@ namespace IbhayiPharmacy.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly Random _random = new Random();
+        private readonly EmailService _email;
 
-        public ScriptsProcessedController(ApplicationDbContext context)
+        public ScriptsProcessedController(ApplicationDbContext context, EmailService email)
         {
             _context = context;
+            _email = email;
         }
 
         // GET: Index - Show unprocessed prescriptions
@@ -223,20 +225,12 @@ namespace IbhayiPharmacy.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ProcessAndDispense(CustomerScriptsVM model)
         {
-            // DEBUG: Log incoming data
-            Console.WriteLine($"=== DEBUG: ProcessAndDispense STARTED ===");
-            Console.WriteLine($"PrescriptionID: {model.Prescr}");
-            Console.WriteLine($"DoctorId from model: {model.DoctorId}");
-            Console.WriteLine($"ScriptLines count: {model.ScriptLines?.Count}");
-
-            // TEMPORARY: Manual DoctorId extraction if model binding fails
             if (!model.DoctorId.HasValue || model.DoctorId == 0)
             {
                 var doctorIdValue = Request.Form["DoctorId"].FirstOrDefault();
                 if (!string.IsNullOrEmpty(doctorIdValue) && int.TryParse(doctorIdValue, out int doctorId))
                 {
                     model.DoctorId = doctorId;
-                    Console.WriteLine($"DEBUG: Extracted DoctorId from form: {model.DoctorId}");
                 }
             }
 
@@ -248,53 +242,20 @@ namespace IbhayiPharmacy.Controllers
         {
             try
             {
-                Console.WriteLine($"=== DEBUG: ProcessPrescriptionInternal STARTED ===");
-                Console.WriteLine($"CreateOrder: {createOrder}, PrescriptionID: {model.Prescr}");
-                Console.WriteLine($"Model DoctorId: {model.DoctorId}");
-                Console.WriteLine($"Model ScriptLines count: {model.ScriptLines?.Count}");
-
-                // DEBUG: Log all received script lines
-                if (model.ScriptLines != null)
-                {
-                    foreach (var sl in model.ScriptLines)
-                    {
-                        Console.WriteLine($"DEBUG RECEIVED - ScriptLineId: {sl.ScriptLineId}, MedicationId: {sl.MedicationId}, Status: {sl.Status}, Quantity: {sl.Quantity}");
-                    }
-                }
-
-                // TEMPORARY: Skip ModelState validation for debugging
-                // if (!ModelState.IsValid)
-                // {
-                //     Console.WriteLine($"DEBUG: ModelState invalid - {ModelState.ErrorCount} errors");
-                //     foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
-                //     {
-                //         Console.WriteLine($"DEBUG: ModelError: {error.ErrorMessage}");
-                //     }
-                //     TempData["ErrorMessage"] = "Please fix the validation errors below.";
-                //     await ReloadViewBags();
-                //     return View(createOrder ? "ProcessAndDispense" : "Edit", model);
-                // }
-
                 var prescription = await _context.Prescriptions
                     .Include(p => p.scriptLines)
                     .FirstOrDefaultAsync(p => p.PrescriptionID == model.Prescr);
 
                 if (prescription == null)
                 {
-                    Console.WriteLine($"DEBUG: Prescription {model.Prescr} not found");
                     TempData["ErrorMessage"] = "Prescription not found";
                     return RedirectToAction(nameof(Index));
                 }
 
-                // DEBUG: Check what script lines we have
-                Console.WriteLine($"DEBUG: Existing prescription script lines: {prescription.scriptLines?.Count}");
-
                 var hasMedications = model.ScriptLines?.Any(sl => sl.MedicationId > 0) == true;
-                Console.WriteLine($"DEBUG: HasMedications: {hasMedications}, ScriptLines count: {model.ScriptLines?.Count}");
 
                 if (!hasMedications)
                 {
-                    Console.WriteLine("DEBUG: No medications found");
                     ModelState.AddModelError("", "Please add at least one medication to process the prescription.");
                     TempData["ErrorMessage"] = "Please add at least one medication to process the prescription.";
                     await ReloadViewBags();
@@ -302,12 +263,9 @@ namespace IbhayiPharmacy.Controllers
                 }
 
                 var hasApprovedMedications = model.ScriptLines?.Any(sl => sl.Status == "Approved") == true;
-                Console.WriteLine($"DEBUG: HasApprovedMedications: {hasApprovedMedications}");
-                Console.WriteLine($"DEBUG: DoctorId: {model.DoctorId}");
 
                 if (hasApprovedMedications && (!model.DoctorId.HasValue || model.DoctorId.Value == 0))
                 {
-                    Console.WriteLine("DEBUG: Doctor required but not selected");
                     ModelState.AddModelError("DoctorId", "Doctor is required when approving medications.");
                     TempData["ErrorMessage"] = "Please select a doctor before approving any medications.";
                     await ReloadViewBags();
@@ -317,7 +275,6 @@ namespace IbhayiPharmacy.Controllers
                 var validationErrors = await ValidateScriptLinesBeforeSave(model.ScriptLines);
                 if (validationErrors.Any())
                 {
-                    Console.WriteLine($"DEBUG: Validation errors: {string.Join(", ", validationErrors)}");
                     TempData["ErrorMessage"] = string.Join(" ", validationErrors);
                     await ReloadViewBags();
                     return View(createOrder ? "ProcessAndDispense" : "Edit", model);
@@ -327,83 +284,64 @@ namespace IbhayiPharmacy.Controllers
 
                 try
                 {
-                    // FIX: Ensure DoctorID is properly set
                     if (model.DoctorId.HasValue && model.DoctorId.Value > 0)
                     {
                         prescription.DoctorID = model.DoctorId.Value;
-                        Console.WriteLine($"DEBUG: Updated prescription DoctorID to: {prescription.DoctorID}");
-                    }
-                    else
-                    {
-                        Console.WriteLine($"DEBUG: WARNING - No valid DoctorID found in model");
                     }
 
-                    // Process script lines
                     foreach (var scriptLineVM in model.ScriptLines.Where(sl => sl.MedicationId > 0))
                     {
-                        Console.WriteLine($"DEBUG: Processing ScriptLine - MedicationId: {scriptLineVM.MedicationId}, Status: {scriptLineVM.Status}, ScriptLineId: {scriptLineVM.ScriptLineId}");
-
                         if (scriptLineVM.ScriptLineId > 0)
                         {
                             await UpdateExistingScriptLine(scriptLineVM);
-                            Console.WriteLine($"DEBUG: Updated script line {scriptLineVM.ScriptLineId}, Status: {scriptLineVM.Status}");
                         }
                         else
                         {
                             await CreateNewScriptLine(scriptLineVM, model.Prescr);
-                            Console.WriteLine($"DEBUG: Created new script line for medication {scriptLineVM.MedicationId}");
                         }
                     }
 
-                    UpdatePrescriptionStatus(model, prescription);
-                    Console.WriteLine($"DEBUG: Updated prescription status to: {prescription.Status}");
-
-                    // Save changes to get updated ScriptLine IDs
+                    // Save changes first to ensure script lines are persisted
                     await _context.SaveChangesAsync();
 
-                    // ORDER CREATION LOGIC - FIXED VERSION
+                    // Update prescription status after saving script lines
+                    await UpdatePrescriptionStatus(model, prescription);
+
+                    await _context.SaveChangesAsync();
+
                     if (createOrder && hasApprovedMedications)
                     {
-                        Console.WriteLine("DEBUG: Attempting to create order...");
                         var customer = await _context.Customers
+                            .Include(c => c.ApplicationUser)
                             .FirstOrDefaultAsync(c => c.ApplicationUserId == prescription.ApplicationUserId);
-
-                        Console.WriteLine($"DEBUG: Customer found: {customer != null}, CustomerID: {customer?.CustormerID}");
 
                         if (customer != null)
                         {
                             var order = await CreateOrderFromPrescription(prescription.PrescriptionID, customer.CustormerID);
-                            Console.WriteLine($"DEBUG: Order creation result: {order != null}, OrderNumber: {order?.OrderNumber}");
 
                             if (order != null)
                             {
-                                Console.WriteLine($"DEBUG: SUCCESS - Order created, redirecting to DispenseOrder");
+                                SendOrderConfirmationEmail(customer, order, prescription);
+
                                 await _context.SaveChangesAsync();
                                 await transaction.CommitAsync();
 
-                                TempData["SuccessMessage"] = $"Prescription processed successfully! Order {order.OrderNumber} created and ready for dispensing.";
+                                TempData["SuccessMessage"] = $"Prescription processed successfully! Order {order.OrderNumber} created and ready for dispensing. Confirmation email sent to customer.";
                                 return RedirectToAction("DispenseOrder", "PharmacistDispensing", new { id = order.OrderID });
                             }
                             else
                             {
-                                Console.WriteLine("DEBUG: Order creation returned null - no order was created");
                                 TempData["WarningMessage"] = "Prescription processed but no order was created (no approved medications with valid data).";
                             }
                         }
                         else
                         {
-                            Console.WriteLine("DEBUG: Customer not found for prescription");
                             TempData["ErrorMessage"] = "Customer not found for this prescription.";
                         }
-                    }
-                    else
-                    {
-                        Console.WriteLine($"DEBUG: Order creation skipped - CreateOrder: {createOrder}, HasApprovedMedications: {hasApprovedMedications}");
                     }
 
                     await _context.SaveChangesAsync();
                     await transaction.CommitAsync();
-                    Console.WriteLine("DEBUG: Final save completed, redirecting to ScriptsProcessed Index");
 
                     TempData["SuccessMessage"] = "Prescription processed successfully!";
                     return RedirectToAction(nameof(Index));
@@ -411,15 +349,11 @@ namespace IbhayiPharmacy.Controllers
                 catch (Exception ex)
                 {
                     await transaction.RollbackAsync();
-                    Console.WriteLine($"DEBUG: Transaction Rollback - Error: {ex.Message}");
                     throw;
                 }
             }
             catch (DbUpdateException dbEx)
             {
-                Console.WriteLine($"DEBUG: DbUpdateException: {dbEx.Message}");
-                Console.WriteLine($"DEBUG: Inner Exception: {dbEx.InnerException?.Message}");
-
                 var errorMessage = "Database error occurred while saving changes.";
                 if (dbEx.InnerException != null)
                 {
@@ -444,22 +378,179 @@ namespace IbhayiPharmacy.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"DEBUG: General Exception: {ex.Message}");
-                Console.WriteLine($"DEBUG: Stack Trace: {ex.StackTrace}");
-
                 TempData["ErrorMessage"] = $"Error processing prescription: {ex.Message}";
                 await ReloadViewBags();
                 return View(createOrder ? "ProcessAndDispense" : "Edit", model);
             }
         }
 
-        // Create order from prescription (FIXED VERSION with enhanced debugging)
+        // EMAIL METHOD: Send order confirmation to customer
+        private void SendOrderConfirmationEmail(Customer customer, Order order, Prescription prescription)
+        {
+            try
+            {
+                var receiver = customer.ApplicationUser?.Email;
+                if (string.IsNullOrEmpty(receiver))
+                {
+                    return;
+                }
+
+                var subject = $"Order Confirmation - {order.OrderNumber}";
+
+                // Get approved medications for the email
+                var approvedMedications = _context.ScriptLines
+                    .Where(sl => sl.PrescriptionID == prescription.PrescriptionID && sl.Status == "Approved")
+                    .Include(sl => sl.Medications)
+                    .ToList();
+
+                var message = $@"
+                    <h3>Order Confirmation</h3>
+                    <p>Dear {customer.ApplicationUser?.Name} {customer.ApplicationUser?.Surname},</p>
+                    
+                    <p>Your prescription has been processed and your order is ready for collection.</p>
+                    
+                    <div style='background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 15px 0;'>
+                        <h4>Order Details:</h4>
+                        <p><strong>Order Number:</strong> {order.OrderNumber}</p>
+                        <p><strong>Prescription Reference:</strong> Prescription_{prescription.PrescriptionID:D2}</p>
+                        <p><strong>Order Date:</strong> {order.OrderDate:dd MMMM yyyy}</p>
+                        <p><strong>Total Amount:</strong> R {order.TotalDue}</p>
+                        <p><strong>Status:</strong> {order.Status}</p>
+                    </div>";
+
+                if (approvedMedications.Any())
+                {
+                    message += @"<h4>Approved Medications:</h4><ul>";
+
+                    foreach (var medication in approvedMedications)
+                    {
+                        message += $@"<li><strong>{medication.Medications?.MedicationName}</strong> - Quantity: {medication.Quantity}<br>
+                                    <small>Instructions: {medication.Instructions}</small></li>";
+                    }
+
+                    message += "</ul>";
+                }
+                else
+                {
+                    message += @"<p><em>No medications were approved for this order.</em></p>";
+                }
+
+                message += $@"
+                    <p>Please bring your ID and medical aid card when collecting your medication.</p>
+                    
+                    <p><strong>Collection Address:</strong><br>
+                    Ibhayi Pharmacy<br>
+                    [Your Pharmacy Address]<br>
+                    [Contact Number]</p>
+
+                    <p>Thank you for choosing Ibhayi Pharmacy!</p>
+                    <p>Best regards,<br>Ibhayi Pharmacy Team</p>";
+
+                _email.SendEmailAsync(receiver, subject, message);
+            }
+            catch (Exception ex)
+            {
+                // Email failure shouldn't break the process
+            }
+        }
+
+        // EMAIL METHOD: Send prescription status update
+        // EMAIL METHOD: Send prescription status update
+        private void SendPrescriptionStatusEmail(Prescription prescription, string status)
+        {
+            try
+            {
+                var customer = _context.Customers
+                    .Include(c => c.ApplicationUser)
+                    .FirstOrDefault(c => c.ApplicationUserId == prescription.ApplicationUserId);
+
+                if (customer?.ApplicationUser == null || string.IsNullOrEmpty(customer.ApplicationUser.Email))
+                {
+                    return;
+                }
+
+                var receiver = customer.ApplicationUser.Email;
+                var subject = $"Prescription Update - {status}";
+
+                // Get all script lines with medications
+                var scriptLines = _context.ScriptLines
+                    .Where(sl => sl.PrescriptionID == prescription.PrescriptionID)
+                    .Include(sl => sl.Medications)
+                    .ToList();
+
+                string statusMessage = status switch
+                {
+                    "Processed" => "has been fully processed and is ready for collection.",
+                    "Partially Processed" => "has been partially processed. Some medications are ready for collection.",
+                    "Rejected" => "could not be processed. Please contact the pharmacy for more information.",
+                    _ => "is being processed. We will notify you when it's ready."
+                };
+
+                var message = $@"
+            <h3>Prescription Status Update</h3>
+            <p>Dear {customer.ApplicationUser.Name} {customer.ApplicationUser.Surname},</p>
+            
+            <p>Your prescription dated {prescription.DateIssued:dd MMMM yyyy} {statusMessage}</p>
+            
+            <div style='background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 15px 0;'>
+                <p><strong>Prescription Reference:</strong> Prescription_{prescription.PrescriptionID:D2}</p>
+                <p><strong>Status:</strong> {status}</p>
+                <p><strong>Date Processed:</strong> {DateTime.Now:dd MMMM yyyy HH:mm}</p>
+            </div>";
+
+                // Add medication details
+                if (scriptLines.Any())
+                {
+                    message += @"<h4>Medication Details:</h4><ul>";
+
+                    foreach (var scriptLine in scriptLines)
+                    {
+                        var statusBadge = scriptLine.Status == "Approved" ?
+                            "<span style='color: #27ae60; font-weight: bold;'>✓ APPROVED</span>" :
+                            scriptLine.Status == "Rejected" ?
+                            "<span style='color: #e74c3c; font-weight: bold;'>✗ REJECTED</span>" :
+                            "<span style='color: #f39c12; font-weight: bold;'>⏳ PENDING</span>";
+
+                        message += $@"<li>
+                        <strong>{scriptLine.Medications?.MedicationName}</strong> - {statusBadge}<br>
+                        <small>Quantity: {scriptLine.Quantity} | Instructions: {scriptLine.Instructions}</small>";
+
+                        // Add repeat information if applicable - BOLD BLUE
+                        if (scriptLine.Repeats > 0 && scriptLine.Status == "Approved")
+                        {
+                            message += $@"<br><small style='color: #1e40af; font-weight: bold; background-color: #dbeafe; padding: 2px 6px; border-radius: 3px;'>🔄 REPEATS: {scriptLine.RepeatsLeft} out of {scriptLine.Repeats} remaining</small>";
+                        }
+
+                        // Add rejection reason if rejected
+                        if (scriptLine.Status == "Rejected" && !string.IsNullOrEmpty(scriptLine.RejectionReason))
+                        {
+                            message += $@"<br><small style='color: #e74c3c;'><strong>Rejection Reason:</strong> {scriptLine.RejectionReason}</small>";
+                        }
+
+                        message += "</li>";
+                    }
+
+                    message += "</ul>";
+                }
+
+                message += $@"
+            <p>If you have any questions, please don't hesitate to contact us.</p>
+            
+            <p>Best regards,<br>Ibhayi Pharmacy Team</p>";
+
+                _email.SendEmailAsync(receiver, subject, message);
+            }
+            catch (Exception ex)
+            {
+                // Email failure shouldn't break the process
+            }
+        }
+
+        // Create order from prescription
         private async Task<Order> CreateOrderFromPrescription(int prescriptionId, int customerId)
         {
             try
             {
-                Console.WriteLine($"DEBUG: CreateOrderFromPrescription started - PrescriptionID: {prescriptionId}, CustomerID: {customerId}");
-
                 var prescription = await _context.Prescriptions
                     .Include(p => p.scriptLines)
                         .ThenInclude(sl => sl.Medications)
@@ -467,29 +558,17 @@ namespace IbhayiPharmacy.Controllers
 
                 if (prescription == null)
                 {
-                    Console.WriteLine("DEBUG: Prescription not found in CreateOrderFromPrescription");
                     throw new Exception("Prescription not found");
                 }
 
-                Console.WriteLine($"DEBUG: Found prescription with {prescription.scriptLines.Count} script lines");
-
                 var approvedScriptLines = prescription.scriptLines.Where(sl => sl.Status == "Approved").ToList();
-                Console.WriteLine($"DEBUG: Approved script lines: {approvedScriptLines.Count}");
-
-                // DEBUG: Log each approved script line
-                foreach (var sl in approvedScriptLines)
-                {
-                    Console.WriteLine($"DEBUG: Approved ScriptLine - ID: {sl.ScriptLineID}, MedicationID: {sl.MedicationID}, Status: {sl.Status}, Medications: {sl.Medications != null}");
-                }
 
                 if (!approvedScriptLines.Any())
                 {
-                    Console.WriteLine("DEBUG: No approved script lines found for order creation");
                     return null;
                 }
 
                 string orderNumber = await GenerateUniqueOrderNumber();
-                Console.WriteLine($"DEBUG: Generated order number: {orderNumber}");
 
                 var order = new Order
                 {
@@ -501,25 +580,20 @@ namespace IbhayiPharmacy.Controllers
                 };
 
                 _context.Orders.Add(order);
-                await _context.SaveChangesAsync(); // Get OrderID
-                Console.WriteLine($"DEBUG: Order created with ID: {order.OrderID}");
+                await _context.SaveChangesAsync();
 
                 decimal subtotal = 0;
                 bool hasValidMedications = false;
 
                 foreach (var scriptLine in approvedScriptLines)
                 {
-                    Console.WriteLine($"DEBUG: Creating order line for medication {scriptLine.MedicationID}, Quantity: {scriptLine.Quantity}");
-
                     if (scriptLine.Medications == null)
                     {
-                        Console.WriteLine($"DEBUG: Medications is null for ScriptLine {scriptLine.ScriptLineID}, skipping...");
                         continue;
                     }
 
                     if (scriptLine.Medications.CurrentPrice <= 0)
                     {
-                        Console.WriteLine($"DEBUG: Invalid price for medication {scriptLine.MedicationID}, skipping...");
                         continue;
                     }
 
@@ -536,12 +610,10 @@ namespace IbhayiPharmacy.Controllers
                     _context.OrderLines.Add(orderLine);
                     subtotal += scriptLine.Medications.CurrentPrice * scriptLine.Quantity;
                     hasValidMedications = true;
-                    Console.WriteLine($"DEBUG: Order line created, subtotal now: {subtotal}");
                 }
 
                 if (!hasValidMedications)
                 {
-                    Console.WriteLine("DEBUG: No valid medications with prices found");
                     _context.Orders.Remove(order);
                     await _context.SaveChangesAsync();
                     return null;
@@ -550,13 +622,10 @@ namespace IbhayiPharmacy.Controllers
                 decimal totalDue = subtotal + (subtotal * order.VAT / 100);
                 order.TotalDue = totalDue.ToString("F2");
 
-                Console.WriteLine($"DEBUG: Order completed successfully, Subtotal: {subtotal:F2}, TotalDue: {order.TotalDue}");
                 return order;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"DEBUG: ERROR in CreateOrderFromPrescription: {ex.Message}");
-                Console.WriteLine($"DEBUG: Stack Trace: {ex.StackTrace}");
                 throw;
             }
         }
@@ -710,19 +779,39 @@ namespace IbhayiPharmacy.Controllers
             }
         }
 
-        private void UpdatePrescriptionStatus(CustomerScriptsVM model, Prescription prescription)
+        private async Task UpdatePrescriptionStatus(CustomerScriptsVM model, Prescription prescription)
         {
             var approvedLines = model.ScriptLines.Count(sl => sl.Status == "Approved");
             var rejectedLines = model.ScriptLines.Count(sl => sl.Status == "Rejected");
 
+            string oldStatus = prescription.Status;
+            string newStatus;
+
             if (approvedLines > 0 && rejectedLines > 0)
-                prescription.Status = "Partially Processed";
+                newStatus = "Partially Processed";
             else if (approvedLines > 0)
-                prescription.Status = "Processed";
+                newStatus = "Processed";
             else if (rejectedLines > 0)
-                prescription.Status = "Rejected";
+                newStatus = "Rejected";
             else
-                prescription.Status = "Pending";
+                newStatus = "Pending";
+
+            prescription.Status = newStatus;
+
+            // Send email if status changed significantly
+            if (oldStatus != newStatus && (newStatus == "Processed" || newStatus == "Partially Processed" || newStatus == "Rejected"))
+            {
+                // RELOAD the prescription with current script lines before sending email
+                var updatedPrescription = await _context.Prescriptions
+                    .Include(p => p.scriptLines)
+                        .ThenInclude(sl => sl.Medications)
+                    .FirstOrDefaultAsync(p => p.PrescriptionID == prescription.PrescriptionID);
+
+                if (updatedPrescription != null)
+                {
+                    SendPrescriptionStatusEmail(updatedPrescription, newStatus);
+                }
+            }
         }
 
         // Download prescription file
