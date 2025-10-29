@@ -246,34 +246,39 @@ namespace IbhayiPharmacy.Controllers
             try
             {
                 var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-                var prescription = await _context.Prescriptions
-                    .Include(p => p.scriptLines!)
-                    .ThenInclude(sl => sl.Medications)
-                    .FirstOrDefaultAsync(p => p.PrescriptionID == prescriptionId && p.ApplicationUserId == userId);
 
-                if (prescription == null || prescription.scriptLines == null)
-                    return Json(new List<object>());
+                // First, verify the prescription exists and belongs to the user
+                var prescriptionExists = await _context.Prescriptions
+                    .AnyAsync(p => p.PrescriptionID == prescriptionId && p.ApplicationUserId == userId);
 
-                var medications = prescription.scriptLines
+                if (!prescriptionExists)
+                {
+                    return Json(new { success = false, message = "Prescription not found or access denied" });
+                }
+
+                // Get script lines with medications - FIXED: Proper include and handling
+                var medications = await _context.ScriptLines
+                    .Where(sl => sl.PrescriptionID == prescriptionId)
+                    .Include(sl => sl.Medications)
                     .Select(sl => new
                     {
                         scriptLineId = sl.ScriptLineID,
                         medicationId = sl.MedicationID,
-                        name = sl.Medications?.MedicationName ?? "Unknown Medication",
+                        name = sl.Medications.MedicationName ?? "Unknown Medication",
                         instructions = sl.Instructions ?? "Take as directed",
                         repeats = sl.Repeats,
-                        price = sl.Medications?.CurrentPrice ?? 0,
+                        price = sl.Medications.CurrentPrice,
                         status = sl.Status ?? "Pending",
                         rejectionReason = sl.RejectionReason ?? "",
                         quantity = sl.Quantity
                     })
-                    .ToList();
+                    .ToListAsync();
 
                 return Json(medications);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return Json(new List<object>());
+                return Json(new { success = false, message = $"Error: {ex.Message}" });
             }
         }
 
@@ -712,20 +717,5 @@ namespace IbhayiPharmacy.Controllers
         }
     }
 
-    //// ADD THESE VIEWMODEL CLASSES AT THE BOTTOM OF THE CONTROLLER FILE
-    //public class OrderSubmissionVM
-    //{
-    //    public List<OrderItemVM> OrderItems { get; set; }
-    //    public int? DoctorId { get; set; }
-    //    public int? PrescriptionId { get; set; }
-    //}
-
-    //public class OrderItemVM
-    //{
-    //    public int MedicationId { get; set; }
-    //    public int ScriptLineId { get; set; }
-    //    public int Quantity { get; set; }
-    //    public string Instructions { get; set; }
-    //    public bool IsRepeat { get; set; }
-    //}
+   
 }
