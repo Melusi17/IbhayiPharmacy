@@ -1,6 +1,7 @@
 ﻿using IbhayiPharmacy.Data;
 using IbhayiPharmacy.Models;
 using IbhayiPharmacy.Models.PharmacistVM;
+using IbhayiPharmacy.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -13,10 +14,12 @@ namespace IbhayiPharmacy.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly Random _random = new Random();
+        private readonly INotificationService _notificationService;
 
-        public CustomerDashboardController(ApplicationDbContext context)
+        public CustomerDashboardController(ApplicationDbContext context, INotificationService notificationService)
         {
             _context = context;
+            _notificationService = notificationService;
         }
 
         // Main Dashboard View
@@ -25,25 +28,71 @@ namespace IbhayiPharmacy.Controllers
             return View();
         }
 
-        // Upload Prescription Section - GET
+        // UPDATED: Upload Prescription Section - GET with order tracking
         public async Task<IActionResult> UploadPrescription()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
+            var unprocessedPrescriptions = await _context.Prescriptions
+                .Where(p => p.ApplicationUserId == userId &&
+                       (p.Status == null || p.Status == "Unprocessed" || p.Status == "Pending"))
+                .OrderByDescending(p => p.DateIssued)
+                .ToListAsync();
+
+            // Get processed prescriptions
+            var processedPrescriptions = await _context.Prescriptions
+                .Where(p => p.ApplicationUserId == userId &&
+                       (p.Status == "Processed" || p.Status == "Partially Processed"))
+                .Include(p => p.Doctors)
+                .Include(p => p.scriptLines)
+                .OrderByDescending(p => p.DateIssued)
+                .ToListAsync();
+
+            // Get all order lines for the user's prescriptions
+            var prescriptionIds = processedPrescriptions.Select(p => p.PrescriptionID).ToList();
+
+            var orderLinesForPrescriptions = await _context.OrderLines
+                .Where(ol => prescriptionIds.Contains(ol.ScriptLine.PrescriptionID) && ol.Status != "Cancelled")
+                .Include(ol => ol.ScriptLine)
+                .ToListAsync();
+
+            // Group order lines by prescription ID
+            var orderLinesByPrescription = orderLinesForPrescriptions
+                .GroupBy(ol => ol.ScriptLine.PrescriptionID)
+                .ToDictionary(g => g.Key, g => g.ToList());
+
+            // Calculate order status for each prescription
+            foreach (var prescription in processedPrescriptions)
+            {
+                if (prescription.scriptLines != null && prescription.scriptLines.Any())
+                {
+                    var totalMedications = prescription.scriptLines.Count;
+
+                    // Count how many script lines have been ordered
+                    var orderedMedications = 0;
+                    if (orderLinesByPrescription.TryGetValue(prescription.PrescriptionID, out var orderLines))
+                    {
+                        // Get unique script lines that have been ordered
+                        var orderedScriptLineIds = orderLines.Select(ol => ol.ScriptLineID).Distinct();
+                        orderedMedications = prescription.scriptLines
+                            .Count(sl => orderedScriptLineIds.Contains(sl.ScriptLineID));
+                    }
+
+                    // Add dynamic properties
+                    prescription.IsFullyOrdered = orderedMedications == totalMedications;
+                    prescription.IsPartiallyOrdered = orderedMedications > 0 && orderedMedications < totalMedications;
+                }
+                else
+                {
+                    prescription.IsFullyOrdered = false;
+                    prescription.IsPartiallyOrdered = false;
+                }
+            }
+
             var model = new CustomerDashboardVM
             {
-                UnprocessedPrescriptions = await _context.Prescriptions
-                    .Where(p => p.ApplicationUserId == userId &&
-                           (p.Status == null || p.Status == "Unprocessed" || p.Status == "Pending"))
-                    .OrderByDescending(p => p.DateIssued)
-                    .ToListAsync(),
-
-                ProcessedPrescriptions = await _context.Prescriptions
-                    .Where(p => p.ApplicationUserId == userId &&
-                           (p.Status == "Processed" || p.Status == "Partially Processed"))
-                    .Include(p => p.Doctors)
-                    .OrderByDescending(p => p.DateIssued)
-                    .ToListAsync()
+                UnprocessedPrescriptions = unprocessedPrescriptions,
+                ProcessedPrescriptions = processedPrescriptions
             };
 
             return View(model);
@@ -111,6 +160,7 @@ namespace IbhayiPharmacy.Controllers
                 return Json(new { success = false, message = $"Error uploading prescription: {ex.Message}" });
             }
         }
+
         // Download Prescription
         public async Task<IActionResult> DownloadPrescription(int id)
         {
@@ -196,34 +246,39 @@ namespace IbhayiPharmacy.Controllers
             try
             {
                 var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-                var prescription = await _context.Prescriptions
-                    .Include(p => p.scriptLines!)
-                    .ThenInclude(sl => sl.Medications)
-                    .FirstOrDefaultAsync(p => p.PrescriptionID == prescriptionId && p.ApplicationUserId == userId);
 
-                if (prescription == null || prescription.scriptLines == null)
-                    return Json(new List<object>());
+                // First, verify the prescription exists and belongs to the user
+                var prescriptionExists = await _context.Prescriptions
+                    .AnyAsync(p => p.PrescriptionID == prescriptionId && p.ApplicationUserId == userId);
 
-                var medications = prescription.scriptLines
+                if (!prescriptionExists)
+                {
+                    return Json(new { success = false, message = "Prescription not found or access denied" });
+                }
+
+                // Get script lines with medications - FIXED: Proper include and handling
+                var medications = await _context.ScriptLines
+                    .Where(sl => sl.PrescriptionID == prescriptionId)
+                    .Include(sl => sl.Medications)
                     .Select(sl => new
                     {
                         scriptLineId = sl.ScriptLineID,
                         medicationId = sl.MedicationID,
-                        name = sl.Medications?.MedicationName ?? "Unknown Medication",
+                        name = sl.Medications.MedicationName ?? "Unknown Medication",
                         instructions = sl.Instructions ?? "Take as directed",
                         repeats = sl.Repeats,
-                        price = sl.Medications?.CurrentPrice ?? 0,
+                        price = sl.Medications.CurrentPrice,
                         status = sl.Status ?? "Pending",
                         rejectionReason = sl.RejectionReason ?? "",
                         quantity = sl.Quantity
                     })
-                    .ToList();
+                    .ToListAsync();
 
                 return Json(medications);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return Json(new List<object>());
+                return Json(new { success = false, message = $"Error: {ex.Message}" });
             }
         }
 
@@ -306,6 +361,7 @@ namespace IbhayiPharmacy.Controllers
 
         // API: Submit order - UPDATED WITH ORDER NUMBER GENERATION
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<JsonResult> SubmitOrder([FromBody] OrderSubmissionVM orderData)
         {
             try
@@ -373,12 +429,12 @@ namespace IbhayiPharmacy.Controllers
             }
         }
 
-        // Generate unique order number
+        // Generate unique order number - UPDATED SHORTER FORMAT
         private async Task<string> GenerateUniqueOrderNumber()
         {
             string orderNumber;
             bool isUnique;
-            int maxAttempts = 5; // Prevent infinite loop
+            int maxAttempts = 5;
             int attempts = 0;
 
             do
@@ -394,18 +450,19 @@ namespace IbhayiPharmacy.Controllers
 
             } while (!isUnique && attempts < maxAttempts);
 
-            // If we still don't have a unique number after max attempts, use a fallback
+            // Fallback if we still don't have a unique number
             if (!isUnique)
             {
-                string timestamp = DateTime.Now.ToString("yyyyMMddHHmmss");
+                string timestamp = DateTime.Now.ToString("yyyyMMddHHmmssfff");
                 orderNumber = $"ORD-{timestamp}";
             }
 
             return orderNumber;
         }
 
-        // API: Request refill
+        // UPDATED: API: Request refill with anti-forgery token
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<JsonResult> RequestRefill(int scriptLineId)
         {
             try
@@ -506,8 +563,6 @@ namespace IbhayiPharmacy.Controllers
             TempData["SuccessMessage"] = "Profile updated successfully!";
             return RedirectToAction("Profile");
         }
-
-
 
         // API: Get prescription details for editing - FIXED ROUTE
         [HttpGet]
@@ -634,5 +689,33 @@ namespace IbhayiPharmacy.Controllers
                 return Json(new { success = false, message = $"Error deleting prescription: {ex.Message}" });
             }
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetNotifications()
+        {
+            try
+            {
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return PartialView("_NotificationsPartial", new CustomerNotificationViewModel());
+                }
+
+                // You might need to inject INotificationService here
+                var notificationService = HttpContext.RequestServices.GetService<INotificationService>();
+                var notifications = await notificationService.GetCustomerNotificationsAsync(userId);
+
+                return PartialView("_NotificationsPartial", notifications);
+            }
+            catch (Exception ex)
+            {
+                // Log error
+                Console.WriteLine($"Error in GetNotifications: {ex.Message}");
+                return PartialView("_NotificationsPartial", new CustomerNotificationViewModel());
+            }
+        }
     }
+
+   
 }

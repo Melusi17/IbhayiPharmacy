@@ -15,13 +15,16 @@ namespace IbhayiPharmacy.Controllers
         private readonly ApplicationDbContext _context;
         private readonly UserManager<IdentityUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly EmailService _email; // ADDED: Email service
         private readonly Random _random = new Random();
 
-        public WalkInPrescriptionController(ApplicationDbContext context, UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager)
+        // UPDATED: Constructor with EmailService
+        public WalkInPrescriptionController(ApplicationDbContext context, UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager, EmailService email)
         {
             _context = context;
             _userManager = userManager;
             _roleManager = roleManager;
+            _email = email; // ADDED
         }
 
         // GET: Main walk-in prescription creation form
@@ -51,7 +54,7 @@ namespace IbhayiPharmacy.Controllers
             }
         }
 
-        // POST: Save walk-in prescription and create order (UPDATED WITH REJECTION FUNCTIONALITY)
+        // POST: Save walk-in prescription and create order (UPDATED WITH EMAIL FUNCTIONALITY)
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(WalkInPrescriptionVM model)
@@ -87,7 +90,7 @@ namespace IbhayiPharmacy.Controllers
                     return View(model);
                 }
 
-                // NEW: Validate script lines before processing
+                // Validate script lines before processing
                 var validationErrors = await ValidateScriptLinesBeforeSave(validMedications);
                 if (validationErrors.Any())
                 {
@@ -136,7 +139,7 @@ namespace IbhayiPharmacy.Controllers
                             RejectionReason = scriptLineVM.RejectionReason
                         };
 
-                        // NEW: Set approval/rejection dates based on status
+                        // Set approval/rejection dates based on status
                         UpdateScriptLineDates(scriptLine, scriptLineVM.Status);
 
                         _context.ScriptLines.Add(scriptLine);
@@ -153,10 +156,14 @@ namespace IbhayiPharmacy.Controllers
                         await _context.SaveChangesAsync();
                     }
 
-                    // NEW: Update prescription status based on script line statuses
+                    // Update prescription status based on script line statuses
                     UpdatePrescriptionStatus(prescription);
 
                     await _context.SaveChangesAsync();
+
+                    // ADDED: Send appropriate email notification
+                    await SendWalkInPrescriptionEmail(prescription, order, model.CustomerId.Value);
+
                     await transaction.CommitAsync();
 
                     var approvedCount = approvedScriptLines.Count;
@@ -294,22 +301,312 @@ namespace IbhayiPharmacy.Controllers
         }
 
         // NEW: Update overall prescription status based on script line statuses
+        // UPDATED: Prescription stays as "WalkIn" unless ALL medications are rejected
         private void UpdatePrescriptionStatus(Prescription prescription)
         {
             var approvedLines = prescription.scriptLines.Count(sl => sl.Status == "Approved");
             var rejectedLines = prescription.scriptLines.Count(sl => sl.Status == "Rejected");
-            var pendingLines = prescription.scriptLines.Count(sl => sl.Status == "Pending");
+            var totalLines = prescription.scriptLines.Count;
 
-            if (approvedLines > 0 && rejectedLines > 0)
-                prescription.Status = "Partially Processed";
-            else if (approvedLines > 0)
-                prescription.Status = "Processed";
-            else if (rejectedLines > 0)
+            // Only change status if ALL medications are rejected
+            if (rejectedLines == totalLines && totalLines > 0)
+            {
                 prescription.Status = "Rejected";
-            else if (pendingLines > 0)
-                prescription.Status = "Pending";
+            }
             else
+            {
+                // Otherwise, keep it as "WalkIn" regardless of approval mix
                 prescription.Status = "WalkIn";
+            }
+        }
+
+        // =========================================================================
+        // ADDED: EMAIL METHODS FOR WALK-IN PRESCRIPTIONS
+        // =========================================================================
+
+        /// <summary>
+        /// Send welcome email with login credentials to new patients
+        /// </summary>
+        private async Task SendWelcomeEmail(Customer customer, string password)
+        {
+            try
+            {
+                if (customer?.ApplicationUser == null || string.IsNullOrEmpty(customer.ApplicationUser.Email))
+                    return;
+
+                var receiver = customer.ApplicationUser.Email;
+                var customerName = $"{customer.ApplicationUser.Name} {customer.ApplicationUser.Surname}";
+                var subject = "🏥 Welcome to Ibhayi Pharmacy - Your Account Details";
+
+                var message = $@"
+            <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1);'>
+                <!-- Header -->
+                <div style='background: linear-gradient(135deg, #22586A, #3498db); padding: 30px; text-align: center; color: white;'>
+                    <h1 style='margin: 0; font-size: 28px; font-weight: bold;'>🏥 Ibhayi Pharmacy</h1>
+                    <p style='margin: 10px 0 0 0; font-size: 16px; opacity: 0.9;'>Your Trusted Healthcare Partner</p>
+                </div>
+
+                <!-- Content -->
+                <div style='padding: 30px;'>
+                    <h2 style='color: #22586A; margin-top: 0;'>Welcome, {customerName}!</h2>
+                    
+                    <p style='font-size: 16px; line-height: 1.6; color: #333;'>
+                        Thank you for registering with Ibhayi Pharmacy. Your account has been successfully created 
+                        and you can now access our online services.
+                    </p>
+
+                    <!-- Credentials Box -->
+                    <div style='background-color: #f8f9fa; border-left: 4px solid #3498db; padding: 20px; border-radius: 6px; margin: 25px 0;'>
+                        <h3 style='color: #22586A; margin-top: 0;'>🔐 Your Login Credentials</h3>
+                        
+                        <div style='background-color: white; padding: 15px; border-radius: 5px; border: 1px solid #e1e8ed; margin: 15px 0;'>
+                            <table style='width: 100%; border-collapse: collapse;'>
+                                <tr>
+                                    <td style='padding: 8px 0; border-bottom: 1px solid #f8f9fa;'><strong>Username:</strong></td>
+                                    <td style='padding: 8px 0; border-bottom: 1px solid #f8f9fa; color: #22586A; font-weight: bold;'>{customer.ApplicationUser.Email}</td>
+                                </tr>
+                                <tr>
+                                    <td style='padding: 8px 0;'><strong>Password:</strong></td>
+                                    <td style='padding: 8px 0; color: #22586A; font-weight: bold;'>{password}</td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <div style='background-color: #fff3cd; padding: 12px; border-radius: 4px; border-left: 4px solid #ffc107; margin: 15px 0;'>
+                            <p style='margin: 0; color: #856404; font-size: 14px;'>
+                                <strong>🔒 Security Notice:</strong> For your security, we recommend changing your password after first login.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Features -->
+                    <div style='margin: 25px 0;'>
+                        <h3 style='color: #22586A;'>📋 What You Can Do With Your Account:</h3>
+                        <ul style='color: #333; line-height: 1.8;'>
+                            <li>View your prescription history</li>
+                            <li>Track your medication orders</li>
+                            <li>Receive important health notifications</li>
+                            <li>Access your allergy information</li>
+                            <li>Get prescription status updates</li>
+                        </ul>
+                    </div>
+
+                    <!-- Next Steps -->
+                    <div style='background-color: #e8f4fd; padding: 20px; border-radius: 6px; border: 1px solid #3498db;'>
+                        <h3 style='color: #2980b9; margin-top: 0;'>🚀 Getting Started</h3>
+                        <ol style='color: #333; line-height: 1.8;'>
+                            <li>Visit our pharmacy portal</li>
+                            <li>Login using the credentials above</li>
+                            <li>Update your profile if needed</li>
+                            <li>Explore your account features</li>
+                        </ol>
+                    </div>
+
+                    <!-- Support -->
+                    <div style='text-align: center; margin-top: 30px; padding-top: 20px; border-top: 2px solid #f8f9fa;'>
+                        <p style='color: #7f8c8d; font-size: 14px;'>
+                            Need help? Contact our support team:<br>
+                            📞 <strong>041 123 4567</strong> | ✉️ <strong>support@ibhayipharmacy.co.za</strong>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <div style='background-color: #2c3e50; padding: 20px; text-align: center; color: #ecf0f1;'>
+                    <p style='margin: 0; font-size: 14px;'>
+                        &copy; 2024 Ibhayi Pharmacy. All rights reserved.<br>
+                        <small>Delivering Quality Healthcare to Our Community</small>
+                    </p>
+                </div>
+            </div>";
+
+                _email.SendEmailAsync(receiver, subject, message);
+            }
+            catch (Exception ex)
+            {
+                // Log but don't break the registration process
+                Console.WriteLine($"Welcome email failed: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Send email notification for walk-in prescription creation
+        /// </summary>
+        private async Task SendWalkInPrescriptionEmail(Prescription prescription, Order? order, int customerId)
+        {
+            try
+            {
+                // Load customer and doctor details for email
+                var customer = await _context.Customers
+                    .Include(c => c.ApplicationUser)
+                    .FirstOrDefaultAsync(c => c.CustormerID == customerId);
+
+                var doctor = await _context.Doctors
+                    .FirstOrDefaultAsync(d => d.DoctorID == prescription.DoctorID);
+
+                if (customer?.ApplicationUser == null || string.IsNullOrEmpty(customer.ApplicationUser.Email))
+                    return;
+
+                var receiver = customer.ApplicationUser.Email;
+                var customerName = $"{customer.ApplicationUser.Name} {customer.ApplicationUser.Surname}";
+                var doctorName = doctor != null ? $"Dr. {doctor.Name} {doctor.Surname}" : "Unknown Doctor";
+
+                // Get medication details for email
+                var scriptLines = await _context.ScriptLines
+                    .Where(sl => sl.PrescriptionID == prescription.PrescriptionID)
+                    .Include(sl => sl.Medications)
+                    .ToListAsync();
+
+                var approvedMeds = new List<string>();
+                var rejectedMeds = new List<string>();
+                decimal totalApprovedAmount = 0;
+
+                foreach (var sl in scriptLines)
+                {
+                    var medName = sl.Medications?.MedicationName ?? "Unknown Medication";
+                    var instructions = sl.Instructions ?? "Take as directed";
+                    var price = sl.Medications?.CurrentPrice ?? 0;
+                    var lineTotal = price * sl.Quantity;
+
+                    if (sl.Status == "Approved")
+                    {
+                        totalApprovedAmount += lineTotal;
+                        approvedMeds.Add($@"
+                            <div style='background-color: #e8f5e8; border-left: 4px solid #27ae60; padding: 12px; margin: 8px 0; border-radius: 4px;'>
+                                <strong style='color: #27ae60; font-size: 16px;'>🟢 {medName}</strong><br>
+                                <strong>Quantity:</strong> {sl.Quantity} | <strong>Price:</strong> R {price:F2} each<br>
+                                <strong>Line Total:</strong> R {lineTotal:F2}<br>
+                                <strong>Instructions:</strong> {instructions}
+                            </div>");
+                    }
+                    else if (sl.Status == "Rejected")
+                    {
+                        rejectedMeds.Add($@"
+                            <div style='background-color: #ffeaea; border-left: 4px solid #e74c3c; padding: 12px; margin: 8px 0; border-radius: 4px;'>
+                                <strong style='color: #e74c3c;'>🔴 {medName}</strong><br>
+                                <strong>Reason:</strong> {sl.RejectionReason ?? "Not specified"}<br>
+                                <strong>Instructions:</strong> {instructions}
+                            </div>");
+                    }
+                }
+
+                var subject = "";
+                var message = "";
+
+                if (order != null && approvedMeds.Any())
+                {
+                    // Order created successfully
+                    subject = $"💊 Walk-In Prescription Processed - {order.OrderNumber} - IbhayiPharmacy-GRP-04-14";
+
+                    message = $@"
+                        <h3>💊 Your Walk-In Prescription Has Been Processed</h3>
+                        <p>Dear {customerName}, your walk-in prescription has been processed successfully!</p>
+                        
+                        <div style='background-color: #f0f8ff; padding: 20px; border-radius: 8px; margin: 20px 0; border: 2px solid #3498db;'>
+                            <h4 style='color: #3498db; margin-top: 0;'>📦 Order Created</h4>
+                            <p><strong>Order Number:</strong> {order.OrderNumber}</p>
+                            <p><strong>Prescription Date:</strong> {prescription.DateIssued:dd MMMM yyyy}</p>
+                            <p><strong>Prescribing Doctor:</strong> {doctorName}</p>
+                            <p><strong>Approved Amount:</strong> <strong style='color: #27ae60;'>R {totalApprovedAmount:F2}</strong></p>
+                            <p><strong>Total Order Amount:</strong> R {order.TotalDue}</p>
+                        </div>";
+
+                    if (approvedMeds.Any())
+                    {
+                        message += @"<h4 style='color: #27ae60;'>✅ MEDICATIONS APPROVED & READY FOR DISPENSING:</h4>";
+                        foreach (var med in approvedMeds)
+                        {
+                            message += med;
+                        }
+                    }
+
+                    if (rejectedMeds.Any())
+                    {
+                        message += @"<h4 style='color: #e74c3c;'>❌ MEDICATIONS NOT APPROVED:</h4>";
+                        foreach (var med in rejectedMeds)
+                        {
+                            message += med;
+                        }
+
+                        message += $@"
+                            <div style='background-color: #fff3cd; padding: 15px; border-radius: 5px; margin: 15px 0; border-left: 4px solid #f39c12;'>
+                                <h4 style='color: #856404; margin-top: 0;'>👨‍⚕️ Important Notice</h4>
+                                <p>For medications that could not be approved, please <strong>consult your doctor</strong> to discuss alternative treatment options.</p>
+                            </div>";
+                    }
+
+                    message += $@"
+                        <div style='background-color: #e8f4fd; padding: 18px; border-radius: 6px; margin: 20px 0; border: 1px solid #3498db;'>
+                            <h4 style='color: #2980b9; margin-top: 0;'>🛎️ WHAT HAPPENS NEXT</h4>
+                            <ul style='margin-bottom: 0;'>
+                                <li>Your order is now in our dispensing queue</li>
+                                <li>You will receive another email when your medications are ready for collection</li>
+                                <li>Collection available during pharmacy hours</li>
+                                <li>Please bring your ID document when collecting</li>
+                            </ul>
+                        </div>";
+                }
+                else
+                {
+                    // All medications rejected - no order created
+                    subject = $"⚠️ Walk-In Prescription Update - IbhayiPharmacy-GRP-04-14";
+
+                    message = $@"
+                        <h3>⚠️ Walk-In Prescription Update</h3>
+                        <p>Dear {customerName}, we need to discuss your recent walk-in prescription.</p>
+                        
+                        <div style='background-color: #fffaf0; padding: 20px; border-radius: 8px; margin: 20px 0; border: 2px solid #e67e22;'>
+                            <h4 style='color: #e67e22; margin-top: 0;'>📋 Prescription Details</h4>
+                            <p><strong>Prescription Date:</strong> {prescription.DateIssued:dd MMMM yyyy}</p>
+                            <p><strong>Prescribing Doctor:</strong> {doctorName}</p>
+                            <p><strong>Status:</strong> <strong style='color: #e74c3c;'>Requires Follow-up</strong></p>
+                        </div>";
+
+                    if (rejectedMeds.Any())
+                    {
+                        message += @"<h4 style='color: #e74c3c;'>❌ MEDICATIONS NOT APPROVED:</h4>";
+                        foreach (var med in rejectedMeds)
+                        {
+                            message += med;
+                        }
+                    }
+
+                    message += $@"
+                        <div style='background-color: #f8d7da; padding: 18px; border-radius: 6px; margin: 20px 0; border: 1px solid #e74c3c;'>
+                            <h4 style='color: #721c24; margin-top: 0;'>👨‍⚕️ URGENT: CONSULT YOUR DOCTOR</h4>
+                            <p><strong>None of your prescribed medications could be approved at this time.</strong></p>
+                            <p>Please <strong>consult your doctor immediately</strong> to discuss:</p>
+                            <ul style='margin-bottom: 0;'>
+                                <li>Alternative medication options</li>
+                                <li>New prescriptions if needed</li>
+                                <li>Different treatment approaches</li>
+                            </ul>
+                        </div>";
+                }
+
+                message += $@"
+                    <div style='background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 15px 0;'>
+                        <h4 style='color: #2c3e50; margin-top: 0;'>📍 PHARMACY INFORMATION</h4>
+                        <p style='margin-bottom: 5px;'><strong>Ibhayi Pharmacy</strong></p>
+                        <p style='margin-bottom: 5px;'>123 Govan Mbeki Avenue</p>
+                        <p style='margin-bottom: 5px;'>Port Elizabeth, 6001</p>
+                        <p style='margin-bottom: 0;'>📞 041 123 4567</p>
+                    </div>
+
+                    <p>Thank you for choosing Ibhayi Pharmacy! 🏥</p>
+                    
+                    <div style='border-top: 2px solid #3498db; padding-top: 15px; margin-top: 20px;'>
+                        <p style='margin-bottom: 5px;'>Regards,</p>
+                        <p style='margin-bottom: 5px; font-weight: bold;'>The Pharmacy Team</p>
+                        <p style='margin-bottom: 0; font-weight: bold; color: #3498db;'>Ibhayi Pharmacy</p>
+                    </div>";
+
+                _email.SendEmailAsync(receiver, subject, message);
+            }
+            catch (Exception)
+            {
+                // Email failure shouldn't break the prescription creation process
+            }
         }
 
         // AJAX: Search customers
@@ -527,6 +824,9 @@ namespace IbhayiPharmacy.Controllers
 
                 await _context.SaveChangesAsync();
 
+                // ✅ ADDED: Send welcome email with credentials
+                await SendWelcomeEmail(customer, request.Password);
+
                 return Json(new
                 {
                     success = true,
@@ -697,5 +997,26 @@ namespace IbhayiPharmacy.Controllers
             // Preload any needed data for dropdowns
             ViewBag.DosageForms = await _context.DosageForms.ToListAsync();
         }
+    }
+
+    // Request models (keep these exactly as they are)
+    public class RegisterPatientRequest
+    {
+        public string Name { get; set; } = string.Empty;
+        public string Surname { get; set; } = string.Empty;
+        public string IDNumber { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+        public string Cellphone { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
+        public List<int> SelectedAllergyIds { get; set; } = new List<int>();
+    }
+
+    public class RegisterDoctorRequest
+    {
+        public string Name { get; set; } = string.Empty;
+        public string Surname { get; set; } = string.Empty;
+        public string PracticeNumber { get; set; } = string.Empty;
+        public string ContactNumber { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
     }
 }

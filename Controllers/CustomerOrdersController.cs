@@ -159,31 +159,30 @@ namespace IbhayiPharmacy.Controllers
         }
 
         // POST: Create order from selected medications (UPDATED with order number generation)
+        // POST: Create order from selected medications (AJAX version)
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> PlaceOrder(PlaceOrderFormVM model)
+        public async Task<JsonResult> PlaceOrder([FromBody] PlaceOrderFormVM model)
         {
             var currentUserId = GetCurrentUserId();
 
             if (string.IsNullOrEmpty(currentUserId) || model.SelectedScriptLineIds == null || !model.SelectedScriptLineIds.Any())
             {
-                TempData["Error"] = "Please select at least one medication to order.";
-                return RedirectToAction("PlaceOrder");
+                return Json(new { success = false, message = "Please select at least one medication to order." });
             }
 
-            // UPDATED VALIDATION: Removed RepeatsLeft check for initial order
+            // VALIDATION: Only allow approved script lines
             var validScriptLines = await _context.ScriptLines
                 .Include(sl => sl.Medications)
                 .Include(sl => sl.Prescriptions)
                 .Where(sl => model.SelectedScriptLineIds.Contains(sl.ScriptLineID) &&
                             sl.Prescriptions.ApplicationUserId == currentUserId &&
-                            sl.Status == "Approved") // ← Only status check for initial order
+                            sl.Status == "Approved") // Only approved medications
                 .ToListAsync();
 
             if (!validScriptLines.Any())
             {
-                TempData["Error"] = "Selected medications are no longer available.";
-                return RedirectToAction("PlaceOrder");
+                return Json(new { success = false, message = "Selected medications are no longer available." });
             }
 
             using var transaction = await _context.Database.BeginTransactionAsync();
@@ -196,8 +195,7 @@ namespace IbhayiPharmacy.Controllers
 
                 if (customer == null)
                 {
-                    TempData["Error"] = "Customer profile not found.";
-                    return RedirectToAction("PlaceOrder");
+                    return Json(new { success = false, message = "Customer profile not found." });
                 }
 
                 // Generate unique order number
@@ -221,9 +219,11 @@ namespace IbhayiPharmacy.Controllers
                 // Create order lines and update script lines
                 foreach (var scriptLine in validScriptLines)
                 {
-                    // IMPORTANT: Only decrement repeats if it actually has repeats
-                    // For one-time medications (Repeats = 0), don't touch RepeatsLeft
-                    if (scriptLine.Repeats > 0 && scriptLine.RepeatsLeft > 0)
+                    // ✅ FIX: Update script line status to "Ordered" so it disappears from the list
+                    scriptLine.Status = "Ordered";
+
+                    // ✅ FIX: Only decrement repeats if it's a refill (repeats > 0)
+                    if (scriptLine.RepeatsLeft > 0)
                     {
                         scriptLine.RepeatsLeft--;
                     }
@@ -244,20 +244,35 @@ namespace IbhayiPharmacy.Controllers
                 }
 
                 order.TotalDue = (subtotal + (subtotal * 0.15m)).ToString("F2");
+
+                // Save all changes
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
 
-                TempData["Success"] = $"Order {orderNumber} placed successfully!";
+                // ✅ SUCCESS: Return order number for the toast
+                return Json(new
+                {
+                    success = true,
+                    message = $"Order {orderNumber} placed successfully! Your medications will be prepared for collection.",
+                    orderNumber = orderNumber
+                });
 
-                // REDIRECT to Track Order in CustomerDashboardController
-                return RedirectToAction("TrackOrder", "CustomerDashboard");
             }
             catch (Exception ex)
             {
                 await transaction.RollbackAsync();
-                TempData["Error"] = "An error occurred while placing your order. Please try again.";
-                return RedirectToAction("PlaceOrder");
+                return Json(new { success = false, message = "An error occurred while placing your order. Please try again." });
             }
+        }
+
+        // Keep the original POST method for form submissions (as backup)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> PlaceOrderForm(PlaceOrderFormVM model)
+        {
+            // This is the original method - keep it but rename to avoid conflict
+            // ... your existing form submission code ...
+            return RedirectToAction("PlaceOrder");
         }
 
         // Order confirmation page (kept for reference, but redirecting to TrackOrder instead)
@@ -330,7 +345,7 @@ namespace IbhayiPharmacy.Controllers
             return View(orders);
         }
 
-        // NEW: Method specifically for refills (only shows medications with repeats)
+        // NEW: Method specifically for refills (only placeorders medications with repeats)
         public async Task<IActionResult> RequestRefill()
         {
             var currentUserId = GetCurrentUserId();

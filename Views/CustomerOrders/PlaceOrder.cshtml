@@ -9,12 +9,12 @@
         margin: 0;
         font-family: 'Segoe UI', sans-serif;
         background-color: #f4f6f9;
-        overflow: hidden;
+        overflow-x: hidden;
     }
 
     .dashboard-wrapper {
         display: flex;
-        height: 100vh;
+        min-height: 100vh;
     }
 
     .main-content {
@@ -41,25 +41,29 @@
         font-size: 15px;
         font-weight: 600;
         cursor: pointer;
-        transition: background-color 0.3s ease;
+        transition: all 0.3s ease;
         margin-right: 10px;
     }
 
         .btn-upload:hover {
             background-color: #28bf96;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
         }
 
         .btn-upload:disabled {
             background-color: #cccccc;
             cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
         }
 
         .btn-upload.cancel {
-            background-color: #999;
+            background-color: #95a5a6;
         }
 
             .btn-upload.cancel:hover {
-                background-color: #777;
+                background-color: #7f8c8d;
             }
 
     .prescription-table {
@@ -67,18 +71,24 @@
         border-collapse: collapse;
         margin-top: 15px;
         font-size: 14px;
+        background: white;
     }
 
         .prescription-table th,
         .prescription-table td {
             padding: 12px 15px;
-            border: 1px solid #ccc;
+            border: 1px solid #e0f2f1;
             text-align: left;
         }
 
         .prescription-table th {
             background-color: #e0f2f1;
             color: #004d40;
+            font-weight: 600;
+        }
+
+        .prescription-table tr:hover {
+            background-color: #f8f9fa;
         }
 
     .checkbox-cell {
@@ -88,21 +98,30 @@
     .price-cell {
         text-align: right;
         font-weight: bold;
+        color: #1f9f77;
     }
 
     .no-medications {
         text-align: center;
-        padding: 40px;
+        padding: 60px 40px;
         color: #666;
-        font-style: italic;
+        background: #f8f9fa;
+        border-radius: 10px;
+        border: 2px dashed #ddd;
     }
 
+        .no-medications h3 {
+            color: #1f9f77;
+            margin-bottom: 15px;
+        }
+
     .order-summary-container {
-        margin-top: 20px;
-        padding: 20px;
-        background-color: #e6f5f1;
+        margin-top: 30px;
+        padding: 25px;
+        background: linear-gradient(135deg, #e6f5f1 0%, #f0f9f6 100%);
         border-left: 4px solid #1f9f77;
-        border-radius: 8px;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(31, 159, 119, 0.1);
     }
 
     .summary {
@@ -110,11 +129,22 @@
         margin-bottom: 20px;
     }
 
+        .summary p {
+            margin: 8px 0;
+            display: flex;
+            justify-content: space-between;
+            max-width: 300px;
+        }
+
+        .summary strong {
+            color: #004d40;
+        }
+
     .repeat-badge {
         display: inline-block;
-        padding: 2px 8px;
-        border-radius: 12px;
-        font-size: 12px;
+        padding: 4px 10px;
+        border-radius: 15px;
+        font-size: 11px;
         font-weight: bold;
         margin-left: 5px;
     }
@@ -122,66 +152,148 @@
     .repeat-available {
         background-color: #e8f5e8;
         color: #2e7d32;
+        border: 1px solid #c8e6c9;
     }
 
     .no-repeat {
         background-color: #fff3e0;
         color: #ef6c00;
+        border: 1px solid #ffcc80;
     }
 
-    /* Modal Styling */
+    /* Enhanced Modal Styling */
     .modal-overlay {
         position: fixed;
         top: 0;
         left: 0;
         right: 0;
         bottom: 0;
-        background: rgba(0, 0, 0, 0.5);
-        z-index: 1000;
+        background: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(5px);
+        z-index: 10000;
         display: none;
         align-items: center;
         justify-content: center;
+        padding: 20px;
     }
 
     .modal-content {
         background: #fff;
         padding: 30px;
-        border-radius: 10px;
-        width: 600px;
-        max-height: 80vh;
+        border-radius: 16px;
+        width: 90%;
+        max-width: 700px;
+        max-height: 85vh;
         overflow-y: auto;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        border: 1px solid #e0f2f1;
     }
 
         .modal-content h3 {
             margin-bottom: 20px;
-            font-size: 20px;
+            font-size: 22px;
+            color: #1f9f77;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
         }
 
     .modal-table {
         width: 100%;
         border-collapse: collapse;
-        margin-bottom: 20px;
+        margin: 20px 0;
+        font-size: 14px;
     }
 
         .modal-table th,
         .modal-table td {
-            border: 1px solid #ccc;
-            padding: 8px;
+            border: 1px solid #e0f2f1;
+            padding: 10px;
             text-align: left;
         }
 
         .modal-table th {
-            background-color: #f5f5f5;
+            background-color: #e0f2f1;
+            color: #004d40;
+            font-weight: 600;
+        }
+
+        .modal-table tr:hover {
+            background-color: #f8f9fa;
         }
 
     .modal-buttons {
-        text-align: right;
+        display: flex;
+        gap: 15px;
+        justify-content: flex-end;
+        margin-top: 25px;
+        padding-top: 20px;
+        border-top: 1px solid #e0f2f1;
     }
 
     .total-summary {
         font-size: 16px;
-        margin-bottom: 10px;
+        margin: 10px 0;
+        padding: 10px 0;
+        border-top: 1px solid #e0f2f1;
+    }
+
+        .total-summary:last-child {
+            font-size: 18px;
+            font-weight: bold;
+            color: #1f9f77;
+            border-top: 2px solid #1f9f77;
+        }
+
+    /* Toast Notification */
+    .toast-backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        display: none;
+        z-index: 9998;
+    }
+
+    .toast-notification {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) scale(0.8);
+        background: white;
+        padding: 25px 35px;
+        border-radius: 16px;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        z-index: 9999;
+        opacity: 0;
+        transition: all 0.3s ease;
+        max-width: 450px;
+        text-align: center;
+        border-left: 5px solid #1f9f77;
+    }
+
+        .toast-notification.show {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+    .toast-icon {
+        font-size: 28px;
+        flex-shrink: 0;
+    }
+
+    .toast-message {
+        font-weight: 500;
+        font-size: 16px;
+        color: #333;
+        line-height: 1.5;
     }
 
     /* Alert Messages */
@@ -190,9 +302,10 @@
         color: #1f9f77;
         font-weight: 500;
         background-color: #e6f5f1;
-        padding: 10px;
-        border-radius: 5px;
-        margin: 10px 0;
+        padding: 15px;
+        border-radius: 8px;
+        margin: 15px 0;
+        border-left: 4px solid #1f9f77;
     }
 
     .error-message {
@@ -200,263 +313,478 @@
         color: #e74c3c;
         font-weight: 500;
         background-color: #f8d7da;
-        padding: 10px;
-        border-radius: 5px;
-        margin: 10px 0;
+        padding: 15px;
+        border-radius: 8px;
+        margin: 15px 0;
+        border-left: 4px solid #e74c3c;
     }
+
+    .info-message {
+        text-align: center;
+        color: #17a2b8;
+        font-weight: 500;
+        background-color: #d1ecf1;
+        padding: 15px;
+        border-radius: 8px;
+        margin: 15px 0;
+        border-left: 4px solid #17a2b8;
+    }
+
+    /* Loading Spinner */
+    .loading-spinner {
+        display: none;
+        text-align: center;
+        padding: 20px;
+    }
+
+    .spinner {
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #1f9f77;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto;
+    }
+
+    @@keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+    /* Amount alignment */
+    .amount-display {
+        font-family: 'Courier New', monospace;
+        font-weight: bold;
+        text-align: right;
+    }
+    /* Make button links fully clickable */
+    .btn-upload {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        min-width: 200px;
+        text-align: center;
+    }
+
+        /* Ensure the entire button area is clickable */
+        .btn-upload:hover {
+            text-decoration: none;
+        }
 </style>
-        <!-- Main Content -->
-        <main class="main-content" id="mainContent">
-            <div class="upload-prescription-panel">
-                <h2>📦 Place Medication Order</h2>
 
-                <!-- Alert Messages -->
-                <div id="orderStatus"></div>
+<!-- Toast Notification -->
+<div id="toastBackdrop" class="toast-backdrop"></div>
+<div id="toastNotification" class="toast-notification">
+    <span class="toast-icon">✅</span>
+    <span class="toast-message" id="toastMessage">Operation completed successfully!</span>
+</div>
 
-                @if (!Model.Any())
-                {
-                    <div class="no-medications">
-                        <h3>No medications available for ordering</h3>
-                        <p>You don't have any approved prescriptions ready for ordering.</p>
-                        <p>Please upload a prescription first or check if your prescriptions have been processed.</p>
-                        <a asp-controller="CustomerDashboard" asp-action="UploadPrescription" class="btn-upload" style="margin-top: 15px;">
-                            📥 Upload Prescription
-                        </a>
-                    </div>
-                }
-                else
-                {
-                    <form id="orderForm" asp-controller="CustomerOrders" asp-action="PlaceOrder" method="post">
-                        @Html.AntiForgeryToken()
+<!-- Main Content -->
+<main class="main-content" id="mainContent">
+    <div class="upload-prescription-panel">
+        <h2>📦 Place Medication Order</h2>
 
-                        <table class="prescription-table">
-                            <thead>
-                                <tr>
-                                    <th>Select</th>
-                                    <th>Doctor</th>
-                                    <th>Medication</th>
-                                    <th>Qty</th>
-                                    <th>Repeats</th>
-                                    <th>Instructions</th>
-                                    <th>Unit Price (R)</th>
-                                    <th>Total (R)</th>
-                                </tr>
-                            </thead>
-                            <tbody id="medicationBody">
-                                @for (int i = 0; i < Model.Count; i++)
-                                {
-                                    var medication = Model[i];
-                                    <tr>
-                                        <td class="checkbox-cell">
-                                            <input type="checkbox"
-                                                   class="med-check"
-                                                   name="SelectedScriptLineIds"
-                                                   value="@medication.ScriptLineID"
-                                                   data-price="@medication.CurrentPrice"
-                                                   data-quantity="@medication.Quantity"
-                                                   onchange="updateTotals()" />
-                                        </td>
-                                        <td>@medication.FullDoctorName</td>
-                                        <td>@medication.MedicationName</td>
-                                        <td>@medication.Quantity</td>
-                                        <td>
-                                            @if (medication.RepeatsLeft > 0)
-                                            {
-                                                <span class="repeat-badge repeat-available" title="Available for refills">
-                                                    🔄 @medication.RepeatsLeft of @medication.TotalRepeats
-                                                </span>
-                                            }
-                                            else
-                                            {
-                                                <span class="repeat-badge no-repeat" title="One-time medication">
-                                                    ⏸️ No repeats
-                                                </span>
-                                            }
-                                        </td>
-                                        <td>@medication.Instructions</td>
-                                        <td class="price-cell">@medication.CurrentPrice.ToString("F2")</td>
-                                        <td class="price-cell">@medication.LineTotal.ToString("F2")</td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
+        <!-- Alert Messages -->
+        <div id="orderStatus">
+            @if (TempData["Success"] != null)
+            {
+                <div class="success-message">
+                    @TempData["Success"]
+                </div>
+            }
+            @if (TempData["Error"] != null)
+            {
+                <div class="error-message">
+                    @TempData["Error"]
+                </div>
+            }
+        </div>
 
-                        <div class="order-summary-container">
-                            <div class="summary">
-                                <p>Subtotal: R<span id="subtotal">0.00</span></p>
-                                <p>Tax (15%): R<span id="tax">0.00</span></p>
-                                <p><strong>Total Due: R</strong><span id="total">0.00</span></p>
-                            </div>
+        <!-- Loading Spinner -->
+        <div id="loadingSpinner" class="loading-spinner">
+            <div class="spinner"></div>
+            <p>Processing your order...</p>
+        </div>
 
-                            <div class="form-group">
-                                <button type="button" class="btn-upload" onclick="showOrderSummary()" id="placeOrderBtn" disabled>
-                                    Place Order
-                                </button>
-                                <button type="button" class="btn-upload cancel" onclick="clearSelection()">
-                                    Clear Selection
-                                </button>
-                            </div>
-                        </div>
-                    </form>
-
-                    <!-- Confirmation Modal -->
-                    <div id="confirmationModal" class="modal-overlay">
-                        <div class="modal-content">
-                            <h3>✅ Confirm Medication Order</h3>
-
-                            <p><strong>Order Summary</strong></p>
-                            <table class="modal-table">
-                                <thead>
-                                    <tr>
-                                        <th>Doctor</th>
-                                        <th>Medication</th>
-                                        <th>Qty</th>
-                                        <th>Repeats</th>
-                                        <th>Price (R)</th>
-                                        <th>Total (R)</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="confirmationBody"></tbody>
-                            </table>
-                            <p class="total-summary"><strong>Subtotal: R<span id="modalSubtotal">0.00</span></strong></p>
-                            <p class="total-summary"><strong>Tax (15%): R<span id="modalTax">0.00</span></strong></p>
-                            <p class="total-summary"><strong>Total Due (incl. VAT): R<span id="modalTotal">0.00</span></strong></p>
-                            <div class="modal-buttons">
-                                <button type="button" class="btn-upload" onclick="submitOrder()">Confirm Order</button>
-                                <button type="button" class="btn-upload cancel" onclick="closeConfirmation()">Cancel</button>
-                            </div>
-                        </div>
-                    </div>
-                }
+        @if (!Model.Any())
+        {
+            <div class="no-medications">
+                <h3>🎉 No medications available for ordering</h3>
+                <p>All your approved prescriptions have been ordered or are awaiting processing.</p>
+                <p>If you have repeat medications, you can request refills from the Manage Repeats section.</p>
+                <div class="button-container">
+                    <a asp-controller="CustomerDashboard" asp-action="UploadPrescription" class="btn-upload">
+                        📥 Upload New Prescription
+                    </a>
+                    <a asp-controller="CustomerRefill" asp-action="ManageRepeats" class="btn-upload" style="background-color: #3498db;">
+                        🔁 Manage Repeats
+                    </a>
+                </div>
             </div>
-        </main>
+        }
+        else
+        {
+            <form id="orderForm" asp-controller="CustomerOrders" asp-action="PlaceOrder" method="post">
+                @Html.AntiForgeryToken()
 
-    <script>
-        // Update order totals based on selected medications
-        function updateTotals() {
-            const checkboxes = document.querySelectorAll('.med-check:checked');
-            let subtotal = 0;
-            const selectedItems = [];
+                <table class="prescription-table">
+                    <thead>
+                        <tr>
+                            <th>Select</th>
+                            <th>Doctor</th>
+                            <th>Medication</th>
+                            <th>Qty</th>
+                            <th>Repeats</th>
+                            <th>Instructions</th>
+                            <th>Unit Price (R)</th>
+                            <th>Total (R)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="medicationBody">
+                        @for (int i = 0; i < Model.Count; i++)
+                        {
+                            var medication = Model[i];
+                            <tr>
+                                <td class="checkbox-cell">
+                                    <input type="checkbox"
+                                           class="med-check"
+                                           name="SelectedScriptLineIds"
+                                           value="@medication.ScriptLineID"
+                                           data-price="@medication.CurrentPrice"
+                                           data-quantity="@medication.Quantity"
+                                           onchange="updateTotals()" />
+                                </td>
+                                <td>@medication.FullDoctorName</td>
+                                <td>
+                                    <strong>@medication.MedicationName</strong>
+                                </td>
+                                <td>@medication.Quantity</td>
+                                <td>
+                                    @if (medication.RepeatsLeft > 0)
+                                    {
+                                        <span class="repeat-badge repeat-available" title="Available for refills">
+                                            🔄 @medication.RepeatsLeft of @medication.TotalRepeats
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="repeat-badge no-repeat" title="One-time medication">
+                                            ⏸️ No repeats
+                                        </span>
+                                    }
+                                </td>
+                                <td>@medication.Instructions</td>
+                                <td class="price-cell amount-display">@medication.CurrentPrice.ToString("F2")</td>
+                                <td class="price-cell amount-display">@medication.LineTotal.ToString("F2")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
 
-            checkboxes.forEach(cb => {
-                const price = parseFloat(cb.dataset.price || 0);
-                const quantity = parseInt(cb.dataset.quantity || 1);
-                const lineTotal = price * quantity;
-                subtotal += lineTotal;
+                <div class="order-summary-container">
+                    <div class="summary">
+                        <p><strong>Subtotal:</strong> <span class="amount-display">R <span id="subtotal">0.00</span></span></p>
+                        <p><strong>VAT (15%):</strong> <span class="amount-display">R <span id="tax">0.00</span></span></p>
+                        <p><strong>Total Due:</strong> <span class="amount-display">R <span id="total">0.00</span></span></p>
+                    </div>
 
-                // Get row data for confirmation modal
-                const row = cb.closest('tr');
-                const cells = row.querySelectorAll('td');
-                selectedItems.push({
-                    doctor: cells[1].textContent.trim(),
-                    medication: cells[2].textContent.trim(),
-                    quantity: cells[3].textContent.trim(),
-                    repeats: cells[4].textContent.trim(),
-                    price: price,
-                    lineTotal: lineTotal
-                });
-            });
+                    <div class="form-group">
+                        <button type="button" class="btn-upload" onclick="showOrderSummary()" id="placeOrderBtn" disabled>
+                            🛒 Place Order
+                        </button>
+                        <button type="button" class="btn-upload cancel" onclick="clearSelection()">
+                            🗑️ Clear Selection
+                        </button>
+                    </div>
+                </div>
+            </form>
 
-            const tax = subtotal * 0.15;
-            const total = subtotal + tax;
+            <!-- Enhanced Confirmation Modal -->
+            <div id="confirmationModal" class="modal-overlay">
+                <div class="modal-content">
+                    <h3>✅ Confirm Medication Order</h3>
 
-            document.getElementById('subtotal').textContent = subtotal.toFixed(2);
-            document.getElementById('tax').textContent = tax.toFixed(2);
-            document.getElementById('total').textContent = total.toFixed(2);
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                        <p style="margin: 0; color: #666; font-size: 14px;">
+                            Please review your order before confirming. Once placed, this order will be processed by our pharmacy team.
+                        </p>
+                    </div>
 
-            // Enable/disable place order button
-            const placeOrderBtn = document.getElementById('placeOrderBtn');
-            placeOrderBtn.disabled = checkboxes.length === 0;
+                    <p><strong>Order Summary</strong></p>
+                    <table class="modal-table">
+                        <thead>
+                            <tr>
+                                <th>Medication</th>
+                                <th>Doctor</th>
+                                <th>Qty</th>
+                                <th>Repeats</th>
+                                <th>Price (R)</th>
+                                <th>Total (R)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="confirmationBody"></tbody>
+                    </table>
 
-            // Store selected items for confirmation modal
-            window.selectedOrderItems = selectedItems;
-            window.orderSubtotal = subtotal;
-            window.orderTax = tax;
-            window.orderTotal = total;
+                    <div style="background: #e6f5f1; padding: 15px; border-radius: 8px; margin-top: 20px;">
+                        <p class="total-summary"><strong>Subtotal: <span class="amount-display">R <span id="modalSubtotal">0.00</span></span></strong></p>
+                        <p class="total-summary"><strong>VAT (15%): <span class="amount-display">R <span id="modalTax">0.00</span></span></strong></p>
+                        <p class="total-summary"><strong>Total Due (incl. VAT): <span class="amount-display">R <span id="modalTotal">0.00</span></span></strong></p>
+                    </div>
+
+                    <div class="modal-buttons">
+                        <button type="button" class="btn-upload" onclick="submitOrder()" id="confirmOrderBtn">
+                            ✅ Confirm & Place Order
+                        </button>
+                        <button type="button" class="btn-upload cancel" onclick="closeConfirmation()">
+                            ✖️ Cancel
+                        </button>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</main>
+
+<script>
+    // Enhanced Toast notification function
+    function showToast(message, type = 'success', duration = 5000) {
+        const toast = document.getElementById('toastNotification');
+        const backdrop = document.getElementById('toastBackdrop');
+        const toastMessage = document.getElementById('toastMessage');
+
+        // Set message and style based on type
+        toastMessage.textContent = message;
+
+        // Remove previous classes
+        toast.classList.remove('success', 'error', 'warning', 'info');
+        toast.classList.add(type);
+
+        // Set icon based on type
+        const toastIcon = toast.querySelector('.toast-icon');
+        if (type === 'error') {
+            toastIcon.textContent = '❌';
+            toast.style.borderLeftColor = '#e74c3c';
+        } else if (type === 'warning') {
+            toastIcon.textContent = '⚠️';
+            toast.style.borderLeftColor = '#f39c12';
+        } else if (type === 'info') {
+            toastIcon.textContent = 'ℹ️';
+            toast.style.borderLeftColor = '#3498db';
+        } else {
+            toastIcon.textContent = '✅';
+            toast.style.borderLeftColor = '#1f9f77';
         }
 
-        // Show order summary in modal
-        function showOrderSummary() {
-            const checkboxes = document.querySelectorAll('.med-check:checked');
-            if (checkboxes.length === 0) {
-                showOrderStatus('⚠️ Please select at least one medication.', 'error');
-                return;
+        // Show toast with backdrop
+        toast.classList.add('show');
+        backdrop.classList.add('show');
+
+        // Clear any existing timeout
+        if (window.toastTimeout) {
+            clearTimeout(window.toastTimeout);
+        }
+
+        // Hide after specified duration (default 5 seconds)
+        window.toastTimeout = setTimeout(() => {
+            hideToast();
+        }, duration);
+    }
+
+    // Function to manually hide toast
+    function hideToast() {
+        const toast = document.getElementById('toastNotification');
+        const backdrop = document.getElementById('toastBackdrop');
+
+        toast.classList.remove('show');
+        backdrop.classList.remove('show');
+
+        if (window.toastTimeout) {
+            clearTimeout(window.toastTimeout);
+        }
+    }
+
+    // Update order totals based on selected medications
+    function updateTotals() {
+        const checkboxes = document.querySelectorAll('.med-check:checked');
+        let subtotal = 0;
+        const selectedItems = [];
+
+        checkboxes.forEach(cb => {
+            const price = parseFloat(cb.dataset.price || 0);
+            const quantity = parseInt(cb.dataset.quantity || 1);
+            const lineTotal = price * quantity;
+            subtotal += lineTotal;
+
+            // Get row data for confirmation modal
+            const row = cb.closest('tr');
+            const cells = row.querySelectorAll('td');
+            selectedItems.push({
+                medication: cells[2].querySelector('strong').textContent.trim(),
+                doctor: cells[1].textContent.trim(),
+                quantity: cells[3].textContent.trim(),
+                repeats: cells[4].textContent.trim(),
+                price: price,
+                lineTotal: lineTotal,
+                scriptLineId: cb.value
+            });
+        });
+
+        const tax = subtotal * 0.15;
+        const total = subtotal + tax;
+
+        // Update display with proper alignment
+        document.getElementById('subtotal').textContent = subtotal.toFixed(2);
+        document.getElementById('tax').textContent = tax.toFixed(2);
+        document.getElementById('total').textContent = total.toFixed(2);
+
+        // Enable/disable place order button
+        const placeOrderBtn = document.getElementById('placeOrderBtn');
+        placeOrderBtn.disabled = checkboxes.length === 0;
+
+        // Store selected items for confirmation modal
+        window.selectedOrderItems = selectedItems;
+        window.orderSubtotal = subtotal;
+        window.orderTax = tax;
+        window.orderTotal = total;
+    }
+
+    // Show order summary in modal
+    function showOrderSummary() {
+        const checkboxes = document.querySelectorAll('.med-check:checked');
+        if (checkboxes.length === 0) {
+            showToast('⚠️ Please select at least one medication to order.', 'warning');
+            return;
+        }
+
+        const tbody = document.getElementById('confirmationBody');
+        tbody.innerHTML = '';
+
+        window.selectedOrderItems.forEach(item => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td><strong>${item.medication}</strong></td>
+                <td>${item.doctor}</td>
+                <td>${item.quantity}</td>
+                <td>${item.repeats}</td>
+                <td class="amount-display">${item.price.toFixed(2)}</td>
+                <td class="amount-display"><strong>${item.lineTotal.toFixed(2)}</strong></td>
+            `;
+            tbody.appendChild(row);
+        });
+
+        // Show totals in modal with proper alignment
+        document.getElementById('modalSubtotal').textContent = window.orderSubtotal.toFixed(2);
+        document.getElementById('modalTax').textContent = window.orderTax.toFixed(2);
+        document.getElementById('modalTotal').textContent = window.orderTotal.toFixed(2);
+
+        // Show modal
+        document.getElementById('confirmationModal').style.display = 'flex';
+    }
+
+    // Submit the order via AJAX and refresh after success
+    async function submitOrder() {
+        const confirmBtn = document.getElementById('confirmOrderBtn');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+
+        // Show loading state
+        confirmBtn.disabled = true;
+        confirmBtn.innerHTML = '⏳ Processing...';
+        loadingSpinner.style.display = 'block';
+
+        // Close modal
+        document.getElementById('confirmationModal').style.display = 'none';
+
+        try {
+            // Get selected script line IDs
+            const selectedScriptLineIds = window.selectedOrderItems.map(item => item.scriptLineId);
+
+            // Get anti-forgery token
+            const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+
+            // Submit via AJAX
+            const response = await fetch('@Url.Action("PlaceOrder", "CustomerOrders")', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': token
+                },
+                body: JSON.stringify({
+                    SelectedScriptLineIds: selectedScriptLineIds
+                })
+            });
+
+            if (response.ok) {
+                // Show success toast
+                showToast('Order placed successfully!', 'success', 3000);
+
+                // Refresh the page after a short delay to show the toast
+                setTimeout(() => {
+                    window.location.reload();
+                }, 2000);
+            } else {
+                throw new Error('Order submission failed');
             }
 
-            const tbody = document.getElementById('confirmationBody');
-            tbody.innerHTML = '';
+        } catch (error) {
+            console.error('Error placing order:', error);
+            showToast('❌ Error placing order. Please try again.', 'error', 5000);
 
-            window.selectedOrderItems.forEach(item => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${item.doctor}</td>
-                    <td>${item.medication}</td>
-                    <td>${item.quantity}</td>
-                    <td>${item.repeats}</td>
-                    <td>${item.price.toFixed(2)}</td>
-                    <td>${item.lineTotal.toFixed(2)}</td>
-                `;
-                tbody.appendChild(row);
-            });
-
-            // Show totals in modal
-            document.getElementById('modalSubtotal').textContent = window.orderSubtotal.toFixed(2);
-            document.getElementById('modalTax').textContent = window.orderTax.toFixed(2);
-            document.getElementById('modalTotal').textContent = window.orderTotal.toFixed(2);
-
-            // Show modal
-            document.getElementById('confirmationModal').style.display = 'flex';
+            // Reset button state
+            confirmBtn.disabled = false;
+            confirmBtn.innerHTML = '✅ Confirm & Place Order';
+            loadingSpinner.style.display = 'none';
         }
+    }
 
-        // Submit the actual form
-        function submitOrder() {
-            document.getElementById('orderForm').submit();
-        }
+    // Close confirmation modal
+    function closeConfirmation() {
+        document.getElementById('confirmationModal').style.display = 'none';
+    }
 
-        // Close confirmation modal
-        function closeConfirmation() {
-            document.getElementById('confirmationModal').style.display = 'none';
-        }
+    // Clear selection
+    function clearSelection() {
+        document.querySelectorAll('.med-check').forEach(cb => {
+            cb.checked = false;
+        });
+        updateTotals();
+        showToast('Selection cleared', 'info', 2000);
+    }
 
-        // Clear selection
-        function clearSelection() {
-            document.querySelectorAll('.med-check').forEach(cb => {
-                cb.checked = false;
-            });
-            updateTotals();
-        }
+    // Show order status message
+    function showOrderStatus(message, type) {
+        const statusDiv = document.getElementById('orderStatus');
+        statusDiv.innerHTML = '';
 
-        // Show order status message
-        function showOrderStatus(message, type) {
-            const statusDiv = document.getElementById('orderStatus');
-            statusDiv.innerHTML = '';
+        const messageDiv = document.createElement('div');
+        messageDiv.className = type === 'success' ? 'success-message' : 'error-message';
+        messageDiv.textContent = message;
+        statusDiv.appendChild(messageDiv);
+    }
 
-            const messageDiv = document.createElement('div');
-            messageDiv.className = type === 'success' ? 'success-message' : 'error-message';
-            messageDiv.textContent = message;
-            statusDiv.appendChild(messageDiv);
-        }
+    // Initialize page - update totals on load
+    document.addEventListener('DOMContentLoaded', function() {
+        updateTotals();
 
-        // Profile menu functions
-        function toggleProfileMenu() {
-            const menu = document.getElementById('profileMenu');
-            if (menu) {
-                menu.classList.toggle('hidden');
-            }
-        }
-
-        // Close profile menu when clicking outside
-        document.addEventListener('click', function(event) {
-            const profileMenu = document.getElementById('profileMenu');
-            const profileIcon = document.querySelector('.profile-icon');
-
-            if (profileMenu && !profileMenu.contains(event.target) && !profileIcon.contains(event.target)) {
-                profileMenu.classList.add('hidden');
+        // Close modal when clicking outside
+        document.getElementById('confirmationModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeConfirmation();
             }
         });
 
-        // Initialize page - update totals on load
-        document.addEventListener('DOMContentLoaded', function() {
-            updateTotals();
-        });
-    </script>
+        // Show success message from TempData if exists
+    @if (TempData["Success"] != null)
+    {
+        <text>
+                showToast('@TempData["Success"]', 'success', 5000);
+        </text>
+    }
+    });
+</script>
