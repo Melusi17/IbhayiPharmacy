@@ -21,7 +21,7 @@ namespace IbhayiPharmacy.Models
         //[ForeignKey("PharmacistID")]
         //public int PharmacistID { get; set; }
 
-      
+
         public int Quantity { get; set; }
 
         public string Instructions { get; set; }

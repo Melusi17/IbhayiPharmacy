@@ -1,4 +1,285 @@
-﻿using IbhayiPharmacy.Data;
+﻿//using IbhayiPharmacy.Data;
+//using IbhayiPharmacy.Models;
+//using IbhayiPharmacy.Models.PharmacistVM;
+//using Microsoft.AspNetCore.Authorization;
+//using Microsoft.AspNetCore.Mvc;
+//using Microsoft.EntityFrameworkCore;
+//using System.Security.Claims;
+
+//namespace IbhayiPharmacy.Controllers
+//{
+//    [Authorize(Policy = "Customer")]
+//    public class CustomerOrdersController : Controller
+//    {
+//        private readonly ApplicationDbContext _context;
+//        private readonly Random _random = new Random();
+
+//        public CustomerOrdersController(ApplicationDbContext context)
+//        {
+//            _context = context;
+//        }
+
+//        // Helper method to get current user ID
+//        private string GetCurrentUserId()
+//        {
+//            return User.FindFirstValue(ClaimTypes.NameIdentifier);
+//        }
+
+//        // Generate unique order number with ORD-C-RRRR format
+//        private async Task<string> GenerateUniqueOrderNumber()
+//        {
+//            string orderNumber;
+//            bool isUnique;
+//            int maxAttempts = 5;
+//            int attempts = 0;
+
+//            do
+//            {
+//                string randomPart = _random.Next(1000, 10000).ToString();
+//                orderNumber = $"ORD-C-{randomPart}";
+//                isUnique = !await _context.Orders.AnyAsync(o => o.OrderNumber == orderNumber);
+//                attempts++;
+
+//            } while (!isUnique && attempts < maxAttempts);
+
+//            if (!isUnique)
+//            {
+//                string timestamp = DateTime.Now.ToString("HHmmss");
+//                orderNumber = $"ORD-C-{timestamp}";
+//            }
+
+//            return orderNumber;
+//        }
+
+//        // GET: Display processed/approved medications available for ordering
+//        public async Task<IActionResult> PlaceOrder()
+//        {
+//            try
+//            {
+//                var currentUserId = GetCurrentUserId();
+
+//                if (string.IsNullOrEmpty(currentUserId))
+//                {
+//                    return RedirectToAction("Login", "Account");
+//                }
+
+//                // ✅ MODIFIED: Show ALL approved medications that have repeats left
+//                var availableScriptLines = await _context.ScriptLines
+//                    .Include(sl => sl.Medications)
+//                    .Include(sl => sl.Prescriptions)
+//                        .ThenInclude(p => p.Doctors)
+//                    .Where(sl => sl.Prescriptions.ApplicationUserId == currentUserId &&
+//                                sl.Status == "Approved" &&
+//                                sl.RepeatsLeft > 0) // ← KEY CHANGE: Any approved med with repeats left
+//                    .Select(sl => new CustomerOrderVM
+//                    {
+//                        ScriptLineID = sl.ScriptLineID,
+//                        PrescriptionID = sl.PrescriptionID,
+//                        MedicationID = sl.MedicationID,
+//                        Quantity = sl.Quantity,
+//                        TotalRepeats = sl.Repeats,
+//                        RepeatsLeft = sl.RepeatsLeft,
+//                        Instructions = sl.Instructions ?? string.Empty,
+//                        MedicationName = sl.Medications.MedicationName ?? string.Empty,
+//                        CurrentPrice = sl.Medications.CurrentPrice,
+//                        Schedule = sl.Medications.Schedule ?? string.Empty,
+//                        DoctorName = sl.Prescriptions.Doctors.Name ?? string.Empty,
+//                        DoctorSurname = sl.Prescriptions.Doctors.Surname ?? string.Empty,
+//                        IsFirstTimeOrder = sl.RepeatsLeft == sl.Repeats // Flag for UI display
+//                    })
+//                    .ToListAsync();
+
+//                return View(availableScriptLines);
+//            }
+//            catch (Exception ex)
+//            {
+//                TempData["Error"] = "An error occurred while loading medications. Please try again.";
+//                return View(new List<CustomerOrderVM>());
+//            }
+//        }
+
+//        // POST: Create order from selected medications
+//        [HttpPost]
+//        [ValidateAntiForgeryToken]
+//        public async Task<JsonResult> PlaceOrder([FromBody] PlaceOrderFormVM model)
+//        {
+//            var currentUserId = GetCurrentUserId();
+
+//            if (string.IsNullOrEmpty(currentUserId) || model.SelectedScriptLineIds == null || !model.SelectedScriptLineIds.Any())
+//            {
+//                return Json(new { success = false, message = "Please select at least one medication to order." });
+//            }
+
+//            // VALIDATION: Only allow approved medications with repeats left
+//            var validScriptLines = await _context.ScriptLines
+//                .Include(sl => sl.Medications)
+//                .Include(sl => sl.Prescriptions)
+//                .Where(sl => model.SelectedScriptLineIds.Contains(sl.ScriptLineID) &&
+//                            sl.Prescriptions.ApplicationUserId == currentUserId &&
+//                            sl.Status == "Approved" &&
+//                            sl.RepeatsLeft > 0) // ← Any approved med with repeats
+//                .ToListAsync();
+
+//            if (!validScriptLines.Any())
+//            {
+//                return Json(new { success = false, message = "Selected medications are no longer available for ordering." });
+//            }
+
+//            using var transaction = await _context.Database.BeginTransactionAsync();
+
+//            try
+//            {
+//                // Get customer ID
+//                var customer = await _context.Customers
+//                    .FirstOrDefaultAsync(c => c.ApplicationUserId == currentUserId);
+
+//                if (customer == null)
+//                {
+//                    return Json(new { success = false, message = "Customer profile not found." });
+//                }
+
+//                // Generate unique order number
+//                string orderNumber = await GenerateUniqueOrderNumber();
+
+//                // Create order
+//                var order = new Order
+//                {
+//                    CustomerID = customer.CustormerID,
+//                    OrderDate = DateTime.Now,
+//                    Status = "Ordered",
+//                    VAT = 15,
+//                    OrderNumber = orderNumber
+//                };
+
+//                _context.Orders.Add(order);
+//                await _context.SaveChangesAsync();
+
+//                decimal subtotal = 0;
+
+//                // Create order lines
+//                foreach (var scriptLine in validScriptLines)
+//                {
+//                    // Update script line status and repeats
+//                    if (scriptLine.RepeatsLeft == 1) // This is the last available order
+//                    {
+//                        scriptLine.Status = "Dispensed";
+//                    }
+//                    else
+//                    {
+//                        scriptLine.Status = "Approved"; // Keep approved for future refills
+//                    }
+
+//                    scriptLine.RepeatsLeft--;
+
+//                    // Create order line
+//                    var orderLine = new OrderLine
+//                    {
+//                        OrderID = order.OrderID,
+//                        ScriptLineID = scriptLine.ScriptLineID,
+//                        MedicationID = scriptLine.MedicationID,
+//                        Quantity = scriptLine.Quantity,
+//                        ItemPrice = (int)scriptLine.Medications.CurrentPrice,
+//                        Status = "Dispensed"
+//                    };
+
+//                    _context.OrderLines.Add(orderLine);
+//                    subtotal += scriptLine.Medications.CurrentPrice * scriptLine.Quantity;
+//                }
+
+//                order.TotalDue = (subtotal + (subtotal * 0.15m)).ToString("F2");
+
+//                // Save all changes
+//                await _context.SaveChangesAsync();
+//                await transaction.CommitAsync();
+
+//                return Json(new
+//                {
+//                    success = true,
+//                    message = $"Order {orderNumber} placed successfully! Your medications will be prepared for collection.",
+//                    orderNumber = orderNumber
+//                });
+
+//            }
+//            catch (Exception ex)
+//            {
+//                await transaction.RollbackAsync();
+//                return Json(new { success = false, message = "An error occurred while placing your order. Please try again." });
+//            }
+//        }
+
+//        // Order confirmation page
+//        public async Task<IActionResult> OrderConfirmation(int orderId)
+//        {
+//            var currentUserId = GetCurrentUserId();
+
+//            var order = await _context.Orders
+//                .Include(o => o.OrderLines)
+//                    .ThenInclude(ol => ol.Medications)
+//                .Include(o => o.OrderLines)
+//                    .ThenInclude(ol => ol.ScriptLine)
+//                        .ThenInclude(sl => sl.Prescriptions)
+//                            .ThenInclude(p => p.Doctors)
+//                .Include(o => o.Customer)
+//                    .ThenInclude(c => c.ApplicationUser)
+//                .Where(o => o.OrderID == orderId &&
+//                           o.Customer.ApplicationUserId == currentUserId)
+//                .FirstOrDefaultAsync();
+
+//            if (order == null)
+//            {
+//                return NotFound();
+//            }
+
+//            var viewModel = new OrderConfirmationVM
+//            {
+//                OrderID = order.OrderID,
+//                OrderNumber = order.OrderNumber,
+//                OrderDate = order.OrderDate,
+//                Status = order.Status,
+//                TotalAmount = decimal.Parse(order.TotalDue),
+//                CustomerName = $"{order.Customer.ApplicationUser.Name} {order.Customer.ApplicationUser.Surname}",
+//                CustomerEmail = order.Customer.ApplicationUser.Email ?? string.Empty,
+//                OrderLines = order.OrderLines.Select(ol => new OrderLineDetailVM
+//                {
+//                    MedicationName = ol.Medications.MedicationName ?? string.Empty,
+//                    Quantity = ol.Quantity,
+//                    Price = ol.ItemPrice,
+//                    DoctorName = $"Dr. {ol.ScriptLine.Prescriptions.Doctors.Name} {ol.ScriptLine.Prescriptions.Doctors.Surname}",
+//                    Instructions = ol.ScriptLine.Instructions ?? string.Empty
+//                }).ToList()
+//            };
+
+//            return View(viewModel);
+//        }
+
+//        // Order history
+//        public async Task<IActionResult> OrderHistory()
+//        {
+//            var currentUserId = GetCurrentUserId();
+
+//            var orders = await _context.Orders
+//                .Include(o => o.Customer)
+//                    .ThenInclude(c => c.ApplicationUser)
+//                .Where(o => o.Customer.ApplicationUserId == currentUserId)
+//                .OrderByDescending(o => o.OrderDate)
+//                .Select(o => new OrderConfirmationVM
+//                {
+//                    OrderID = o.OrderID,
+//                    OrderNumber = o.OrderNumber,
+//                    OrderDate = o.OrderDate,
+//                    Status = o.Status,
+//                    TotalAmount = decimal.Parse(o.TotalDue),
+//                    CustomerName = $"{o.Customer.ApplicationUser.Name} {o.Customer.ApplicationUser.Surname}",
+//                    CustomerEmail = o.Customer.ApplicationUser.Email ?? string.Empty
+//                })
+//                .ToListAsync();
+
+//            return View(orders);
+//        }
+//    }
+//}
+
+using IbhayiPharmacy.Data;
 using IbhayiPharmacy.Models;
 using IbhayiPharmacy.Models.PharmacistVM;
 using Microsoft.AspNetCore.Authorization;
@@ -159,30 +440,31 @@ namespace IbhayiPharmacy.Controllers
         }
 
         // POST: Create order from selected medications (UPDATED with order number generation)
-        // POST: Create order from selected medications (AJAX version)
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<JsonResult> PlaceOrder([FromBody] PlaceOrderFormVM model)
+        public async Task<IActionResult> PlaceOrder(PlaceOrderFormVM model)
         {
             var currentUserId = GetCurrentUserId();
 
             if (string.IsNullOrEmpty(currentUserId) || model.SelectedScriptLineIds == null || !model.SelectedScriptLineIds.Any())
             {
-                return Json(new { success = false, message = "Please select at least one medication to order." });
+                TempData["Error"] = "Please select at least one medication to order.";
+                return RedirectToAction("PlaceOrder");
             }
 
-            // VALIDATION: Only allow approved script lines
+            // UPDATED VALIDATION: Removed RepeatsLeft check for initial order
             var validScriptLines = await _context.ScriptLines
                 .Include(sl => sl.Medications)
                 .Include(sl => sl.Prescriptions)
                 .Where(sl => model.SelectedScriptLineIds.Contains(sl.ScriptLineID) &&
                             sl.Prescriptions.ApplicationUserId == currentUserId &&
-                            sl.Status == "Approved") // Only approved medications
+                            sl.Status == "Approved") // ← Only status check for initial order
                 .ToListAsync();
 
             if (!validScriptLines.Any())
             {
-                return Json(new { success = false, message = "Selected medications are no longer available." });
+                TempData["Error"] = "Selected medications are no longer available.";
+                return RedirectToAction("PlaceOrder");
             }
 
             using var transaction = await _context.Database.BeginTransactionAsync();
@@ -195,7 +477,8 @@ namespace IbhayiPharmacy.Controllers
 
                 if (customer == null)
                 {
-                    return Json(new { success = false, message = "Customer profile not found." });
+                    TempData["Error"] = "Customer profile not found.";
+                    return RedirectToAction("PlaceOrder");
                 }
 
                 // Generate unique order number
@@ -219,11 +502,9 @@ namespace IbhayiPharmacy.Controllers
                 // Create order lines and update script lines
                 foreach (var scriptLine in validScriptLines)
                 {
-                    // ✅ FIX: Update script line status to "Ordered" so it disappears from the list
-                    scriptLine.Status = "Ordered";
-
-                    // ✅ FIX: Only decrement repeats if it's a refill (repeats > 0)
-                    if (scriptLine.RepeatsLeft > 0)
+                    // IMPORTANT: Only decrement repeats if it actually has repeats
+                    // For one-time medications (Repeats = 0), don't touch RepeatsLeft
+                    if (scriptLine.Repeats > 0 && scriptLine.RepeatsLeft > 0)
                     {
                         scriptLine.RepeatsLeft--;
                     }
@@ -244,35 +525,20 @@ namespace IbhayiPharmacy.Controllers
                 }
 
                 order.TotalDue = (subtotal + (subtotal * 0.15m)).ToString("F2");
-
-                // Save all changes
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
 
-                // ✅ SUCCESS: Return order number for the toast
-                return Json(new
-                {
-                    success = true,
-                    message = $"Order {orderNumber} placed successfully! Your medications will be prepared for collection.",
-                    orderNumber = orderNumber
-                });
+                TempData["Success"] = $"Order {orderNumber} placed successfully!";
 
+                // REDIRECT to Track Order in CustomerDashboardController
+                return RedirectToAction("TrackOrder", "CustomerDashboard");
             }
             catch (Exception ex)
             {
                 await transaction.RollbackAsync();
-                return Json(new { success = false, message = "An error occurred while placing your order. Please try again." });
+                TempData["Error"] = "An error occurred while placing your order. Please try again.";
+                return RedirectToAction("PlaceOrder");
             }
-        }
-
-        // Keep the original POST method for form submissions (as backup)
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> PlaceOrderForm(PlaceOrderFormVM model)
-        {
-            // This is the original method - keep it but rename to avoid conflict
-            // ... your existing form submission code ...
-            return RedirectToAction("PlaceOrder");
         }
 
         // Order confirmation page (kept for reference, but redirecting to TrackOrder instead)
@@ -345,7 +611,7 @@ namespace IbhayiPharmacy.Controllers
             return View(orders);
         }
 
-        // NEW: Method specifically for refills (only placeorders medications with repeats)
+        // NEW: Method specifically for refills (only shows medications with repeats)
         public async Task<IActionResult> RequestRefill()
         {
             var currentUserId = GetCurrentUserId();

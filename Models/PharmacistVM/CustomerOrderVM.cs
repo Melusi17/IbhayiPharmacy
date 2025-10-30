@@ -18,6 +18,8 @@
         public string FullDoctorName => $"Dr. {DoctorName} {DoctorSurname}";
         public decimal LineTotal => Quantity * CurrentPrice;
         public string RepeatsDisplay => $"{RepeatsLeft} of {TotalRepeats}";
+
+        public bool IsFirstTimeOrder { get; set; }
     }
 
     public class OrderSummaryVM
