@@ -110,15 +110,15 @@
         margin: 0 auto;
     }
 
-    .login-panel::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 4px;
-        background: linear-gradient(90deg, #1f9f77, #00796b);
-    }
+        .login-panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #1f9f77, #00796b);
+        }
 
     /* Pharmacy Brand Styling */
     .pharmacy-brand {
@@ -137,10 +137,10 @@
         box-shadow: 0 5px 15px rgba(31, 159, 119, 0.3);
     }
 
-    .brand-icon i {
-        font-size: 30px;
-        color: white;
-    }
+        .brand-icon i {
+            font-size: 30px;
+            color: white;
+        }
 
     .pharmacy-name {
         color: #00796b;
@@ -179,20 +179,20 @@
         text-align: left;
     }
 
-    .input-with-icon i {
-        position: absolute;
-        left: 15px;
-        top: 50%;
-        transform: translateY(-50%);
-        color: #1f9f77;
-        font-size: 16px;
-        z-index: 2;
-    }
+        .input-with-icon i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #1f9f77;
+            font-size: 16px;
+            z-index: 2;
+        }
 
-    .input-with-icon .form-control {
-        padding-left: 45px;
-        text-align: left;
-    }
+        .input-with-icon .form-control {
+            padding-left: 45px;
+            text-align: left;
+        }
 
     .form-control {
         border: 2px solid #e9ecef;
@@ -205,13 +205,13 @@
         text-align: left;
     }
 
-    .form-control:focus {
-        outline: none;
-        border-color: #1f9f77;
-        box-shadow: 0 0 0 3px rgba(31,159,119,0.15);
-        background: white;
-        transform: translateY(-1px);
-    }
+        .form-control:focus {
+            outline: none;
+            border-color: #1f9f77;
+            box-shadow: 0 0 0 3px rgba(31,159,119,0.15);
+            background: white;
+            transform: translateY(-1px);
+        }
 
     .form-check {
         display: flex;
@@ -228,10 +228,10 @@
         border: 2px solid #dee2e6;
     }
 
-    .form-check-input:checked {
-        background-color: #1f9f77;
-        border-color: #1f9f77;
-    }
+        .form-check-input:checked {
+            background-color: #1f9f77;
+            border-color: #1f9f77;
+        }
 
     .form-check-label {
         color: #22586A;
@@ -262,15 +262,15 @@
         box-shadow: 0 6px 20px rgba(31, 159, 119, 0.3);
     }
 
-    .btn-login:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 10px 30px rgba(31, 159, 119, 0.4);
-        background: linear-gradient(135deg, #28bf96, #00897b);
-    }
+        .btn-login:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(31, 159, 119, 0.4);
+            background: linear-gradient(135deg, #28bf96, #00897b);
+        }
 
-    .btn-login:active {
-        transform: translateY(-1px);
-    }
+        .btn-login:active {
+            transform: translateY(-1px);
+        }
 
     .btn-content {
         display: flex;
@@ -283,26 +283,26 @@
         padding: 0;
     }
 
-    .btn-content i,
-    .btn-content span {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        height: 100%;
-        line-height: 1;
-        margin: 0;
-        padding: 0;
-    }
+        .btn-content i,
+        .btn-content span {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            line-height: 1;
+            margin: 0;
+            padding: 0;
+        }
 
-    .btn-content i {
-        font-size: 16px;
-        width: 16px;
-    }
+        .btn-content i {
+            font-size: 16px;
+            width: 16px;
+        }
 
-    .btn-content span {
-        font-weight: 600;
-        white-space: nowrap;
-    }
+        .btn-content span {
+            font-weight: 600;
+            white-space: nowrap;
+        }
 
     /* Links */
     .login-links {
@@ -324,13 +324,13 @@
         background: #f8fdfb;
     }
 
-    .login-link:hover {
-        color: #28bf96;
-        text-decoration: none;
-        transform: translateY(-2px);
-        background: #f0f9f6;
-        box-shadow: 0 4px 12px rgba(31, 159, 119, 0.15);
-    }
+        .login-link:hover {
+            color: #28bf96;
+            text-decoration: none;
+            transform: translateY(-2px);
+            background: #f0f9f6;
+            box-shadow: 0 4px 12px rgba(31, 159, 119, 0.15);
+        }
 
     /* Alert styling */
     .alert {
@@ -398,9 +398,9 @@
             height: 60px;
         }
 
-        .brand-icon i {
-            font-size: 25px;
-        }
+            .brand-icon i {
+                font-size: 25px;
+            }
 
         .btn-login {
             width: 100%;
@@ -432,9 +432,9 @@
             height: 50px;
         }
 
-        .brand-icon i {
-            font-size: 22px;
-        }
+            .brand-icon i {
+                font-size: 22px;
+            }
 
         .btn-login {
             padding: 14px 30px;
@@ -557,5 +557,4 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 }
