@@ -275,14 +275,6 @@
         </table>
     </div>
 
-    <!-- TEMPORARY DEBUG SECTION - REMOVE AFTER FIXING -->
-    <div style="background: #f8f9fa; padding: 15px; margin: 20px 0; border-radius: 8px; border: 1px solid #ddd;">
-        <h3 style="color: #dc3545;">Debug Section</h3>
-        <button type="button" onclick="debugAvailableRefills()" class="btn btn-info">Check Available Refills</button>
-        <button type="button" onclick="debugCurrentScriptLine()" class="btn btn-warning">Debug Current ScriptLine</button>
-        <div id="debug-output" style="margin-top: 15px; padding: 10px; background: white; border-radius: 5px;"></div>
-    </div>
-
 </main>
 
 <!-- Refill History Modal -->
@@ -321,6 +313,8 @@
             document.getElementById('debug-output').innerHTML = 'Error: ' + error.message;
         }
     }
+
+
 
     async function debugCurrentScriptLine() {
         // Get the first available script line ID for testing
@@ -374,6 +368,8 @@
             });
         });
 
+
+
         // Show refill history modal
         document.addEventListener('click', function(e) {
             if (e.target.classList.contains('btn-view-history')) {
@@ -388,6 +384,8 @@
             }
         });
 
+
+
         // Request refill from main table
         document.addEventListener('click', function(e) {
             if (e.target.classList.contains('btn-request-refill')) {
@@ -400,12 +398,16 @@
             }
         });
 
+
+
         // Request refill from modal
         requestRefillBtn.addEventListener('click', function() {
             if (currentScriptLineId) {
                 requestRefill(currentScriptLineId, null, true);
             }
         });
+
+
 
         // Load refill history from API
         async function loadRefillHistory(scriptLineId) {
@@ -456,6 +458,9 @@
                 requestRefillBtn.style.display = 'none';
             }
         }
+
+
+
 
         // Request refill function
             // Request refill function

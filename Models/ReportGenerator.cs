@@ -19,12 +19,11 @@ public static class ReportGenerator
         var textFont = FontFactory.GetFont(FontFactory.HELVETICA, 10);
         var boldFont = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 10);
 
-        // Dynamic title based on grouping
+        // Report Title
         string reportTitle = report.GroupBy == "Doctor"
-            ? "DISPENSED PRESCRIPTIONS BY DOCTOR"
-            : "DISPENSED PRESCRIPTIONS BY MEDICATION";
+            ? "MY DISPENSED PRESCRIPTIONS & ORDERS - GROUPED BY DOCTOR"
+            : "MY DISPENSED PRESCRIPTIONS & ORDERS - GROUPED BY MEDICATION";
 
-        // Title and Date Range
         var title = new Paragraph(reportTitle, titleFont)
         {
             Alignment = Element.ALIGN_CENTER,
@@ -32,7 +31,8 @@ public static class ReportGenerator
         };
         doc.Add(title);
 
-        var dateRange = new Paragraph($"{report.StartDate:dd/MM/yyyy} – {report.EndDate:dd/MM/yyyy}", textFont)
+        // Date Range
+        var dateRange = new Paragraph($"Period: {report.StartDate:dd/MM/yyyy} to {report.EndDate:dd/MM/yyyy}", textFont)
         {
             Alignment = Element.ALIGN_CENTER,
             SpacingAfter = 20f
@@ -42,24 +42,24 @@ public static class ReportGenerator
         foreach (var group in report.Groups)
         {
             // Group Header
-            var groupHeader = new Paragraph($"{report.GroupBy.ToUpper()}: {group.GroupName}", headerFont)
+            var groupHeader = new Paragraph($"{report.GroupBy}: {group.GroupName}", headerFont)
             {
                 SpacingAfter = 10f
             };
             doc.Add(groupHeader);
 
-            // Create table with dynamic columns based on grouping
+            // Create table
             int columnCount = report.GroupBy == "Medication" ? 5 : 4;
             PdfPTable table = new PdfPTable(columnCount);
             table.WidthPercentage = 100;
 
             if (report.GroupBy == "Medication")
             {
-                table.SetWidths(new float[] { 20, 35, 10, 10, 25 }); // Date, Medication, Qty, Repeats, Doctor
+                table.SetWidths(new float[] { 20, 35, 10, 10, 25 });
             }
             else
             {
-                table.SetWidths(new float[] { 20, 45, 15, 20 }); // Date, Medication, Qty, Repeats
+                table.SetWidths(new float[] { 20, 45, 15, 20 });
             }
 
             // Table headers
@@ -110,7 +110,7 @@ public static class ReportGenerator
         }
         else
         {
-            var noData = new Paragraph("No data found for the selected period.", textFont)
+            var noData = new Paragraph("No dispensed prescriptions or orders found for the selected period.", textFont)
             {
                 Alignment = Element.ALIGN_CENTER,
                 SpacingBefore = 20f
