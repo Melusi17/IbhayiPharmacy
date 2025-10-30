@@ -17,6 +17,9 @@ public class CustomerReportsController : Controller
         _context = context;
     }
 
+
+
+
     [HttpGet]
     public IActionResult PrescriptionReport()
     {
@@ -27,6 +30,9 @@ public class CustomerReportsController : Controller
         };
         return View(model);
     }
+
+
+
 
     [HttpPost]
     [ValidateAntiForgeryToken]
@@ -59,7 +65,6 @@ public class CustomerReportsController : Controller
 
             // Get dispensed prescriptions and orders for the current customer
             var reportData = await GetDispensedPrescriptionsData(customer.CustormerID, model.StartDate, model.EndDate);
-
             var groups = GenerateReportGroups(reportData, model.GroupBy);
 
             var report = new PrescriptionReportVM
@@ -77,7 +82,6 @@ public class CustomerReportsController : Controller
         }
         catch (Exception ex)
         {
-            // Log the exception
             Console.WriteLine($"Error generating report: {ex.Message}");
             TempData["Error"] = "An error occurred while generating the report. Please try again.";
             return RedirectToAction("PrescriptionReport");
@@ -107,7 +111,6 @@ public class CustomerReportsController : Controller
 
             // Get dispensed prescriptions and orders for the current customer
             var reportData = await GetDispensedPrescriptionsData(customer.CustormerID, startDate, endDate);
-
             var groups = GenerateReportGroups(reportData, groupBy);
 
             var report = new PrescriptionReportVM
@@ -123,18 +126,33 @@ public class CustomerReportsController : Controller
         }
         catch (Exception ex)
         {
-            // Log exception
             Console.WriteLine($"Error previewing report: {ex.Message}");
             return PartialView("_ReportPreview", new PrescriptionReportVM());
         }
     }
 
+
+
+
+
+
     private async Task<List<PrescriptionItemVM>> GetDispensedPrescriptionsData(int customerId, DateTime startDate, DateTime endDate)
     {
         var reportData = new List<PrescriptionItemVM>();
 
-        // OPTION 1: Get data from Orders (Dispensed orders)
-        var dispensedOrders = await _context.Orders
+        // Get the current customer's ApplicationUserId
+        var customer = await _context.Customers
+            .Where(c => c.CustormerID == customerId)
+            .Select(c => new { c.ApplicationUserId })
+            .FirstOrDefaultAsync();
+
+        if (customer == null || string.IsNullOrEmpty(customer.ApplicationUserId))
+            return reportData;
+
+        var endOfDay = endDate.Date.AddDays(1).AddSeconds(-1);
+
+        // 1. Get data from Orders (Dispensed orders) for this customer
+        var orderData = await _context.Orders
             .Include(o => o.Doctor)
             .Include(o => o.OrderLines)
                 .ThenInclude(ol => ol.Medications)
@@ -142,46 +160,39 @@ public class CustomerReportsController : Controller
                 .ThenInclude(ol => ol.ScriptLine)
             .Where(o => o.CustomerID == customerId &&
                        o.OrderDate >= startDate &&
-                       o.OrderDate <= endDate &&
+                       o.OrderDate <= endOfDay &&
                        o.Status.ToLower() == "dispensed")
             .ToListAsync();
 
-        foreach (var order in dispensedOrders)
+        foreach (var order in orderData)
         {
-            foreach (var orderLine in order.OrderLines)
+            foreach (var orderLine in order.OrderLines.Where(ol => ol.Medications != null))
             {
-                if (orderLine.Medications != null)
+                reportData.Add(new PrescriptionItemVM
                 {
-                    reportData.Add(new PrescriptionItemVM
-                    {
-                        Date = order.OrderDate,
-                        Medication = orderLine.Medications.MedicationName,
-                        Quantity = orderLine.Quantity,
-                        Repeats = orderLine.ScriptLine?.Repeats ?? 0,
-                        DoctorName = order.Doctor != null
-                            ? $"{order.Doctor.Name} {order.Doctor.Surname}"
-                            : "Unknown Doctor",
-                        Instructions = orderLine.ScriptLine?.Instructions ?? string.Empty
-                    });
-                }
+                    Date = order.OrderDate,
+                    Medication = orderLine.Medications.MedicationName,
+                    Quantity = orderLine.Quantity,
+                    Repeats = orderLine.ScriptLine != null ? orderLine.ScriptLine.Repeats : 0,
+                    DoctorName = order.Doctor != null ?
+                        $"{order.Doctor.Name} {order.Doctor.Surname}" : "Unknown Doctor",
+                    Instructions = orderLine.ScriptLine != null ? orderLine.ScriptLine.Instructions : string.Empty
+                });
             }
         }
 
-        // OPTION 2: Also get data from Prescriptions if they have a dispensed status
-        var dispensedPrescriptions = await _context.Prescriptions
+        // 2. Get data from Prescriptions for this customer's ApplicationUserId
+        var prescriptionData = await _context.Prescriptions
             .Include(p => p.Doctors)
             .Include(p => p.scriptLines)
                 .ThenInclude(sl => sl.Medications)
-            .Where(p => p.ApplicationUserId == _context.Customers
-                .Where(c => c.CustormerID == customerId)
-                .Select(c => c.ApplicationUserId)
-                .FirstOrDefault() &&
+            .Where(p => p.ApplicationUserId == customer.ApplicationUserId &&
                        p.DateIssued >= startDate &&
-                       p.DateIssued <= endDate &&
+                       p.DateIssued <= endOfDay &&
                        (p.Status.ToLower() == "dispensed" || p.Status.ToLower() == "approved"))
             .ToListAsync();
 
-        foreach (var prescription in dispensedPrescriptions)
+        foreach (var prescription in prescriptionData)
         {
             foreach (var scriptLine in prescription.scriptLines.Where(sl => sl.Medications != null))
             {
@@ -191,48 +202,60 @@ public class CustomerReportsController : Controller
                     Medication = scriptLine.Medications.MedicationName,
                     Quantity = scriptLine.Quantity,
                     Repeats = scriptLine.Repeats,
-                    DoctorName = prescription.Doctors != null
-                        ? $"{prescription.Doctors.Name} {prescription.Doctors.Surname}"
-                        : "Unknown Doctor",
+                    DoctorName = prescription.Doctors != null ?
+                        $"{prescription.Doctors.Name} {prescription.Doctors.Surname}" : "Unknown Doctor",
                     Instructions = scriptLine.Instructions
                 });
             }
         }
 
-        // OPTION 3: Get from ScriptLines with approved status
-        var approvedScriptLines = await _context.ScriptLines
+        // 3. Get data from ScriptLines for this customer's ApplicationUserId
+        var scriptLineData = await _context.ScriptLines
             .Include(sl => sl.Medications)
             .Include(sl => sl.Prescriptions)
                 .ThenInclude(p => p.Doctors)
-            .Where(sl => sl.Prescriptions.ApplicationUserId == _context.Customers
-                .Where(c => c.CustormerID == customerId)
-                .Select(c => c.ApplicationUserId)
-                .FirstOrDefault() &&
-                       (sl.Status.ToLower() == "approved" || sl.Status.ToLower() == "dispensed") &&
-                       sl.ApprovedDate >= startDate &&
-                       sl.ApprovedDate <= endDate)
+            .Where(sl => sl.Prescriptions.ApplicationUserId == customer.ApplicationUserId &&
+                        (sl.Status.ToLower() == "approved" || sl.Status.ToLower() == "dispensed") &&
+                        sl.ApprovedDate >= startDate &&
+                        sl.ApprovedDate <= endOfDay)
             .ToListAsync();
 
-        foreach (var scriptLine in approvedScriptLines)
+        foreach (var scriptLine in scriptLineData.Where(sl => sl.Medications != null))
         {
-            if (scriptLine.Medications != null)
+            reportData.Add(new PrescriptionItemVM
             {
-                reportData.Add(new PrescriptionItemVM
-                {
-                    Date = scriptLine.ApprovedDate ?? scriptLine.Prescriptions.DateIssued,
-                    Medication = scriptLine.Medications.MedicationName,
-                    Quantity = scriptLine.Quantity,
-                    Repeats = scriptLine.Repeats,
-                    DoctorName = scriptLine.Prescriptions.Doctors != null
-                        ? $"{scriptLine.Prescriptions.Doctors.Name} {scriptLine.Prescriptions.Doctors.Surname}"
-                        : "Unknown Doctor",
-                    Instructions = scriptLine.Instructions
-                });
-            }
+                Date = scriptLine.ApprovedDate ?? scriptLine.Prescriptions.DateIssued,
+                Medication = scriptLine.Medications.MedicationName,
+                Quantity = scriptLine.Quantity,
+                Repeats = scriptLine.Repeats,
+                DoctorName = scriptLine.Prescriptions.Doctors != null ?
+                    $"{scriptLine.Prescriptions.Doctors.Name} {scriptLine.Prescriptions.Doctors.Surname}" : "Unknown Doctor",
+                Instructions = scriptLine.Instructions
+            });
         }
 
-        return reportData;
+        // Remove potential duplicates by grouping on key fields
+        return reportData
+            .GroupBy(x => new {
+                Date = x.Date.Date,
+                x.Medication,
+                x.DoctorName,
+                x.Quantity,
+                x.Repeats
+            })
+            .Select(g => g.First())
+            .OrderBy(x => x.Date)
+            .ThenBy(x => x.Medication)
+            .ToList();
     }
+
+
+
+
+
+
+
+
 
     private List<ReportGroup> GenerateReportGroups(List<PrescriptionItemVM> reportData, string groupBy)
     {
@@ -271,37 +294,6 @@ public class CustomerReportsController : Controller
         return groups;
     }
 
-    [HttpGet]
-    public async Task<IActionResult> DebugData()
-    {
-        var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        var customer = await _context.Customers
-            .FirstOrDefaultAsync(c => c.ApplicationUserId == currentUserId);
 
-        if (customer == null)
-        {
-            return Content("Customer not found");
-        }
 
-        var debugInfo = $"Customer ID: {customer.CustormerID}<br/>";
-
-        // Check orders
-        var orders = await _context.Orders
-            .Where(o => o.CustomerID == customer.CustormerID)
-            .ToListAsync();
-        debugInfo += $"Total Orders: {orders.Count}<br/>";
-
-        foreach (var order in orders)
-        {
-            debugInfo += $"Order: {order.OrderID}, Date: {order.OrderDate}, Status: {order.Status}<br/>";
-        }
-
-        // Check prescriptions
-        var prescriptions = await _context.Prescriptions
-            .Where(p => p.ApplicationUserId == currentUserId)
-            .ToListAsync();
-        debugInfo += $"Total Prescriptions: {prescriptions.Count}<br/>";
-
-        return Content(debugInfo);
-    }
 }

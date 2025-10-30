@@ -184,6 +184,16 @@
             color: white;
             text-decoration: none;
         }
+
+    .status-waiting {
+        background-color: #fff3cd;
+        color: #856404;
+    }
+
+    .status-processing {
+        background-color: #d1ecf1;
+        color: #0c5460;
+    }
 </style>
 
 <div class="track-order-panel">
@@ -221,6 +231,7 @@
                     <tr class="order-summary-row" onclick="toggleDetails(@i)">
                         <td>@order.OrderNumber</td>
                         <td>@order.OrderDate.ToString("yyyy-MM-dd")</td>
+                        <!-- In your TrackOrder.cshtml - Update the status display -->
                         <td>
                             @{
                                 var statusClass = "status-ordered";
@@ -237,6 +248,10 @@
                                 else if (order.Status == "Processing")
                                 {
                                     statusClass = "status-processing";
+                                }
+                                else if (order.Status == "Waiting Customer Action")
+                                {
+                                    statusClass = "status-waiting";
                                 }
                             }
                             <span class="status @statusClass">@statusText</span>

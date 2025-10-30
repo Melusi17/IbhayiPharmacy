@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
+using System.Text.Json;
 
 namespace IbhayiPharmacy.Controllers
 {
@@ -18,6 +19,10 @@ namespace IbhayiPharmacy.Controllers
         {
             _context = context;
         }
+
+
+
+
 
         // GET: Manage refills - shows medications with repeats available GROUPED BY PRESCRIPTION
         public async Task<IActionResult> ManageRepeats()
@@ -65,9 +70,15 @@ namespace IbhayiPharmacy.Controllers
             return View(prescriptionsGrouped);
         }
 
+
+
+
+
+
+
         // GET: Refill history for a specific medication
         [HttpGet]
-        public async Task<JsonResult> GetRefillHistory(int scriptLineId)
+        public async Task<IActionResult> GetRefillHistory(int scriptLineId)
         {
             try
             {
@@ -81,6 +92,17 @@ namespace IbhayiPharmacy.Controllers
                 if (currentScriptLine == null)
                 {
                     return Json(new { success = false, message = "Medication not found" });
+                }
+
+                // Verify the script line belongs to the current user
+                var userScriptLine = await _context.ScriptLines
+                    .Include(sl => sl.Prescriptions)
+                    .FirstOrDefaultAsync(sl => sl.ScriptLineID == scriptLineId &&
+                                              sl.Prescriptions.ApplicationUserId == currentUserId);
+
+                if (userScriptLine == null)
+                {
+                    return Json(new { success = false, message = "Access denied" });
                 }
 
                 // Get dispensed order lines for this script line
@@ -127,32 +149,76 @@ namespace IbhayiPharmacy.Controllers
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, message = ex.Message });
+                return Json(new { success = false, message = "An error occurred while loading refill history" });
             }
         }
+
+
+
+
+
+
 
         // POST: Request refill - creates new order
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<JsonResult> RequestRefill(int scriptLineId)
+        public async Task<IActionResult> RequestRefill(int scriptLineId)
         {
             try
             {
                 var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-                // Validate script line exists and has repeats
+                Console.WriteLine($"=== REFILL REQUEST START ===");
+                Console.WriteLine($"User: {currentUserId}, ScriptLine: {scriptLineId}");
+
+                // Use the same approach as the debug endpoint - find first, then validate
                 var scriptLine = await _context.ScriptLines
                     .Include(sl => sl.Medications)
                     .Include(sl => sl.Prescriptions)
-                    .FirstOrDefaultAsync(sl => sl.ScriptLineID == scriptLineId &&
-                                              sl.Prescriptions.ApplicationUserId == currentUserId &&
-                                              sl.Status == "Approved" &&
-                                              sl.RepeatsLeft > 0);
+                    .FirstOrDefaultAsync(sl => sl.ScriptLineID == scriptLineId);
+
+                Console.WriteLine($"ScriptLine found: {scriptLine != null}");
 
                 if (scriptLine == null)
                 {
-                    return Json(new { success = false, message = "Refill not available or medication not found." });
+                    Console.WriteLine("ScriptLine is null");
+                    return Json(new { success = false, message = "Medication not found in system." });
                 }
+
+                Console.WriteLine($"ScriptLine details - Status: {scriptLine.Status}, RepeatsLeft: {scriptLine.RepeatsLeft}, PrescriptionUser: {scriptLine.Prescriptions?.ApplicationUserId}");
+
+                // Validate conditions separately
+                if (scriptLine.Prescriptions?.ApplicationUserId != currentUserId)
+                {
+                    Console.WriteLine($"User mismatch: {scriptLine.Prescriptions?.ApplicationUserId} vs {currentUserId}");
+                    return Json(new
+                    {
+                        success = false,
+                        message = "This medication doesn't belong to your account."
+                    });
+                }
+
+                if (scriptLine.Status != "Approved")
+                {
+                    Console.WriteLine($"Status not approved: {scriptLine.Status}");
+                    return Json(new
+                    {
+                        success = false,
+                        message = $"This medication is not approved for refill. Current status: {scriptLine.Status}"
+                    });
+                }
+
+                if (scriptLine.RepeatsLeft <= 0)
+                {
+                    Console.WriteLine($"No repeats left: {scriptLine.RepeatsLeft}");
+                    return Json(new
+                    {
+                        success = false,
+                        message = "No repeats left for this medication."
+                    });
+                }
+
+                Console.WriteLine("All validation passed - proceeding with refill");
 
                 // Get customer
                 var customer = await _context.Customers
@@ -160,8 +226,11 @@ namespace IbhayiPharmacy.Controllers
 
                 if (customer == null)
                 {
+                    Console.WriteLine("Customer not found");
                     return Json(new { success = false, message = "Customer profile not found." });
                 }
+
+                Console.WriteLine($"Customer found: {customer.CustormerID}");
 
                 using var transaction = await _context.Database.BeginTransactionAsync();
 
@@ -169,6 +238,7 @@ namespace IbhayiPharmacy.Controllers
                 {
                     // Generate unique refill order number
                     string orderNumber = await GenerateRefillOrderNumber();
+                    Console.WriteLine($"Order number: {orderNumber}");
 
                     // Create order
                     var order = new Order
@@ -183,8 +253,11 @@ namespace IbhayiPharmacy.Controllers
                     _context.Orders.Add(order);
                     await _context.SaveChangesAsync();
 
+                    Console.WriteLine($"Order created: {order.OrderID}");
+
                     // Decrement repeats
                     scriptLine.RepeatsLeft--;
+                    Console.WriteLine($"Repeats left after decrement: {scriptLine.RepeatsLeft}");
 
                     // Create order line
                     var orderLine = new OrderLine
@@ -206,6 +279,8 @@ namespace IbhayiPharmacy.Controllers
                     await _context.SaveChangesAsync();
                     await transaction.CommitAsync();
 
+                    Console.WriteLine($"=== REFILL SUCCESSFUL ===");
+
                     return Json(new
                     {
                         success = true,
@@ -218,14 +293,23 @@ namespace IbhayiPharmacy.Controllers
                 catch (Exception ex)
                 {
                     await transaction.RollbackAsync();
+                    Console.WriteLine($"Transaction error: {ex.Message}");
+                    Console.WriteLine($"Stack trace: {ex.StackTrace}");
                     return Json(new { success = false, message = $"Error processing refill: {ex.Message}" });
                 }
             }
             catch (Exception ex)
             {
+                Console.WriteLine($"General error: {ex.Message}");
+                Console.WriteLine($"Stack trace: {ex.StackTrace}");
                 return Json(new { success = false, message = $"Error: {ex.Message}" });
             }
         }
+
+
+
+
+
 
         // Generate unique refill order number
         private async Task<string> GenerateRefillOrderNumber()
@@ -256,7 +340,7 @@ namespace IbhayiPharmacy.Controllers
 
         // GET: Order summary for display in modal
         [HttpGet]
-        public async Task<JsonResult> GetOrderSummary(string orderNumber)
+        public async Task<IActionResult> GetOrderSummary(string orderNumber)
         {
             try
             {
@@ -299,8 +383,79 @@ namespace IbhayiPharmacy.Controllers
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, message = ex.Message });
+                return Json(new { success = false, message = "An error occurred while loading order summary" });
             }
         }
+
+
+
+
+
+
+
+        // ADD THESE DIAGNOSTIC ENDPOINTS TO YOUR CONTROLLER:
+        // Diagnostic endpoint to check script line details
+        [HttpGet]
+        public async Task<IActionResult> DebugScriptLine(int scriptLineId)
+        {
+            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            var scriptLine = await _context.ScriptLines
+                .Include(sl => sl.Medications)
+                .Include(sl => sl.Prescriptions)
+                .FirstOrDefaultAsync(sl => sl.ScriptLineID == scriptLineId);
+
+            if (scriptLine == null)
+            {
+                return Json(new
+                {
+                    found = false,
+                    message = "ScriptLine not found in database"
+                });
+            }
+
+            return Json(new
+            {
+                found = true,
+                scriptLineId = scriptLine.ScriptLineID,
+                medicationId = scriptLine.MedicationID,
+                medicationName = scriptLine.Medications?.MedicationName,
+                status = scriptLine.Status,
+                repeatsLeft = scriptLine.RepeatsLeft,
+                prescriptionUserId = scriptLine.Prescriptions?.ApplicationUserId,
+                currentUserId = currentUserId,
+                userMatches = scriptLine.Prescriptions?.ApplicationUserId == currentUserId,
+                isApproved = scriptLine.Status == "Approved",
+                hasRepeats = scriptLine.RepeatsLeft > 0,
+                meetsAllConditions = scriptLine.Prescriptions?.ApplicationUserId == currentUserId &&
+                                   scriptLine.Status == "Approved" &&
+                                   scriptLine.RepeatsLeft > 0
+            });
+        }
+
+        // Diagnostic endpoint to list all available script lines for current user
+        [HttpGet]
+        public async Task<IActionResult> DebugAvailableRefills()
+        {
+            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            var availableScriptLines = await _context.ScriptLines
+                .Include(sl => sl.Medications)
+                .Include(sl => sl.Prescriptions)
+                .Where(sl => sl.Prescriptions.ApplicationUserId == currentUserId)
+                .Select(sl => new
+                {
+                    ScriptLineID = sl.ScriptLineID,
+                    MedicationName = sl.Medications.MedicationName,
+                    Status = sl.Status,
+                    RepeatsLeft = sl.RepeatsLeft,
+                    PrescriptionUserId = sl.Prescriptions.ApplicationUserId,
+                    MeetsRefillConditions = sl.Status == "Approved" && sl.RepeatsLeft > 0
+                })
+                .ToListAsync();
+
+            return Json(availableScriptLines);
+        }
+
     }
 }

@@ -5,34 +5,6 @@
     Layout = "~/Views/Shared/CustomerLayout/_CustomerLayout.cshtml";
 }
 <style>
-    /* Focused CSS for Manage Repeats view only */
-   /*  * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
-
-    body {
-        font-family: Arial, sans-serif;
-        background-color: #f7f9fb;
-        color: #333;
-        height: 100vh;
-        overflow: hidden;
-    }
-
-    .dashboard-wrapper {
-        display: flex;
-        height: 100vh;
-        width: 100vw;
-    }
-
-    .main-content {
-        flex: 1;
-        padding: 30px;
-        overflow-y: auto;
-        height: 100vh;
-    } */
-
     .upload-prescription-panel {
         background: white;
         padding: 30px;
@@ -213,342 +185,336 @@
         font-style: italic;
     }
 </style>
-        <!-- Main Content -->
-        <main class="main-content" id="mainContent">
-            <div class="upload-prescription-panel">
-                <h2>Manage Repeat Prescriptions</h2>
 
-                <table class="prescription-table" id="orders-table">
-                    <thead>
-                        <tr>
-                            <th>Doctor</th>
-                            <th>Prescription Date</th>
+<!-- Anti-forgery token for POST requests -->
+@Html.AntiForgeryToken()
+
+<main class="main-content" id="mainContent">
+    <div class="upload-prescription-panel">
+        <h2>Manage Repeat Prescriptions</h2>
+
+        <table class="prescription-table" id="orders-table">
+            <thead>
+                <tr>
+                    <th>Doctor</th>
+                    <th>Prescription Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model != null && Model.Any())
+                {
+                    @foreach (var prescription in Model)
+                    {
+                        <tr class="order-row" data-prescription-id="@prescription.PrescriptionID">
+                            <td data-doctor="@prescription.DoctorName">@prescription.DoctorName</td>
+                            <td data-date="@prescription.PrescriptionDate.ToString("yyyy-MM-dd")">@prescription.PrescriptionDate.ToString("yyyy-MM-dd")</td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        @if (Model != null && Model.Any())
-                        {
-                            @foreach (var prescription in Model)
-                            {
-                                <tr class="order-row" data-prescription-id="@prescription.PrescriptionID">
-                                    <td data-doctor="@prescription.DoctorName">@prescription.DoctorName</td>
-                                    <td data-date="@prescription.FormattedDate">@prescription.FormattedDate</td>
-                                </tr>
-                                <tr class="medication-details" data-parent-id="@prescription.PrescriptionID">
-                                    <td colspan="2">
-                                        <table class="modal-table">
-                                            <thead>
-                                                <tr>
-                                                    <th>Medication</th>
-                                                    <th>Instructions</th>
-                                                    <th>Quantity</th>
-                                                    <th>Repeats Left</th>
-                                                    <th>Actions</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                @foreach (var medication in prescription.Medications)
-                                                {
-                                                    <tr class="prescription-row"
-                                                        data-script-line-id="@medication.ScriptLineID"
-                                                        data-prescription-id="@prescription.PrescriptionID"
-                                                        data-medication-id="@medication.MedicationID"
-                                                        data-medication="@medication.MedicationName"
-                                                        data-price="@medication.CurrentPrice"
-                                                        data-qty="@medication.Quantity"
-                                                        data-repeats-left="@medication.RepeatsLeft">
-                                                        <td class="medication-name">@medication.MedicationName</td>
-                                                        <td>@medication.Instructions</td>
-                                                        <td>@medication.Quantity</td>
-                                                        <td class="repeats-left">@medication.RepeatsLeft</td>
-                                                        <td>
-                                                            <button class="btn-view-history"
-                                                                    data-script-line-id="@medication.ScriptLineID"
-                                                                    data-medication-name="@medication.MedicationName">
-                                                                View History
-                                                            </button>
-                                                            @if (medication.RepeatsLeft > 0)
-                                                            {
-                                                                <button class="btn-request-refill"
-                                                                        data-script-line-id="@medication.ScriptLineID"
-                                                                        data-medication-name="@medication.MedicationName">
-                                                                    Request Refill
-                                                                </button>
-                                                            }
-                                                            else
-                                                            {
-                                                                <span class="no-repeats">No repeats left</span>
-                                                            }
-                                                        </td>
-                                                    </tr>
-                                                }
-                                            </tbody>
-                                        </table>
-                                    </td>
-                                </tr>
-                            }
-                        }
-                        else
-                        {
-                            <tr>
-                                <td colspan="2" style="text-align: center; padding: 20px;">
-                                    No medications available for refill at this time.
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-        </main>
-    <!-- Refill History Modal -->
-    <div class="modal" id="refill-modal">
-        <div class="modal-content">
-            <span class="close" id="modal-close">&times;</span>
-            <h3 id="modal-medication-title">Refill History & Request</h3>
-            <div id="refill-messages"></div>
-            <table class="modal-table" id="refill-history-table">
-                <thead>
+                        <tr class="medication-details" data-parent-id="@prescription.PrescriptionID">
+                            <td colspan="2">
+                                <table class="modal-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Medication</th>
+                                            <th>Instructions</th>
+                                            <th>Quantity</th>
+                                            <th>Repeats Left</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var medication in prescription.Medications)
+                                        {
+                                            <tr class="prescription-row"
+                                                data-script-line-id="@medication.ScriptLineID"
+                                                data-prescription-id="@prescription.PrescriptionID"
+                                                data-medication-id="@medication.MedicationID"
+                                                data-medication="@medication.MedicationName"
+                                                data-price="@medication.CurrentPrice"
+                                                data-qty="@medication.Quantity"
+                                                data-repeats-left="@medication.RepeatsLeft">
+                                                <td class="medication-name">@medication.MedicationName</td>
+                                                <td>@medication.Instructions</td>
+                                                <td>@medication.Quantity</td>
+                                                <td class="repeats-left">@medication.RepeatsLeft</td>
+                                                <td>
+                                                    <button class="btn-view-history"
+                                                            data-script-line-id="@medication.ScriptLineID"
+                                                            data-medication-name="@medication.MedicationName">
+                                                        View History
+                                                    </button>
+                                                    @if (medication.RepeatsLeft > 0)
+                                                    {
+                                                        <button class="btn-request-refill"
+                                                                data-script-line-id="@medication.ScriptLineID"
+                                                                data-medication-name="@medication.MedicationName">
+                                                            Request Refill
+                                                        </button>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="no-repeats">No repeats left</span>
+                                                    }
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
                     <tr>
-                        <th>Date</th>
-                        <th>Order No.</th>
-                        <th>Repeats Left</th>
-                        <th>Status</th>
+                        <td colspan="2" style="text-align: center; padding: 20px;">
+                            No medications available for refill at this time.
+                        </td>
                     </tr>
-                </thead>
-                <tbody id="refill-history-body">
-                    <!-- Filled by JS -->
-                </tbody>
-            </table>
-            <div class="modal-footer">
-                <button id="btn-request-refill-modal" class="btn-request-refill" style="display: none;">Request Refill</button>
-            </div>
-        </div>
+                }
+            </tbody>
+        </table>
     </div>
 
-    <!-- Order Summary Modal -->
-    <div class="modal" id="order-summary-modal">
-        <div class="modal-content">
-            <span class="close" id="order-summary-close">&times;</span>
-            <h3>
-                <span id="summary-order-no">Order No: </span>
-                <span id="summary-order-date" style="float:right;"></span>
-            </h3>
-            <p><strong>Doctor:</strong> <span id="summary-doctor"></span></p>
-            <table class="modal-table">
-                <thead>
-                    <tr>
-                        <th>Medication</th>
-                        <th>Qty</th>
-                        <th>Price</th>
-                        <th>Subtotal</th>
-                    </tr>
-                </thead>
-                <tbody id="order-summary-body">
-                    <!-- JS will populate -->
-                </tbody>
-            </table>
-            <div class="modal-footer">
-                Total: R<span id="order-total">0.00</span>
-            </div>
+</main>
+
+<!-- Refill History Modal -->
+<div class="modal" id="refill-modal">
+    <div class="modal-content">
+        <span class="close" id="modal-close">&times;</span>
+        <h3 id="modal-medication-title">Refill History & Request</h3>
+        <div id="refill-messages"></div>
+        <table class="modal-table" id="refill-history-table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Order No.</th>
+                    <th>Repeats Left</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody id="refill-history-body">
+                <!-- Filled by JS -->
+            </tbody>
+        </table>
+        <div class="modal-footer">
+            <button id="btn-request-refill-modal" class="btn-request-refill" style="display: none;">Request Refill</button>
         </div>
     </div>
+</div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            let currentScriptLineId = null;
-            let currentMedicationName = null;
+<script>
 
-            const refillModal = document.getElementById('refill-modal');
-            const modalClose = document.getElementById('modal-close');
-            const refillHistoryBody = document.getElementById('refill-history-body');
-            const modalTitle = document.getElementById('modal-medication-title');
-            const refillMessages = document.getElementById('refill-messages');
-            const requestRefillBtn = document.getElementById('btn-request-refill-modal');
+    async function debugAvailableRefills() {
+        try {
+            const response = await fetch('/CustomerRefill/DebugAvailableRefills');
+            const data = await response.json();
+            document.getElementById('debug-output').innerHTML = '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+        } catch (error) {
+            document.getElementById('debug-output').innerHTML = 'Error: ' + error.message;
+        }
+    }
 
-            // Toggle prescription details when clicking doctor rows
-            document.querySelectorAll('.order-row').forEach(row => {
-                row.addEventListener('click', () => {
-                    const id = row.dataset.prescriptionId;
-                    const detailsRow = document.querySelector(`.medication-details[data-parent-id="${id}"]`);
 
-                    // Toggle the current details
-                    if (detailsRow.style.display === 'table-row') {
-                        detailsRow.style.display = 'none';
-                    } else {
-                        // Close all other open details first
-                        document.querySelectorAll('.medication-details').forEach(detail => {
-                            detail.style.display = 'none';
-                        });
-                        // Then open the current one
-                        detailsRow.style.display = 'table-row';
-                    }
-                });
-            });
 
-            // Show refill history modal
-            document.addEventListener('click', function(e) {
-                if (e.target.classList.contains('btn-view-history')) {
-                    currentScriptLineId = e.target.dataset.scriptLineId;
-                    currentMedicationName = e.target.dataset.medicationName;
-
-                    modalTitle.textContent = `${currentMedicationName} - Refill History`;
-                    refillMessages.innerHTML = '';
-                    requestRefillBtn.style.display = 'none';
-
-                    loadRefillHistory(currentScriptLineId);
-                }
-            });
-
-            // Request refill from main table
-            document.addEventListener('click', function(e) {
-                if (e.target.classList.contains('btn-request-refill')) {
-                    const scriptLineId = e.target.dataset.scriptLineId;
-                    const medicationName = e.target.dataset.medicationName;
-
-                    if (confirm(`Request refill for ${medicationName}?`)) {
-                        requestRefill(scriptLineId, e.target);
-                    }
-                }
-            });
-
-            // Request refill from modal
-            requestRefillBtn.addEventListener('click', function() {
-                if (currentScriptLineId) {
-                    requestRefill(currentScriptLineId, null, true);
-                }
-            });
-
-            // Load refill history from API
-            async function loadRefillHistory(scriptLineId) {
-                refillHistoryBody.innerHTML = '<tr><td colspan="4" class="loading">Loading history...</td></tr>';
-                refillModal.style.display = 'block';
-
-                try {
-                    const response = await fetch(`/CustomerRefill/GetRefillHistory?scriptLineId=${scriptLineId}`);
-                    const data = await response.json();
-
-                    if (data.success) {
-                        refillHistoryBody.innerHTML = '';
-
-                        if (data.history && data.history.length > 0) {
-                            data.history.forEach(entry => {
-                                const tr = document.createElement('tr');
-                                tr.innerHTML = `
-                                    <td>${entry.date || 'N/A'}</td>
-                                    <td>${entry.orderNumber || 'N/A'}</td>
-                                    <td>${entry.repeatsLeft !== undefined ? entry.repeatsLeft : 'N/A'}</td>
-                                    <td>${entry.status || 'N/A'}</td>`;
-                                refillHistoryBody.appendChild(tr);
-                            });
-
-                            // Show request button if current repeats > 0
-                            if (data.currentRepeats > 0) {
-                                requestRefillBtn.style.display = 'inline-block';
-                                requestRefillBtn.textContent = `Request Refill (${data.currentRepeats} left)`;
-                            } else {
-                                requestRefillBtn.style.display = 'none';
-                            }
-                        } else {
-                            refillHistoryBody.innerHTML = '<tr><td colspan="4" style="color:#999; padding: 20px;">No refill history found for this medication.</td></tr>';
-                            requestRefillBtn.style.display = 'none';
-                        }
-                    } else {
-                        refillHistoryBody.innerHTML = `<tr><td colspan="4" style="color:red; padding: 20px;">Error: ${data.message || 'Unknown error'}</td></tr>`;
-                        requestRefillBtn.style.display = 'none';
-                    }
-                } catch (error) {
-                    refillHistoryBody.innerHTML = `<tr><td colspan="4" style="color:red; padding: 20px;">Network error: Unable to load history</td></tr>`;
-                    requestRefillBtn.style.display = 'none';
-                }
+    async function debugCurrentScriptLine() {
+        // Get the first available script line ID for testing
+        const firstScriptLine = document.querySelector('[data-script-line-id]');
+        if (firstScriptLine) {
+            const scriptLineId = firstScriptLine.dataset.scriptLineId;
+            try {
+                const response = await fetch(`/CustomerRefill/DebugScriptLine?scriptLineId=${scriptLineId}`);
+                const data = await response.json();
+                document.getElementById('debug-output').innerHTML = '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+            } catch (error) {
+                document.getElementById('debug-output').innerHTML = 'Error: ' + error.message;
             }
+        } else {
+            document.getElementById('debug-output').innerHTML = 'No script lines found on page';
+        }
+    }
 
-            // Request refill function
-            async function requestRefill(scriptLineId, buttonElement = null, fromModal = false) {
-                const requestBody = new FormData();
-                requestBody.append('scriptLineId', scriptLineId);
 
-                // Get anti-forgery token
-                const token = document.querySelector('input[name="__RequestVerificationToken"]');
-                if (token) {
-                    requestBody.append('__RequestVerificationToken', token.value);
-                }
 
-                try {
-                    const response = await fetch('/CustomerRefill/RequestRefill', {
-                        method: 'POST',
-                        body: requestBody
+
+
+    document.addEventListener('DOMContentLoaded', () => {
+        let currentScriptLineId = null;
+        let currentMedicationName = null;
+
+        const refillModal = document.getElementById('refill-modal');
+        const modalClose = document.getElementById('modal-close');
+        const refillHistoryBody = document.getElementById('refill-history-body');
+        const modalTitle = document.getElementById('modal-medication-title');
+        const refillMessages = document.getElementById('refill-messages');
+        const requestRefillBtn = document.getElementById('btn-request-refill-modal');
+
+        // Toggle prescription details when clicking doctor rows
+        document.querySelectorAll('.order-row').forEach(row => {
+            row.addEventListener('click', () => {
+                const id = row.dataset.prescriptionId;
+                const detailsRow = document.querySelector(`.medication-details[data-parent-id="${id}"]`);
+
+                // Toggle the current details
+                if (detailsRow.style.display === 'table-row') {
+                    detailsRow.style.display = 'none';
+                } else {
+                    // Close all other open details first
+                    document.querySelectorAll('.medication-details').forEach(detail => {
+                        detail.style.display = 'none';
                     });
-                    const data = await response.json();
-
-                    if (data.success) {
-                        // Show success message
-                        const successMsg = `<div class="success-message">${data.message}</div>`;
-
-                        if (fromModal) {
-                            refillMessages.innerHTML = successMsg;
-                            requestRefillBtn.style.display = 'none';
-                        } else {
-                            // Update the button in the main table
-                            if (buttonElement) {
-                                const row = buttonElement.closest('tr');
-                                const repeatsCell = row.querySelector('.repeats-left');
-                                if (repeatsCell) {
-                                    repeatsCell.textContent = data.repeatsLeft;
-                                }
-
-                                if (data.repeatsLeft === 0) {
-                                    buttonElement.style.display = 'none';
-                                    const noRepeatsSpan = document.createElement('span');
-                                    noRepeatsSpan.className = 'no-repeats';
-                                    noRepeatsSpan.textContent = 'No repeats left';
-                                    buttonElement.parentNode.appendChild(noRepeatsSpan);
-                                }
-                            }
-
-                            // Show success message
-                            alert(data.message);
-                        }
-
-                        // Reload history if in modal
-                        if (fromModal && currentScriptLineId) {
-                            loadRefillHistory(currentScriptLineId);
-                        }
-                    } else {
-                        const errorMsg = `<div class="error-message">${data.message}</div>`;
-                        if (fromModal) {
-                            refillMessages.innerHTML = errorMsg;
-                        } else {
-                            alert('Error: ' + data.message);
-                        }
-                    }
-                } catch (error) {
-                    const errorMsg = `<div class="error-message">Network error: ${error.message}</div>`;
-                    if (fromModal) {
-                        refillMessages.innerHTML = errorMsg;
-                    } else {
-                        alert('Network error: ' + error.message);
-                    }
+                    // Then open the current one
+                    detailsRow.style.display = 'table-row';
                 }
-            }
-
-            // Modal close functionality
-            modalClose.addEventListener('click', () => refillModal.style.display = 'none');
-            window.addEventListener('click', e => {
-                if (e.target === refillModal) refillModal.style.display = 'none';
-            });
-
-            // Order Summary Modal logic
-            const orderSummaryModal = document.getElementById('order-summary-modal');
-            const orderSummaryClose = document.getElementById('order-summary-close');
-
-            orderSummaryClose.addEventListener('click', () => orderSummaryModal.style.display = 'none');
-            window.addEventListener('click', e => {
-                if (e.target === orderSummaryModal) orderSummaryModal.style.display = 'none';
             });
         });
 
-        function toggleProfileMenu() {
-            const menu = document.getElementById("profileMenu");
-            menu.classList.toggle("hidden");
+
+
+        // Show refill history modal
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('btn-view-history')) {
+                currentScriptLineId = e.target.dataset.scriptLineId;
+                currentMedicationName = e.target.dataset.medicationName;
+
+                modalTitle.textContent = `${currentMedicationName} - Refill History`;
+                refillMessages.innerHTML = '';
+                requestRefillBtn.style.display = 'none';
+
+                loadRefillHistory(currentScriptLineId);
+            }
+        });
+
+
+
+        // Request refill from main table
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('btn-request-refill')) {
+                const scriptLineId = e.target.dataset.scriptLineId;
+                const medicationName = e.target.dataset.medicationName;
+
+                if (confirm(`Request refill for ${medicationName}?`)) {
+                    requestRefill(scriptLineId, e.target);
+                }
+            }
+        });
+
+
+
+        // Request refill from modal
+        requestRefillBtn.addEventListener('click', function() {
+            if (currentScriptLineId) {
+                requestRefill(currentScriptLineId, null, true);
+            }
+        });
+
+
+
+        // Load refill history from API
+        async function loadRefillHistory(scriptLineId) {
+            refillHistoryBody.innerHTML = '<tr><td colspan="4" class="loading">Loading history...</td></tr>';
+            refillModal.style.display = 'block';
+
+            try {
+                const response = await fetch(`/CustomerRefill/GetRefillHistory?scriptLineId=${scriptLineId}`);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                if (data.success) {
+                    refillHistoryBody.innerHTML = '';
+
+                    if (data.history && data.history.length > 0) {
+                        data.history.forEach(entry => {
+                            const tr = document.createElement('tr');
+                            tr.innerHTML = `
+                                <td>${entry.date || 'N/A'}</td>
+                                <td>${entry.orderNumber || 'N/A'}</td>
+                                <td>${entry.repeatsLeft !== undefined ? entry.repeatsLeft : 'N/A'}</td>
+                                <td>${entry.status || 'N/A'}</td>`;
+                            refillHistoryBody.appendChild(tr);
+                        });
+
+                        // Show request button if current repeats > 0
+                        if (data.currentRepeats > 0) {
+                            requestRefillBtn.style.display = 'inline-block';
+                            requestRefillBtn.textContent = `Request Refill (${data.currentRepeats} left)`;
+                        } else {
+                            requestRefillBtn.style.display = 'none';
+                        }
+                    } else {
+                        refillHistoryBody.innerHTML = '<tr><td colspan="4" style="color:#999; padding: 20px;">No refill history found for this medication.</td></tr>';
+                        requestRefillBtn.style.display = 'none';
+                    }
+                } else {
+                    refillHistoryBody.innerHTML = `<tr><td colspan="4" style="color:red; padding: 20px;">Error: ${data.message || 'Unknown error'}</td></tr>`;
+                    requestRefillBtn.style.display = 'none';
+                }
+            } catch (error) {
+                console.error('Error loading refill history:', error);
+                refillHistoryBody.innerHTML = `<tr><td colspan="4" style="color:red; padding: 20px;">Network error: Unable to load history</td></tr>`;
+                requestRefillBtn.style.display = 'none';
+            }
         }
-    </script>
+
+
+
+
+        // Request refill function
+            // Request refill function
+    async function requestRefill(scriptLineId, buttonElement = null, fromModal = false) {
+        console.log(`=== REQUEST REFILL START ===`);
+        console.log(`ScriptLineID: ${scriptLineId}`);
+        console.log(`From modal: ${fromModal}`);
+        console.log(`Button element: ${buttonElement}`);
+
+        const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+        console.log(`Token exists: ${!!token}`);
+
+        try {
+            const requestBody = {
+                scriptLineId: parseInt(scriptLineId)
+            };
+
+            console.log('Request body:', requestBody);
+
+            const response = await fetch('/CustomerRefill/RequestRefill', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': token
+                },
+                body: JSON.stringify(requestBody)
+            });
+
+            console.log(`Response status: ${response.status}`);
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            console.log('Response data:', data);
+
+            if (data.success) {
+                console.log('Refill successful');
+                // ... rest of your success handling code
+            } else {
+                console.error('Server returned error:', data.message);
+                // ... rest of your error handling code
+            }
+        } catch (error) {
+            console.error('Error requesting refill:', error);
+            // ... rest of your error handling code
+        }
+    }
+
+        // Modal close functionality
+        modalClose.addEventListener('click', () => refillModal.style.display = 'none');
+        window.addEventListener('click', e => {
+            if (e.target === refillModal) refillModal.style.display = 'none';
+        });
+    });
+</script>

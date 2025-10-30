@@ -32,6 +32,7 @@
         margin: 20px auto;
     }
 
+    /* Button Styles - FIXED ALIGNMENT */
     .btn-upload {
         background-color: #1f9f77;
         color: white;
@@ -42,13 +43,23 @@
         font-weight: 600;
         cursor: pointer;
         transition: all 0.3s ease;
-        margin-right: 10px;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 160px;
+        height: 44px;
+        text-align: center;
+        box-sizing: border-box;
+        flex: 0 0 auto;
     }
 
         .btn-upload:hover {
             background-color: #28bf96;
             transform: translateY(-2px);
             box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            text-decoration: none;
+            color: white;
         }
 
         .btn-upload:disabled {
@@ -66,12 +77,40 @@
                 background-color: #7f8c8d;
             }
 
+        .btn-upload.refill {
+            background-color: #3498db;
+        }
+
+            .btn-upload.refill:hover {
+                background-color: #2980b9;
+            }
+
+    /* PERFECTLY ALIGNED BUTTON CONTAINER */
+    .button-container {
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+        align-items: center;
+        flex-wrap: wrap;
+        margin-top: 25px;
+        width: 100%;
+    }
+
+        /* Ensure all buttons have same dimensions */
+        .button-container .btn-upload {
+            flex: 1;
+            min-width: 160px;
+            max-width: 200px;
+            white-space: nowrap;
+        }
+
     .prescription-table {
         width: 100%;
         border-collapse: collapse;
         margin-top: 15px;
         font-size: 14px;
         background: white;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     }
 
         .prescription-table th,
@@ -79,12 +118,15 @@
             padding: 12px 15px;
             border: 1px solid #e0f2f1;
             text-align: left;
+            vertical-align: middle;
         }
 
         .prescription-table th {
             background-color: #e0f2f1;
             color: #004d40;
             font-weight: 600;
+            position: sticky;
+            top: 0;
         }
 
         .prescription-table tr:hover {
@@ -93,6 +135,7 @@
 
     .checkbox-cell {
         text-align: center;
+        width: 50px;
     }
 
     .price-cell {
@@ -108,11 +151,19 @@
         background: #f8f9fa;
         border-radius: 10px;
         border: 2px dashed #ddd;
+        margin: 20px 0;
     }
 
         .no-medications h3 {
             color: #1f9f77;
             margin-bottom: 15px;
+            font-size: 24px;
+        }
+
+        .no-medications p {
+            margin-bottom: 20px;
+            font-size: 16px;
+            line-height: 1.5;
         }
 
     .order-summary-container {
@@ -122,6 +173,8 @@
         border-left: 4px solid #1f9f77;
         border-radius: 12px;
         box-shadow: 0 2px 8px rgba(31, 159, 119, 0.1);
+        position: sticky;
+        bottom: 20px;
     }
 
     .summary {
@@ -140,6 +193,7 @@
             color: #004d40;
         }
 
+    /* Badge Styles */
     .repeat-badge {
         display: inline-block;
         padding: 4px 10px;
@@ -159,6 +213,43 @@
         background-color: #fff3e0;
         color: #ef6c00;
         border: 1px solid #ffcc80;
+    }
+
+    .order-type-badge {
+        display: inline-block;
+        padding: 3px 8px;
+        border-radius: 12px;
+        font-size: 10px;
+        font-weight: bold;
+        margin-left: 5px;
+        text-transform: uppercase;
+    }
+
+    .first-time-order {
+        background-color: #e8f5e8;
+        color: #2e7d32;
+        border: 1px solid #c8e6c9;
+    }
+
+    .repeat-order {
+        background-color: #e3f2fd;
+        color: #1565c0;
+        border: 1px solid #bbdefb;
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 10px;
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+
+    .status-approved {
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
     }
 
     /* Enhanced Modal Styling */
@@ -187,18 +278,34 @@
         overflow-y: auto;
         box-shadow: 0 10px 30px rgba(0,0,0,0.3);
         border: 1px solid #e0f2f1;
+        animation: modalSlideIn 0.3s ease-out;
     }
 
-        .modal-content h3 {
-            margin-bottom: 20px;
-            font-size: 22px;
-            color: #1f9f77;
-            text-align: center;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
+    @@keyframes modalSlideIn {
+        from
+
+    {
+        opacity: 0;
+        transform: translateY(-50px) scale(0.9);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+
+    }
+
+    .modal-content h3 {
+        margin-bottom: 20px;
+        font-size: 22px;
+        color: #1f9f77;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
 
     .modal-table {
         width: 100%;
@@ -226,12 +333,18 @@
 
     .modal-buttons {
         display: flex;
-        gap: 15px;
+        gap: 12px;
         justify-content: flex-end;
+        align-items: center;
         margin-top: 25px;
         padding-top: 20px;
         border-top: 1px solid #e0f2f1;
     }
+
+        .modal-buttons .btn-upload {
+            min-width: 180px;
+            height: 44px;
+        }
 
     .total-summary {
         font-size: 16px;
@@ -348,13 +461,16 @@
     }
 
     @@keyframes spin {
-        0% {
-            transform: rotate(0deg);
-        }
+        0%
 
-        100% {
-            transform: rotate(360deg);
-        }
+    {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+
     }
 
     /* Amount alignment */
@@ -363,20 +479,143 @@
         font-weight: bold;
         text-align: right;
     }
-    /* Make button links fully clickable */
-    .btn-upload {
-        display: inline-flex;
+
+    /* Header and Info Styles */
+    .page-header {
+        display: flex;
+        justify-content: space-between;
         align-items: center;
-        justify-content: center;
-        text-decoration: none;
-        min-width: 200px;
-        text-align: center;
+        margin-bottom: 25px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid #e0f2f1;
     }
 
-        /* Ensure the entire button area is clickable */
-        .btn-upload:hover {
-            text-decoration: none;
+        .page-header h2 {
+            color: #1f9f77;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
+
+    .info-box {
+        background: #e6f5f1;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        border-left: 4px solid #1f9f77;
+    }
+
+        .info-box p {
+            margin: 0;
+            color: #004d40;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+    /* Selection Counter */
+    .selection-counter {
+        background: #1f9f77;
+        color: white;
+        padding: 8px 15px;
+        border-radius: 20px;
+        font-size: 14px;
+        font-weight: 600;
+        margin-left: 10px;
+    }
+
+    /* Medication Details */
+    .medication-details {
+        font-size: 12px;
+        color: #666;
+        margin-top: 2px;
+    }
+
+    .schedule-badge {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+        padding: 2px 6px;
+        font-size: 10px;
+        color: #6c757d;
+    }
+
+    /* Responsive Design - FIXED BUTTON ALIGNMENT */
+    @@media (max-width: 768px) {
+        .main-content
+
+    {
+        padding: 15px;
+    }
+
+    .upload-prescription-panel {
+        padding: 20px;
+    }
+
+    .prescription-table {
+        font-size: 12px;
+    }
+
+        .prescription-table th,
+        .prescription-table td {
+            padding: 8px 10px;
+        }
+
+    /* PERFECT MOBILE BUTTON ALIGNMENT */
+    .button-container {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+
+        .button-container .btn-upload {
+            width: 100%;
+            max-width: 100%;
+            min-width: unset;
+            margin: 0;
+        }
+
+    .modal-content {
+        padding: 20px;
+    }
+
+    .modal-buttons {
+        flex-direction: column;
+    }
+
+        .modal-buttons .btn-upload {
+            width: 100%;
+            max-width: 100%;
+            min-width: unset;
+        }
+
+    }
+
+    /* No medications section button alignment */
+    .no-medications .button-container {
+        justify-content: center;
+        gap: 15px;
+    }
+
+        .no-medications .button-container .btn-upload {
+            flex: 0 1 auto;
+            min-width: 200px;
+        }
+
+    @@media (max-width: 768px) {
+        .no-medications .button-container
+
+    {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .no-medications .button-container .btn-upload {
+        width: 100%;
+        max-width: 280px;
+    }
+
+    }
 </style>
 
 <!-- Toast Notification -->
@@ -389,7 +628,20 @@
 <!-- Main Content -->
 <main class="main-content" id="mainContent">
     <div class="upload-prescription-panel">
-        <h2>📦 Place Medication Order</h2>
+        <div class="page-header">
+            <h2>📦 Place Medication Order</h2>
+            <div id="selectionCounter" class="selection-counter" style="display: none;">
+                <span id="selectedCount">0</span> selected
+            </div>
+        </div>
+
+        <!-- Info Box -->
+        <div class="info-box">
+            <p>
+                <strong>💡 Information:</strong> This page shows all your processed and approved prescriptions available for ordering.
+                Select medications to place an order for collection at our pharmacy.
+            </p>
+        </div>
 
         <!-- Alert Messages -->
         <div id="orderStatus">
@@ -423,8 +675,11 @@
                     <a asp-controller="CustomerDashboard" asp-action="UploadPrescription" class="btn-upload">
                         📥 Upload New Prescription
                     </a>
-                    <a asp-controller="CustomerRefill" asp-action="ManageRepeats" class="btn-upload" style="background-color: #3498db;">
+                    <a asp-controller="CustomerRefill" asp-action="ManageRepeats" class="btn-upload refill">
                         🔁 Manage Repeats
+                    </a>
+                    <a asp-controller="CustomerOrders" asp-action="OrderHistory" class="btn-upload" style="background-color: #9b59b6;">
+                        📋 View Order History
                     </a>
                 </div>
             </div>
@@ -437,11 +692,13 @@
                 <table class="prescription-table">
                     <thead>
                         <tr>
-                            <th>Select</th>
+                            <th class="checkbox-cell">Select</th>
                             <th>Doctor</th>
-                            <th>Medication</th>
+                            <th>Medication Details</th>
                             <th>Qty</th>
                             <th>Repeats</th>
+                            <th>Type</th>
+                            <th>Status</th>
                             <th>Instructions</th>
                             <th>Unit Price (R)</th>
                             <th>Total (R)</th>
@@ -459,13 +716,28 @@
                                            value="@medication.ScriptLineID"
                                            data-price="@medication.CurrentPrice"
                                            data-quantity="@medication.Quantity"
+                                           data-medication="@medication.MedicationName"
+                                           data-doctor="@medication.FullDoctorName"
+                                           data-repeats="@medication.RepeatsLeft"
                                            onchange="updateTotals()" />
                                 </td>
-                                <td>@medication.FullDoctorName</td>
                                 <td>
-                                    <strong>@medication.MedicationName</strong>
+                                    <strong>@medication.FullDoctorName</strong>
                                 </td>
-                                <td>@medication.Quantity</td>
+                                <td>
+                                    <div>
+                                        <strong>@medication.MedicationName</strong>
+                                        @if (!string.IsNullOrEmpty(medication.Schedule))
+                                        {
+                                            <div class="medication-details">
+                                                <span class="schedule-badge">Schedule: @medication.Schedule</span>
+                                            </div>
+                                        }
+                                    </div>
+                                </td>
+                                <td>
+                                    <strong>@medication.Quantity</strong>
+                                </td>
                                 <td>
                                     @if (medication.RepeatsLeft > 0)
                                     {
@@ -480,7 +752,37 @@
                                         </span>
                                     }
                                 </td>
-                                <td>@medication.Instructions</td>
+                                <td>
+                                    @if (medication.IsFirstTimeOrder)
+                                    {
+                                        <span class="order-type-badge first-time-order" title="First-time order">
+                                            New
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="order-type-badge repeat-order" title="Repeat order">
+                                            Refill
+                                        </span>
+                                    }
+                                </td>
+                                <td>
+                                    <span class="status-badge status-approved" title="Approved for dispensing">
+                                        Approved
+                                    </span>
+                                </td>
+                                <td>
+                                    @if (!string.IsNullOrEmpty(medication.Instructions))
+                                    {
+                                        <span title="@medication.Instructions">
+                                            @(medication.Instructions.Length > 50 ? medication.Instructions.Substring(0, 50) + "..." : medication.Instructions)
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">No instructions</span>
+                                    }
+                                </td>
                                 <td class="price-cell amount-display">@medication.CurrentPrice.ToString("F2")</td>
                                 <td class="price-cell amount-display">@medication.LineTotal.ToString("F2")</td>
                             </tr>
@@ -490,18 +792,25 @@
 
                 <div class="order-summary-container">
                     <div class="summary">
+                        <p><strong>Selected Items:</strong> <span id="selectedItemsCount">0</span></p>
                         <p><strong>Subtotal:</strong> <span class="amount-display">R <span id="subtotal">0.00</span></span></p>
                         <p><strong>VAT (15%):</strong> <span class="amount-display">R <span id="tax">0.00</span></span></p>
                         <p><strong>Total Due:</strong> <span class="amount-display">R <span id="total">0.00</span></span></p>
                     </div>
 
-                    <div class="form-group">
+                    <div class="button-container">
                         <button type="button" class="btn-upload" onclick="showOrderSummary()" id="placeOrderBtn" disabled>
                             🛒 Place Order
                         </button>
                         <button type="button" class="btn-upload cancel" onclick="clearSelection()">
                             🗑️ Clear Selection
                         </button>
+                        <a asp-controller="CustomerRefill" asp-action="ManageRepeats" class="btn-upload refill">
+                            🔁 Manage Repeats
+                        </a>
+                        <a asp-controller="CustomerOrders" asp-action="OrderHistory" class="btn-upload" style="background-color: #9b59b6;">
+                            📋 Order History
+                        </a>
                     </div>
                 </div>
             </form>
@@ -512,19 +821,20 @@
                     <h3>✅ Confirm Medication Order</h3>
 
                     <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
-                        <p style="margin: 0; color: #666; font-size: 14px;">
-                            Please review your order before confirming. Once placed, this order will be processed by our pharmacy team.
+                        <p style="margin: 0; color: #666; font-size: 14px; line-height: 1.4;">
+                            Please review your order before confirming. Once placed, this order will be processed by our pharmacy team and prepared for collection.
+                            You will receive a confirmation with your order number.
                         </p>
                     </div>
 
-                    <p><strong>Order Summary</strong></p>
+                    <p><strong>📋 Order Details</strong></p>
                     <table class="modal-table">
                         <thead>
                             <tr>
                                 <th>Medication</th>
                                 <th>Doctor</th>
                                 <th>Qty</th>
-                                <th>Repeats</th>
+                                <th>Type</th>
                                 <th>Price (R)</th>
                                 <th>Total (R)</th>
                             </tr>
@@ -584,7 +894,8 @@
 
         // Show toast with backdrop
         toast.classList.add('show');
-        backdrop.classList.add('show');
+        backdrop.style.display = 'block';
+        setTimeout(() => backdrop.classList.add('show'), 10);
 
         // Clear any existing timeout
         if (window.toastTimeout) {
@@ -604,6 +915,10 @@
 
         toast.classList.remove('show');
         backdrop.classList.remove('show');
+
+        setTimeout(() => {
+            backdrop.style.display = 'none';
+        }, 300);
 
         if (window.toastTimeout) {
             clearTimeout(window.toastTimeout);
@@ -625,11 +940,16 @@
             // Get row data for confirmation modal
             const row = cb.closest('tr');
             const cells = row.querySelectorAll('td');
+
+            // Determine order type
+            const orderTypeCell = cells[5];
+            const isFirstTime = orderTypeCell.querySelector('.first-time-order') !== null;
+
             selectedItems.push({
-                medication: cells[2].querySelector('strong').textContent.trim(),
-                doctor: cells[1].textContent.trim(),
-                quantity: cells[3].textContent.trim(),
-                repeats: cells[4].textContent.trim(),
+                medication: cb.dataset.medication,
+                doctor: cb.dataset.doctor,
+                quantity: quantity,
+                type: isFirstTime ? 'New' : 'Refill',
                 price: price,
                 lineTotal: lineTotal,
                 scriptLineId: cb.value
@@ -643,6 +963,17 @@
         document.getElementById('subtotal').textContent = subtotal.toFixed(2);
         document.getElementById('tax').textContent = tax.toFixed(2);
         document.getElementById('total').textContent = total.toFixed(2);
+        document.getElementById('selectedItemsCount').textContent = checkboxes.length;
+
+        // Update selection counter
+        const selectionCounter = document.getElementById('selectionCounter');
+        const selectedCount = document.getElementById('selectedCount');
+        if (checkboxes.length > 0) {
+            selectedCount.textContent = checkboxes.length;
+            selectionCounter.style.display = 'inline-block';
+        } else {
+            selectionCounter.style.display = 'none';
+        }
 
         // Enable/disable place order button
         const placeOrderBtn = document.getElementById('placeOrderBtn');
@@ -672,7 +1003,11 @@
                 <td><strong>${item.medication}</strong></td>
                 <td>${item.doctor}</td>
                 <td>${item.quantity}</td>
-                <td>${item.repeats}</td>
+                <td>
+                    <span class="order-type-badge ${item.type === 'New' ? 'first-time-order' : 'repeat-order'}">
+                        ${item.type}
+                    </span>
+                </td>
                 <td class="amount-display">${item.price.toFixed(2)}</td>
                 <td class="amount-display"><strong>${item.lineTotal.toFixed(2)}</strong></td>
             `;
@@ -689,6 +1024,8 @@
     }
 
     // Submit the order via AJAX and refresh after success
+       // Submit the order via AJAX and redirect to track order
+       // Submit the order via AJAX and redirect to track order
     async function submitOrder() {
         const confirmBtn = document.getElementById('confirmOrderBtn');
         const loadingSpinner = document.getElementById('loadingSpinner');
@@ -705,6 +1042,8 @@
             // Get selected script line IDs
             const selectedScriptLineIds = window.selectedOrderItems.map(item => item.scriptLineId);
 
+            console.log('🛒 Submitting order with script line IDs:', selectedScriptLineIds);
+
             // Get anti-forgery token
             const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
 
@@ -720,21 +1059,52 @@
                 })
             });
 
-            if (response.ok) {
-                // Show success toast
-                showToast('Order placed successfully!', 'success', 3000);
+            console.log('📡 Response status:', response.status);
+            console.log('📡 Response OK:', response.ok);
 
-                // Refresh the page after a short delay to show the toast
+            // First, get the response as text to see what we're actually getting
+            const responseText = await response.text();
+            console.log('📡 Raw response:', responseText);
+
+            // Try to parse as JSON
+            let result;
+            try {
+                result = JSON.parse(responseText);
+            } catch (parseError) {
+                console.error('❌ JSON parse error:', parseError);
+                console.error('📡 Response that failed to parse:', responseText);
+
+                // Check if it's an HTML error page
+                if (responseText.includes('Microsoft.') || responseText.includes('<html')) {
+                    throw new Error('Server returned an error page. Please check the server logs.');
+                } else {
+                    throw new Error('Invalid response from server. Please try again.');
+                }
+            }
+
+            console.log('📦 Parsed result:', result);
+
+            if (result.success) {
+                // Show success toast
+                showToast(`✅ ${result.message}`, 'success', 3000);
+
+                // Redirect to track order after delay
                 setTimeout(() => {
-                    window.location.reload();
+                    window.location.href = '@Url.Action("TrackOrder", "CustomerDashboard")';
                 }, 2000);
             } else {
-                throw new Error('Order submission failed');
+                throw new Error(result.message || 'Order submission failed');
             }
 
         } catch (error) {
-            console.error('Error placing order:', error);
-            showToast('❌ Error placing order. Please try again.', 'error', 5000);
+            console.error('❌ Error placing order:', error);
+
+            let errorMessage = error.message;
+            if (errorMessage.includes('Microsoft.') || errorMessage.includes('Server returned an error page')) {
+                errorMessage = 'A server error occurred. Please try again or contact support.';
+            }
+
+            showToast(`❌ ${errorMessage}`, 'error', 5000);
 
             // Reset button state
             confirmBtn.disabled = false;
@@ -757,15 +1127,17 @@
         showToast('Selection cleared', 'info', 2000);
     }
 
-    // Show order status message
-    function showOrderStatus(message, type) {
-        const statusDiv = document.getElementById('orderStatus');
-        statusDiv.innerHTML = '';
+    // Select all medications
+    function selectAllMedications() {
+        const checkboxes = document.querySelectorAll('.med-check');
+        const allChecked = Array.from(checkboxes).every(cb => cb.checked);
 
-        const messageDiv = document.createElement('div');
-        messageDiv.className = type === 'success' ? 'success-message' : 'error-message';
-        messageDiv.textContent = message;
-        statusDiv.appendChild(messageDiv);
+        checkboxes.forEach(cb => {
+            cb.checked = !allChecked;
+        });
+        updateTotals();
+
+        showToast(allChecked ? 'All medications deselected' : 'All medications selected', 'info', 2000);
     }
 
     // Initialize page - update totals on load
@@ -779,12 +1151,38 @@
             }
         });
 
+        // Close toast when clicking backdrop
+        document.getElementById('toastBackdrop').addEventListener('click', hideToast);
+
         // Show success message from TempData if exists
     @if (TempData["Success"] != null)
     {
         <text>
-                showToast('@TempData["Success"]', 'success', 5000);
+                showToast('@Html.Raw(TempData["Success"])', 'success', 5000);
         </text>
     }
+    @if (TempData["Error"] != null)
+    {
+        <text>
+                showToast('@Html.Raw(TempData["Error"])', 'error', 5000);
+        </text>
+    }
+    });
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', function(e) {
+        // ESC key closes modal
+        if (e.key === 'Escape') {
+            if (document.getElementById('confirmationModal').style.display === 'flex') {
+                closeConfirmation();
+            }
+            hideToast();
+        }
+
+        // Ctrl+A to select all (when not in input field)
+        if (e.ctrlKey && e.key === 'a' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+            e.preventDefault();
+            selectAllMedications();
+        }
     });
 </script>

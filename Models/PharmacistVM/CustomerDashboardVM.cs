@@ -5,8 +5,9 @@ namespace IbhayiPharmacy.Models.PharmacistVM
     // View Models
     public class CustomerDashboardVM
     {
-        public List<Prescription> UnprocessedPrescriptions { get; set; } = new();
-        public List<Prescription> ProcessedPrescriptions { get; set; } = new();
+        public List<Prescription> UnprocessedPrescriptions { get; set; } /*= new();*/
+        public List<Prescription> ProcessedPrescriptions { get; set; } /*= new();*/
+        public List<MedicationHistoryVM> MedicationHistory { get; set; }
     }
 
     public class PlaceOrderVM
@@ -105,5 +106,18 @@ namespace IbhayiPharmacy.Models.PharmacistVM
         public string DoctorName { get; set; } = string.Empty;
         public string Instructions { get; set; } = string.Empty;
 
+    }
+
+    public class MedicationHistoryVM
+    {
+        public int MedicationID { get; set; }
+        public string MedicationName { get; set; }
+        public string DoctorName { get; set; }
+        public DateTime? LastOrderDate { get; set; }
+        public int TotalOrders { get; set; }
+        public int RepeatsUsed { get; set; }
+        public int TotalRepeats { get; set; }
+        public int RepeatsLeft { get; set; }
+        public bool IsActive { get; set; }
     }
 }
