@@ -29,6 +29,7 @@ namespace IbhayiPharmacy.Models.PharmacistVM
     {
         public List<OrderItemVM> OrderItems { get; set; } = new();
         public int? DoctorId { get; set; }
+        public int? PrescriptionId { get; set; } // ADDED: To track which prescription is being ordered
     }
 
     public class OrderItemVM
@@ -66,37 +67,7 @@ namespace IbhayiPharmacy.Models.PharmacistVM
         public string? RejectionReason { get; set; }
         public string DoctorName { get; set; } = string.Empty; // For the table display
     }
-
-    //Reports
-
-    //public class PrescriptionReportVM
-    //{
-    //    public DateTime StartDate { get; set; }
-    //    public DateTime EndDate { get; set; }
-    //    public DateTime GeneratedOn { get; set; } = DateTime.Now;
-    //    public string GroupBy { get; set; } = "Doctor"; // "Doctor" or "Medication"
-    //    public List<ReportGroup> Groups { get; set; } = new();
-    //    public int GrandTotal { get; set; }
-    //}
-
-    //public class ReportGroup
-    //{
-    //    public string GroupName { get; set; } = string.Empty; // Doctor Name or Medication Name
-    //    public List<PrescriptionItemVM> Records { get; set; } = new();
-    //    public int Subtotal { get; set; }
-    //}
-
-    //public class PrescriptionItemVM
-    //{
-    //    public DateTime Date { get; set; }
-    //    public string Medication { get; set; } = string.Empty;
-    //    public int Quantity { get; set; }
-    //    public int Repeats { get; set; }
-    //    public string DoctorName { get; set; } = string.Empty;
-    //    public string Instructions { get; set; } = string.Empty;
-    //}
-
-
+    
     // Reports View Models
     public class PrescriptionReportVM
     {
