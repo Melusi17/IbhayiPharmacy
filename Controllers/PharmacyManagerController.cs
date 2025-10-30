@@ -466,18 +466,13 @@ namespace PharmMan.Controllers
         })
         .ToList();
 
+
+
+
+
+
             return View(orders);
         }
-
-
-
-
-
-
-
-
-
-
 
 
         [HttpGet]
@@ -558,6 +553,13 @@ namespace PharmMan.Controllers
         }
 
 
+
+
+
+
+
+
+
         public IActionResult StockManagement()
         {
             var meds = _db.Medications
@@ -581,6 +583,18 @@ namespace PharmMan.Controllers
             _db.SaveChanges();
             return RedirectToAction("StockManagement");
         }
+
+
+
+
+
+
+
+
+
+
+
+
         [HttpGet]
         public IActionResult Reports(string groupBy = "")
         {
