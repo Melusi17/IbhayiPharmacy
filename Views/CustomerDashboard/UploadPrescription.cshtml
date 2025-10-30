@@ -725,6 +725,20 @@
             margin: 5px 0;
         }
     }
+
+    .badge-available {
+        background-color: #3498db;
+        color: white;
+        border: 1px solid #2980b9;
+    }
+
+    .history-summary {
+        background: #e6f5f1;
+        padding: 15px;
+        border-radius: 8px; 
+        margin-top: 20px;
+        border-left: 4px solid #1f9f77;
+    }
 </style>
 
 <!-- Toast Notification -->
@@ -905,7 +919,7 @@
                                             <!-- View Details button -->
                                             <button class="btn-upload btn-view"
                                                     onclick="openViewModal('@prescription.DateIssued.ToString("yyyy-MM-dd")', '@(prescription.Doctors?.Name ?? "Not Assigned")', @prescription.PrescriptionID)">
-                                                👁️ View Details
+                                                View Details
                                             </button>
                                         </div>
                                     </td>
@@ -1109,6 +1123,11 @@
 </div>
 
 <script>
+
+
+
+
+
     // Enhanced Toast notification function
     function showToast(message, type = 'success', duration = 5000) {
         const toast = document.getElementById('toastNotification');
@@ -1148,6 +1167,8 @@
         }, duration);
     }
 
+
+
     // Function to manually hide toast
     function hideToast() {
         const toast = document.getElementById('toastNotification');
@@ -1179,15 +1200,19 @@
         }
     }
 
+
+
     async function viewMedicationHistory(medicationId, medicationName) {
         try {
+            console.log('💊 Loading history for:', medicationName, 'ID:', medicationId);
+
             // Show loading state
             document.getElementById('historyMedicationName').textContent = medicationName;
             document.getElementById('totalOrders').textContent = '0';
             document.getElementById('firstTimeOrders').textContent = '0';
             document.getElementById('refillOrders').textContent = '0';
             document.getElementById('totalQuantity').textContent = '0';
-            document.getElementById('orderTimeline').innerHTML = '<div class="loading">🔄 Loading order history...</div>';
+            document.getElementById('orderTimeline').innerHTML = '<div class="loading">🔄 Loading medication history...</div>';
 
             // Show modal
             document.getElementById('medicationHistoryModal').style.display = 'flex';
@@ -1195,59 +1220,116 @@
             // Fetch medication history
             const response = await fetch(`/CustomerDashboard/GetMedicationHistory?medicationId=${medicationId}`);
 
-            if (!response.ok) throw new Error('Failed to fetch medication history');
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
 
-            const history = await response.json();
+            const result = await response.json();
+            console.log('📦 API Result:', result);
+
+            if (!result.success) {
+                throw new Error(result.message || 'Failed to load history');
+            }
 
             // Update statistics
-            document.getElementById('totalOrders').textContent = history.totalOrders || 0;
-            document.getElementById('firstTimeOrders').textContent = history.firstTimeOrders || 0;
-            document.getElementById('refillOrders').textContent = history.refillOrders || 0;
-            document.getElementById('totalQuantity').textContent = history.totalQuantity || 0;
+            document.getElementById('totalOrders').textContent = result.statistics?.TotalOrders || 0;
+            document.getElementById('firstTimeOrders').textContent = result.statistics?.FirstTimeOrders || 0;
+            document.getElementById('refillOrders').textContent = result.statistics?.RefillOrders || 0;
+            document.getElementById('totalQuantity').textContent = result.statistics?.TotalQuantity || 0;
 
             // Populate timeline
             const timeline = document.getElementById('orderTimeline');
             timeline.innerHTML = '';
 
-            if (!history.orders || history.orders.length === 0) {
-                timeline.innerHTML = '<div class="no-history">No order history found for this medication.</div>';
+            if (!result.history || result.history.length === 0) {
+                timeline.innerHTML = `
+                    <div class="no-history" style="text-align: center; padding: 40px; color: #666;">
+                        <div style="font-size: 48px; margin-bottom: 15px;">📭</div>
+                        <h4>No History Found</h4>
+                        <p>No orders or approved prescriptions found for this medication.</p>
+                    </div>
+                `;
                 return;
             }
 
-            history.orders.forEach(order => {
+            result.history.forEach(item => {
                 const timelineItem = document.createElement('div');
                 timelineItem.className = 'timeline-item';
 
-                const orderTypeBadge = order.isFirstTimeOrder ?
-                    '<span class="history-badge badge-first-time">First Time</span>' :
-                    '<span class="history-badge badge-refill">Refill</span>';
+                // Determine badge and styling based on type
+                let badge = '';
+                let borderColor = '#1f9f77';
+
+                if (item.Type === 'Available') {
+                    badge = '<span class="history-badge badge-available">Available</span>';
+                    borderColor = '#3498db';
+                    timelineItem.style.borderLeft = `4px solid ${borderColor}`;
+                    timelineItem.style.background = '#e3f2fd';
+                } else if (item.IsFirstTimeOrder) {
+                    badge = '<span class="history-badge badge-first-time">First Time</span>';
+                } else {
+                    badge = '<span class="history-badge badge-refill">Refill</span>';
+                }
 
                 timelineItem.innerHTML = `
                     <div class="timeline-header">
-                        <span class="timeline-date">${order.orderDate}</span>
-                        ${orderTypeBadge}
+                        <span class="timeline-date">${item.OrderDate || 'N/A'}</span>
+                        ${badge}
                     </div>
                     <div class="timeline-details">
-                        <strong>Order #:</strong> ${order.orderNumber}<br>
-                        <strong>Quantity:</strong> ${order.quantity}<br>
-                        <strong>Status:</strong> ${order.status}<br>
-                        <strong>Repeats Left:</strong> ${order.repeatsLeft} of ${order.totalRepeats}
+                        <strong>Order #:</strong> ${item.OrderNumber || 'N/A'}<br>
+                        <strong>Quantity:</strong> ${item.Quantity || '0'}<br>
+                        <strong>Status:</strong> ${item.Status || 'N/A'}<br>
+                        <strong>Doctor:</strong> ${item.DoctorName || 'Unknown Doctor'}<br>
+                        <strong>Repeats Left:</strong> ${item.RepeatsLeft ?? 'N/A'} of ${item.TotalRepeats ?? 'N/A'}
+                        ${item.ItemPrice > 0 ? `<br><strong>Price:</strong> R ${item.ItemPrice}` : ''}
+                        ${item.LineTotal > 0 ? `<br><strong>Line Total:</strong> R ${item.LineTotal}` : ''}
+                        ${item.Instructions ? `<br><strong>Instructions:</strong> ${item.Instructions}` : ''}
+                        ${item.Type === 'Available' ? '<br><strong>💡 Ready to order from Place Order page</strong>' : ''}
                     </div>
                 `;
 
                 timeline.appendChild(timelineItem);
             });
 
+            // Show summary
+            if (result.statistics.AvailablePrescriptions > 0) {
+                const summary = document.createElement('div');
+                summary.className = 'history-summary';
+                summary.style.background = '#e6f5f1';
+                summary.style.padding = '15px';
+                summary.style.borderRadius = '8px';
+                summary.style.marginTop = '20px';
+                summary.style.borderLeft = '4px solid #1f9f77';
+
+                summary.innerHTML = `
+                    <h4 style="margin: 0 0 10px 0; color: #004d40;">📊 Summary</h4>
+                    <p style="margin: 5px 0;"><strong>Total Orders:</strong> ${result.statistics.TotalOrders}</p>
+                    <p style="margin: 5px 0;"><strong>Available for Order:</strong> ${result.statistics.AvailablePrescriptions} prescription(s)</p>
+                    <p style="margin: 5px 0;"><strong>Total Quantity Ordered:</strong> ${result.statistics.TotalQuantity}</p>
+                    ${result.statistics.TotalValue > 0 ? `<p style="margin: 5px 0;"><strong>Total Value:</strong> R ${result.statistics.TotalValue}</p>` : ''}
+                `;
+
+                timeline.appendChild(summary);
+            }
+
         } catch (error) {
-            console.error('Error loading medication history:', error);
-            document.getElementById('orderTimeline').innerHTML =
-                '<div class="error-message">❌ Error loading medication history</div>';
+            console.error('❌ Error loading medication history:', error);
+            document.getElementById('orderTimeline').innerHTML = `
+                <div class="error-message">
+                    ❌ Error loading medication history: ${error.message}
+                </div>
+            `;
         }
     }
 
-    function closeMedicationHistoryModal() {
+
+
+       function closeMedicationHistoryModal() {
         document.getElementById('medicationHistoryModal').style.display = 'none';
     }
+
+
 
     // View Prescription Modal Functions - Simplified
     function openViewModal(date, doctor, prescriptionId) {
