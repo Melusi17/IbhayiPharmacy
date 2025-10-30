@@ -117,22 +117,25 @@ namespace IbhayiPharmacy.Areas.Identity.Pages.Account
                 var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
                 if (result.Succeeded)
                 {
-                    _logger.LogInformation("ApplicationUser logged in.");
+                    _logger.LogInformation("User logged in.");
 
-                    //var user = await _userManager.FindByEmailAsync(Input.Email);
-                    //if (await _userManager.IsInRoleAsync(user, "Customer"))
-                    //{
-                    //    return RedirectToAction("Dashboard", "Customer");
-
-                    //}
-                    //else if (await _userManager.IsInRoleAsync(user, "Phamacist"))
-                    //{
-                    //    return RedirectToAction("Index", "Phamacist");
-                    //}
-                    //else if(await _userManager.IsInRoleAsync(user, "Phamacy Manager") )
-                    //{
-                    //    return RedirectToAction("Dashboard", "Phamacy Manage");
-                    //}
+                    var user = await _userManager.FindByEmailAsync(Input.Email);
+                    if (user != null)
+                    {
+                        // Check roles and redirect accordingly
+                        if (await _userManager.IsInRoleAsync(user, "Customer"))
+                        {
+                            return RedirectToAction("UploadPrescription", "CustomerDashboard");
+                        }
+                        else if (await _userManager.IsInRoleAsync(user, "Pharmacist"))
+                        {
+                            return RedirectToAction("Index", "PharmacistDispensing");
+                        }
+                        else if (await _userManager.IsInRoleAsync(user, "Pharmacy Manager"))
+                        {
+                            return RedirectToAction("Index", "PharmacyManager");
+                        }
+                    }
 
                     return LocalRedirect(returnUrl);
                 }
@@ -142,7 +145,7 @@ namespace IbhayiPharmacy.Areas.Identity.Pages.Account
                 }
                 if (result.IsLockedOut)
                 {
-                    _logger.LogWarning("ApplicationUser account locked out.");
+                    _logger.LogWarning("User account locked out.");
                     return RedirectToPage("./Lockout");
                 }
                 else
