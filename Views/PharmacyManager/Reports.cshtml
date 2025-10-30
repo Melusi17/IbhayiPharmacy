@@ -2,10 +2,11 @@
 
 @{
     ViewData["Title"] = "Medication Stock Report";
+    Layout = "~/Views/Shared/_ManagerLayout.cshtml";
 }
 
 <div class="container mt-4">
-    <h2>Medication Stock Report</h2>
+     
 
     <form method="get" asp-action="Reports">
         <label><strong>Group By:</strong></label>
@@ -15,7 +16,7 @@
             <option value="Schedule" selected="@(Model.GroupBy == "Schedule")">Schedule</option>
             <option value="Supplier" selected="@(Model.GroupBy == "Supplier")">Supplier</option>
         </select>
-        <button type="submit" class="btn btn-primary ms-2">Generate</button>
+        <button type="submit" class="btn btn-primary m-2">Generate</button>
     </form>
 
     <hr />
