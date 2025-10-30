@@ -1,6 +1,11 @@
 ﻿@model List<Prescription>
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
 @{
     ViewData["Title"] = "Processed Scripts - Ibhayi Pharmacy";
+    var user = await UserManager.GetUserAsync(User);
+    var userName = user?.UserName ?? "Pharmacist";
 }
 
 <!DOCTYPE html>
@@ -119,6 +124,34 @@
             justify-content: center;
             box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
+
+        /* ===== LOGOUT FORM ===== */
+        .logout-form {
+            display: inline;
+        }
+
+        .btn-logout {
+            background: transparent;
+            border: none;
+            color: #ecf0f1;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 8px 0;
+            padding: 10px 15px;
+            border-radius: 5px;
+            transition: all 0.3s;
+            width: 100%;
+            text-align: left;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+            .btn-logout:hover {
+                background-color: #34495e;
+                transform: translateX(5px);
+            }
 
         /* ===== TOPBAR ===== */
         .topbar {
@@ -429,13 +462,17 @@
             <small style="color: #bdc3c7;">Dedicated Dictionary</small>
         </div>
         <nav class="sidebar-nav">
-            <a href="#"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
-            <a href="LoadPrescriptions.html"><i class="fas fa-tachometer-alt"></i> Walk In Prescription</a>
-            <a href="Orders.html"><i class="fas fa-clipboard-list"></i> Orders</a>
-            <a href="@Url.Action("Index", "ScriptsProcessed")"><i class="fas fa-file-prescription"></i> Unprocessed Scripts</a>
-            <a href="@Url.Action("ProcessedScripts", "ScriptsProcessed")" class="active"><i class="fas fa-boxes"></i> Processed Scripts</a>
-            <a href="TrackOrders.html"><i class="fas fa-boxes"></i> Track Orders</a>
-            <a href="#"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            <a asp-controller="Pharmacy" asp-action="Index"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <a asp-controller="WalkInPrescription" asp-action="Create"><i class="fas fa-tachometer-alt"></i> Walk In Prescription</a>
+            <a asp-controller="PharmacistDispensing" asp-action="Index"><i class="fas fa-clipboard-list"></i> Orders</a>
+            <a asp-controller="ScriptsProcessed" asp-action="Index"><i class="fas fa-file-prescription"></i> Unprocessed Scripts</a>
+            <a asp-controller="ScriptsProcessed" asp-action="ProcessedScripts"><i class="fas fa-boxes"></i> Processed Scripts</a>
+            <a asp-controller="PharmacistDispensing" asp-action="CollectionTracking"><i class="fas fa-boxes"></i> Track Orders</a>
+            <form class="logout-form" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                <button type="submit" class="btn-logout">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </form>
         </nav>
         <div class="sidebar-footer">
             <p>Ibhayi Pharmacy v2.1</p>
@@ -445,7 +482,7 @@
     <!-- TOPBAR -->
     <div class="topbar">
         <span>Processed Scripts</span>
-        <div>Welcome, <strong>Pharmacist</strong></div>
+        <div>Welcome, <strong>@userName</strong></div>
     </div>
 
     <!-- MAIN CONTENT -->
@@ -511,62 +548,62 @@
         const patients = [
             @foreach (var patientGroup in Model.GroupBy(p => p.ApplicationUserId))
             {
-                        var firstPrescription = patientGroup.First();
-                        var patientName = $"{firstPrescription.ApplicationUser?.Name} {firstPrescription.ApplicationUser?.Surname}";
-                        var idNumber = firstPrescription.ApplicationUser?.IDNumber ?? "";
+                            var firstPrescription = patientGroup.First();
+                            var patientName = $"{firstPrescription.ApplicationUser?.Name} {firstPrescription.ApplicationUser?.Surname}";
+                            var idNumber = firstPrescription.ApplicationUser?.IDNumber ?? "";
 
-                        // Clean the data for JavaScript
-                        patientName = patientName.Replace("\"", "\\\"");
-                        idNumber = idNumber?.Replace("\"", "\\\"") ?? "";
+                            // Clean the data for JavaScript
+                            patientName = patientName.Replace("\"", "\\\"");
+                            idNumber = idNumber?.Replace("\"", "\\\"") ?? "";
 
-                        <text>
-                        {
-                            userId: "@firstPrescription.ApplicationUserId",
-                            id: "@idNumber",
-                            name: "@patientName",
-                            prescriptions: [
-                                @foreach (var prescription in patientGroup)
-                                {
-                                            var statusClass = "process-unknown";
-                                            var statusText = "Unknown";
+                            <text>
+                            {
+                                userId: "@firstPrescription.ApplicationUserId",
+                                id: "@idNumber",
+                                name: "@patientName",
+                                prescriptions: [
+                                    @foreach (var prescription in patientGroup)
+                                    {
+                                                    var statusClass = "process-unknown";
+                                                    var statusText = "Unknown";
 
-                                            if (!string.IsNullOrEmpty(prescription.Status))
-                                            {
-                                                        statusClass = prescription.Status.ToLower() switch
-                                                        {
-                                                                "processed" => "process-yes",
-                                                                "partially processed" => "process-partial",
-                                                                "rejected" => "process-no",
-                                                                "pending" => "process-pending",
-                                                                _ => "process-unknown"
-                                                        };
-                                                        statusText = prescription.Status;
-                                            }
+                                                    if (!string.IsNullOrEmpty(prescription.Status))
+                                                    {
+                                                                    statusClass = prescription.Status.ToLower() switch
+                                                                    {
+                                                                                "processed" => "process-yes",
+                                                                                "partially processed" => "process-partial",
+                                                                                "rejected" => "process-no",
+                                                                                "pending" => "process-pending",
+                                                                                _ => "process-unknown"
+                                                                    };
+                                                                    statusText = prescription.Status;
+                                                    }
 
-                                            var doctorName = prescription.Doctors != null ?
-                                                            $"Dr. {prescription.Doctors.Name} {prescription.Doctors.Surname}" :
-                                                            "Not assigned";
-                                            doctorName = doctorName.Replace("\"", "\\\"");
+                                                    var doctorName = prescription.Doctors != null ?
+                                                                                    $"Dr. {prescription.Doctors.Name} {prescription.Doctors.Surname}" :
+                                                                                    "Not assigned";
+                                                    doctorName = doctorName.Replace("\"", "\\\"");
 
-                                            var canDownload = (prescription.Script != null && prescription.Script.Length > 0);
+                                                    var canDownload = (prescription.Script != null && prescription.Script.Length > 0);
 
-                                            <text>
-                                            {
-                                                date: "@prescription.DateIssued.ToString("yyyy-MM-dd")",
-                                                file: "Prescription_@(prescription.PrescriptionID).pdf",
-                                                processed: true,
-                                                doctor: "@doctorName",
-                                                status: "@statusText",
-                                                statusClass: "@statusClass",
-                                                statusText: "@statusText",
-                                                canDownload: @canDownload.ToString().ToLower(),
-                                                prescriptionId: @prescription.PrescriptionID
-                                            },
-                                            </text>
-                                }
-                            ]
-                        },
-                        </text>
+                                                    <text>
+                                                    {
+                                                        date: "@prescription.DateIssued.ToString("yyyy-MM-dd")",
+                                                        file: "Prescription_@(prescription.PrescriptionID).pdf",
+                                                        processed: true,
+                                                        doctor: "@doctorName",
+                                                        status: "@statusText",
+                                                        statusClass: "@statusClass",
+                                                        statusText: "@statusText",
+                                                        canDownload: @canDownload.ToString().ToLower(),
+                                                        prescriptionId: @prescription.PrescriptionID
+                                                    },
+                                                    </text>
+                                    }
+                                ]
+                            },
+                            </text>
             }
         ];
 
