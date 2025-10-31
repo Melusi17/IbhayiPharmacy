@@ -1016,7 +1016,7 @@
                                 <tr>
                                     <td>
                                         <strong>@medication.MedicationName</strong>
-                                        @if (medication.RepeatsLeft == 0)
+                                       @*  @if (medication.RepeatsLeft == 0)
                                         {
                                             <span class="repeat-badge no-repeats" title="No repeats left">
                                                 ⏸️ Completed
@@ -1027,7 +1027,7 @@
                                             <span class="repeat-badge badge-available" title="Available for order">
                                                 📋 Available
                                             </span>
-                                        }
+                                        } *@
                                     </td>
                                     <td>@medication.DoctorName</td>
                                     <td>@(medication.LastOrderDate?.ToString("yyyy-MM-dd") ?? "Never")</td>
