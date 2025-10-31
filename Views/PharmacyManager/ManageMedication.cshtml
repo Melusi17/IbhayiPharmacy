@@ -29,12 +29,17 @@
             <tbody>
                 @foreach (var med in Model)
                 {
+                    bool isLowStock = med.QuantityOnHand <= (med.ReOrderLevel + 10);
+
+
                     <tr>
                         <td>@med.MedicationName</td>
                         <td>@med.Schedule</td>
                         <td>R @med.CurrentPrice</td>
                         <td>@med.ReOrderLevel</td>
-                        <td>@med.QuantityOnHand</td>
+                        <td style="color:@(isLowStock ? "red" : "black"); font-weight:@(isLowStock ? "bold" : "normal");">
+                            @med.QuantityOnHand
+                        </td>
                         <td>@med.DosageForm?.DosageFormName</td>
                         <td>@med.Supplier?.SupplierName</td>
                         <td>
