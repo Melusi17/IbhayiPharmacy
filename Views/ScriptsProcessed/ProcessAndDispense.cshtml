@@ -42,7 +42,7 @@
             left: 0;
             box-shadow: 2px 0 10px rgba(0,0,0,0.1);
             z-index: 1000;
-            transition: all 0.3s;
+            transition: all 0.3s ease-in-out;
         }
 
             .sidebar.collapsed {
@@ -146,7 +146,7 @@
             justify-content: space-between;
             align-items: center;
             z-index: 999;
-            transition: all 0.3s;
+            transition: all 0.3s ease-in-out;
         }
 
         .sidebar.collapsed + .topbar {
@@ -156,6 +156,18 @@
         .topbar span {
             font-weight: bold;
             color: #2c3e50;
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        .main-content {
+            margin-left: 220px;
+            margin-top: 60px;
+            padding: 30px;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .sidebar.collapsed + .topbar + .main-content {
+            margin-left: 0;
         }
 
         /* Add a menu button in topbar for when sidebar is collapsed */
@@ -168,22 +180,16 @@
             border-radius: 5px;
             cursor: pointer;
             margin-right: 15px;
-        }
-
-        .sidebar.collapsed + .topbar .menu-toggle {
-            display: block;
-        }
-
-        /* ===== MAIN CONTENT ===== */
-        .main-content {
-            margin-left: 220px;
-            margin-top: 60px;
-            padding: 30px;
             transition: all 0.3s;
         }
 
-        .sidebar.collapsed + .topbar + .main-content {
-            margin-left: 0;
+            .menu-toggle:hover {
+                background: #2980b9;
+                transform: translateY(-1px);
+            }
+
+        .sidebar.collapsed + .topbar .menu-toggle {
+            display: block;
         }
 
         /* ===== FORM LAYOUT ===== */
@@ -191,9 +197,10 @@
             display: grid;
             grid-template-areas:
                 "customer doctor"
-                "pdf pdf"
-                "meds meds";
+                "meds pdf"
+                "meds .";
             grid-template-columns: 1fr 1fr;
+            grid-template-rows: auto 1fr auto;
             gap: 25px;
             max-width: 1800px;
             margin: 0 auto;
@@ -221,6 +228,8 @@
             grid-area: meds;
             position: relative;
             min-height: 600px;
+            /* Allow medication card to expand when sidebar collapses */
+            min-width: 0; /* Important for flex/grid children */
         }
 
         .pdf-card {
@@ -228,6 +237,8 @@
             height: 500px;
             overflow: hidden;
             border: 2px dashed #3498db;
+            /* Ensure PDF viewer doesn't get too small */
+            min-height: 400px;
         }
 
         h3 {
@@ -336,13 +347,9 @@
                 background: #c0392b;
             }
 
-        .btn-dispense {
+        .btn-done {
             background: #9b59b6;
         }
-
-            .btn-dispense:hover {
-                background: #8e44ad;
-            }
 
         /* ===== MEDICATION TABLE ===== */
         .medication-table-container {
@@ -724,7 +731,7 @@
             border: 1px solid #e74c3c;
         }
 
-        /* ===== LOGOUT FORM ===== */
+        /* Logout form styles */
         .logout-form {
             display: inline;
         }
@@ -758,9 +765,10 @@
                 grid-template-areas:
                     "customer"
                     "doctor"
-                    "pdf"
-                    "meds";
+                    "meds"
+                    "pdf";
                 grid-template-columns: 1fr;
+                grid-template-rows: auto;
             }
 
             .meds-card {
@@ -769,6 +777,7 @@
 
             .pdf-card {
                 height: 400px;
+                min-height: 300px;
             }
 
             .medication-table-container {
