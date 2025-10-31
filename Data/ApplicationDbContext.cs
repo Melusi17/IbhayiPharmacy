@@ -117,7 +117,7 @@ namespace IbhayiPharmacy.Data
                 new Supplier { SupplierID = 2, SupplierName = "HelixMed", ContactName = "Nicky", ContactSurname = "Mostert", EmailAddress = "nmostert@mandela.ac.za" },
                 new Supplier { SupplierID = 3, SupplierName = "VitaGenix", ContactName = "Matimu", ContactSurname = "Vuqa", EmailAddress = "matimu@example.com" },
                 new Supplier { SupplierID = 4, SupplierName = "Apex Biomed", ContactName = "Lulu", ContactSurname = "Ndhambi", EmailAddress = "lulu@example.com" },
-                new Supplier { SupplierID = 5, SupplierName = "CuraNova", ContactName = "Pharmacy Manager Group Member Name", ContactSurname = "Pharmacy Manager Group Member Surname", EmailAddress = "Pharmacy Manager Group Member E-mail" }
+                new Supplier { SupplierID = 5, SupplierName = "CuraNova", ContactName = "Mbasa", ContactSurname = "Majila", EmailAddress = "s224378449@mandela.ac.za" }
             );
 
             // Seed Doctors
@@ -159,9 +159,10 @@ namespace IbhayiPharmacy.Data
                 new ApplicationUser { Id = "pharmacist-1", UserName = "lindile@example.com", NormalizedUserName = "LINDILE@EXAMPLE.COM", Email = "lindile@example.com", NormalizedEmail = "LINDILE@EXAMPLE.COM", EmailConfirmed = true, PasswordHash = GetPasswordHash("Hadebe123!"), SecurityStamp = Guid.NewGuid().ToString(), Name = "Lindile", Surname = "Hadebe", IDNumber = "1234567890123", CellphoneNumber = "061 2345 678" },
                 new ApplicationUser { Id = "pharmacist-2", UserName = "dorothy@example.com", NormalizedUserName = "DOROTHY@EXAMPLE.COM", Email = "dorothy@example.com", NormalizedEmail = "DOROTHY@EXAMPLE.COM", EmailConfirmed = true, PasswordHash = GetPasswordHash("Daniels123!"), SecurityStamp = Guid.NewGuid().ToString(), Name = "Dorothy", Surname = "Daniels", IDNumber = "1234567890124", CellphoneNumber = "062 2345 678" },
                 new ApplicationUser { Id = "pharmacist-3", UserName = "marcel@example.com", NormalizedUserName = "MARCEL@EXAMPLE.COM", Email = "marcel@example.com", NormalizedEmail = "MARCEL@EXAMPLE.COM", EmailConfirmed = true, PasswordHash = GetPasswordHash("VanNiekerk123!"), SecurityStamp = Guid.NewGuid().ToString(), Name = "Marcel", Surname = "Van Niekerk", IDNumber = "1234567890125", CellphoneNumber = "063 2345 678" },
+                new ApplicationUser { Id = "pharmacist-4", UserName = "s224113038@mandela.ac.za", NormalizedUserName = "S224113038@MANDELA.AC.ZA", Email = "s224113038@mandela.ac.za", NormalizedEmail = "S224113038MANDELA.AC.ZA", EmailConfirmed = true, PasswordHash = GetPasswordHash("Mamba123!"), SecurityStamp = Guid.NewGuid().ToString(), Name = "Melusi", Surname = "Mamba", IDNumber = "1234567890125", CellphoneNumber = "063 2345 678" },
 
                 // Pharmacy Manager
-                new ApplicationUser { Id = "manager-1", UserName = "john.doe@example.com", NormalizedUserName = "JOHN.DOE@EXAMPLE.COM", Email = "john.doe@example.com", NormalizedEmail = "JOHN.DOE@EXAMPLE.COM", EmailConfirmed = true, PasswordHash = GetPasswordHash("Doe123!"), SecurityStamp = Guid.NewGuid().ToString(), Name = "John", Surname = "Doe", IDNumber = "1234567890126", CellphoneNumber = "082 289 4758" }
+                new ApplicationUser { Id = "manager-1", UserName = "s224378449@mandela.ac.za", NormalizedUserName = "S224378449@MANDELA.AC.ZA", Email = "s224378449@mandela.ac.za", NormalizedEmail = "S224378449@MANDELA.AC.ZA", EmailConfirmed = true, PasswordHash = GetPasswordHash("Majila123!"), SecurityStamp = Guid.NewGuid().ToString(), Name = "Mbasa", Surname = "Majila", IDNumber = "1234567890126", CellphoneNumber = "082 289 4758" }
             );
 
             // Seed User Roles
@@ -225,7 +226,8 @@ namespace IbhayiPharmacy.Data
             modelBuilder.Entity<Pharmacist>().HasData(
                 new Pharmacist { PharmacistID = 1, ApplicationUserId = "pharmacist-1", HealthCouncilRegNo = "123456" },
                 new Pharmacist { PharmacistID = 2, ApplicationUserId = "pharmacist-2", HealthCouncilRegNo = "234567" },
-                new Pharmacist { PharmacistID = 3, ApplicationUserId = "pharmacist-3", HealthCouncilRegNo = "345678" }
+                new Pharmacist { PharmacistID = 3, ApplicationUserId = "pharmacist-3", HealthCouncilRegNo = "345678" },
+                new Pharmacist { PharmacistID = 4, ApplicationUserId = "pharmacist-4", HealthCouncilRegNo = "146220" }
             );
 
             // Seed Pharmacy Manager
