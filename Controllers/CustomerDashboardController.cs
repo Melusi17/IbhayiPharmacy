@@ -29,7 +29,6 @@ namespace IbhayiPharmacy.Controllers
         }
 
 
-        // UPDATED: Upload Prescription Section - GET with order tracking AND medication history
         // UPDATED: Upload Prescription Section - GET with proper model usage
         [HttpGet]
         public async Task<IActionResult> UploadPrescription()

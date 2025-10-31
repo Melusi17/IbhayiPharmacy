@@ -85,7 +85,8 @@ namespace IbhayiPharmacy.Controllers
                     .Include(sl => sl.Prescriptions)
                         .ThenInclude(p => p.Doctors)
                     .Where(sl => sl.Prescriptions.ApplicationUserId == currentUserId &&
-                                sl.Status == "Approved") // ← ONLY APPROVED!
+                                sl.Status == "Approved" &&
+            (sl.RepeatsLeft > 0 || sl.Repeats == 0)) // ← ONLY APPROVED!
                     .Select(sl => new CustomerOrderVM
                     {
                         ScriptLineID = sl.ScriptLineID,
@@ -232,7 +233,7 @@ namespace IbhayiPharmacy.Controllers
                     await _context.SaveChangesAsync();
                     await transaction.CommitAsync();
 
-                    Console.WriteLine($"🎉 Order {orderNumber} completed successfully!");
+                    Console.WriteLine($"Order {orderNumber} completed successfully!");
 
                     return Json(new
                     {

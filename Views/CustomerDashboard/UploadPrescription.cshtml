@@ -317,14 +317,6 @@
             background-color: #7f8c8d;
         }
 
-    .btn-history {
-        background-color: #607d8b;
-    }
-
-        .btn-history:hover {
-            background-color: #546e7a;
-        }
-
     /* Prescription Info */
     .prescription-info {
         background: #f8f9fa;
@@ -761,6 +753,30 @@
         color: #ef6c00;
         border: 1px solid #ffcc80;
     }
+
+    /* Clickable Order Number */
+    .order-number-link {
+        color: #1976d2;
+        text-decoration: none;
+        font-weight: 600;
+        cursor: pointer;
+        padding: 4px 8px;
+        border-radius: 4px;
+        transition: all 0.3s ease;
+        border: 1px solid transparent;
+    }
+
+        .order-number-link:hover {
+            background-color: #e3f2fd;
+            border-color: #1976d2;
+            text-decoration: underline;
+        }
+
+    .order-number-available {
+        color: #2e7d32;
+        font-weight: 600;
+        font-style: italic;
+    }
 </style>
 
 <!-- Toast Notification -->
@@ -967,7 +983,7 @@
                 }
                 else
                 {
-                    <p id="noProcessedMessage" class="empty-state-message">No Processed prescription found! <br><small>Your processed prescriptions will reappear when you upload new prescriptions that get processed.</small></p>
+                    <p id="noProcessedMessage" class="empty-state-message">🎉 All medications have been ordered! <br><small>Your processed prescriptions will reappear when you upload new prescriptions that get processed.</small></p>
                 }
             </div>
         </div>
@@ -991,9 +1007,7 @@
                                 <th>Doctor</th>
                                 <th>Last Ordered</th>
                                 <th>Total Orders</th>
-                                <th>Repeats Used</th>
                                 <th>Status</th>
-                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody id="medicationHistoryBody">
@@ -1018,7 +1032,6 @@
                                     <td>@medication.DoctorName</td>
                                     <td>@(medication.LastOrderDate?.ToString("yyyy-MM-dd") ?? "Never")</td>
                                     <td>@medication.TotalOrders</td>
-                                    <td>@medication.RepeatsUsed of @medication.TotalRepeats</td>
                                     <td>
                                         @if (medication.RepeatsLeft == 0)
                                         {
@@ -1037,14 +1050,7 @@
                                             <span class="status-badge status-expired">Expired</span>
                                         }
                                     </td>
-                                    <td>
-                                        <div class="action-buttons">
-                                            <button class="btn-upload btn-history"
-                                                    onclick="viewMedicationHistory(@medication.MedicationID, '@medication.MedicationName')">
-                                                📈 View History
-                                            </button>
-                                        </div>
-                                    </td>
+                                    
                                 </tr>
                             }
                         </tbody>
