@@ -317,14 +317,6 @@
             background-color: #7f8c8d;
         }
 
-    .btn-history {
-        background-color: #607d8b;
-    }
-
-        .btn-history:hover {
-            background-color: #546e7a;
-        }
-
     /* Prescription Info */
     .prescription-info {
         background: #f8f9fa;
@@ -735,9 +727,55 @@
     .history-summary {
         background: #e6f5f1;
         padding: 15px;
-        border-radius: 8px; 
+        border-radius: 8px;
         margin-top: 20px;
         border-left: 4px solid #1f9f77;
+    }
+
+    /* Order Progress */
+    .order-progress {
+        display: inline-block;
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 11px;
+        font-weight: bold;
+        margin-left: 5px;
+    }
+
+    .progress-ordered {
+        background-color: #e3f2fd;
+        color: #1976d2;
+        border: 1px solid #bbdefb;
+    }
+
+    .progress-partial {
+        background-color: #fff3e0;
+        color: #ef6c00;
+        border: 1px solid #ffcc80;
+    }
+
+    /* Clickable Order Number */
+    .order-number-link {
+        color: #1976d2;
+        text-decoration: none;
+        font-weight: 600;
+        cursor: pointer;
+        padding: 4px 8px;
+        border-radius: 4px;
+        transition: all 0.3s ease;
+        border: 1px solid transparent;
+    }
+
+        .order-number-link:hover {
+            background-color: #e3f2fd;
+            border-color: #1976d2;
+            text-decoration: underline;
+        }
+
+    .order-number-available {
+        color: #2e7d32;
+        font-weight: 600;
+        font-style: italic;
     }
 </style>
 
@@ -886,6 +924,7 @@
                                 <th>Date</th>
                                 <th>Doctor</th>
                                 <th>Status</th>
+                                <th>Order Progress</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -915,6 +954,20 @@
                                         }
                                     </td>
                                     <td>
+                                        @if (prescription.IsFullyOrdered)
+                                        {
+                                            <span class="order-progress progress-ordered">✅ All Ordered</span>
+                                        }
+                                        else if (prescription.IsPartiallyOrdered)
+                                        {
+                                            <span class="order-progress progress-partial">🔄 Partially Ordered</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="order-progress status-pending">📋 Ready to Order</span>
+                                        }
+                                    </td>
+                                    <td>
                                         <div class="action-buttons">
                                             <!-- View Details button -->
                                             <button class="btn-upload btn-view"
@@ -930,7 +983,7 @@
                 }
                 else
                 {
-                    <p id="noProcessedMessage" class="empty-state-message">📋 No processed prescriptions found. <br><small>Your unprocessed prescriptions will appear here once reviewed by our pharmacy team.</small></p>
+                    <p id="noProcessedMessage" class="empty-state-message">🎉 All medications have been ordered! <br><small>Your processed prescriptions will reappear when you upload new prescriptions that get processed.</small></p>
                 }
             </div>
         </div>
@@ -954,9 +1007,7 @@
                                 <th>Doctor</th>
                                 <th>Last Ordered</th>
                                 <th>Total Orders</th>
-                                <th>Repeats Used</th>
                                 <th>Status</th>
-                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody id="medicationHistoryBody">
@@ -965,39 +1016,41 @@
                                 <tr>
                                     <td>
                                         <strong>@medication.MedicationName</strong>
-                                        @if (medication.RepeatsLeft == 0)
+                                       @*  @if (medication.RepeatsLeft == 0)
                                         {
                                             <span class="repeat-badge no-repeats" title="No repeats left">
                                                 ⏸️ Completed
                                             </span>
                                         }
+                                        else if (medication.TotalOrders == 0)
+                                        {
+                                            <span class="repeat-badge badge-available" title="Available for order">
+                                                📋 Available
+                                            </span>
+                                        } *@
                                     </td>
                                     <td>@medication.DoctorName</td>
                                     <td>@(medication.LastOrderDate?.ToString("yyyy-MM-dd") ?? "Never")</td>
                                     <td>@medication.TotalOrders</td>
-                                    <td>@medication.RepeatsUsed of @medication.TotalRepeats</td>
                                     <td>
                                         @if (medication.RepeatsLeft == 0)
                                         {
                                             <span class="status-badge status-completed">Completed</span>
                                         }
-                                        else if (medication.IsActive)
+                                        else if (medication.IsActive && medication.TotalOrders > 0)
                                         {
                                             <span class="status-badge status-approved">Active</span>
+                                        }
+                                        else if (medication.TotalOrders == 0)
+                                        {
+                                            <span class="status-badge status-pending">Ready to Order</span>
                                         }
                                         else
                                         {
                                             <span class="status-badge status-expired">Expired</span>
                                         }
                                     </td>
-                                    <td>
-                                        <div class="action-buttons">
-                                            <button class="btn-upload btn-history"
-                                                    onclick="viewMedicationHistory(@medication.MedicationID, '@medication.MedicationName')">
-                                                📈 View History
-                                            </button>
-                                        </div>
-                                    </td>
+                                    
                                 </tr>
                             }
                         </tbody>
@@ -1038,10 +1091,11 @@
                 <thead>
                     <tr>
                         <th>Medication</th>
-                        <th>Status</th>
+                        <th>Approval Status</th>
+                        <th>Order Status</th>
                         <th>Quantity</th>
                         <th>Instructions</th>
-                        <th>Repeats</th>
+                        <th>Repeats Left</th>
                     </tr>
                 </thead>
                 <tbody id="viewMedicationsBody">
@@ -1123,11 +1177,6 @@
 </div>
 
 <script>
-
-
-
-
-
     // Enhanced Toast notification function
     function showToast(message, type = 'success', duration = 5000) {
         const toast = document.getElementById('toastNotification');
@@ -1167,8 +1216,6 @@
         }, duration);
     }
 
-
-
     // Function to manually hide toast
     function hideToast() {
         const toast = document.getElementById('toastNotification');
@@ -1199,8 +1246,6 @@
             toggleText.textContent = 'Hide History';
         }
     }
-
-
 
     async function viewMedicationHistory(medicationId, medicationName) {
         try {
@@ -1323,15 +1368,11 @@
         }
     }
 
-
-
-       function closeMedicationHistoryModal() {
+    function closeMedicationHistoryModal() {
         document.getElementById('medicationHistoryModal').style.display = 'none';
     }
 
-
-
-    // View Prescription Modal Functions - Simplified
+    // View Prescription Modal Functions
     function openViewModal(date, doctor, prescriptionId) {
         console.log('Opening view modal for prescription:', prescriptionId);
 
@@ -1354,38 +1395,58 @@
         document.getElementById("viewPrescriptionModal").style.display = "none";
     }
 
+    // Enhanced function to load prescription medications with order status
     async function loadPrescriptionMedications(prescriptionId) {
         try {
             const tbody = document.getElementById('viewMedicationsBody');
-            tbody.innerHTML = '<tr><td colspan="5" class="loading">🔄 Loading medications...</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="6" class="loading">🔄 Loading medications...</td></tr>';
 
             const response = await fetch('@Url.Action("GetPrescriptionMedications", "CustomerDashboard")?prescriptionId=' + prescriptionId);
 
             if (!response.ok) throw new Error('Network error');
 
-            const medications = await response.json();
+            const result = await response.json();
 
             tbody.innerHTML = '';
 
-            if (!medications || medications.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" class="loading">No medications found for this prescription</td></tr>';
+            if (!result.success || !result.medications || result.medications.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="loading">No medications found for this prescription</td></tr>';
                 return;
             }
 
-            medications.forEach(med => {
-                const statusBadge = med.status === "Approved" ?
-                    '<span class="status-badge status-approved">✅ Approved</span>' :
-                    med.status === "Rejected" ?
-                    '<span class="status-badge status-rejected">❌ Rejected</span>' :
-                    '<span class="status-badge status-pending">⏳ Pending</span>';
+            result.medications.forEach(med => {
+                // Status badge based on approval status
+                let statusBadge = '';
+                if (med.status === "Approved") {
+                    statusBadge = '<span class="status-badge status-approved">✅ Approved</span>';
+                } else if (med.status === "Rejected") {
+                    statusBadge = '<span class="status-badge status-rejected">❌ Rejected</span>';
+                } else {
+                    statusBadge = '<span class="status-badge status-pending">⏳ Pending</span>';
+                }
+
+                // Order status badge
+                let orderStatusBadge = '';
+                if (med.isOrdered) {
+                    if (med.orderStatus === "Completed" || med.orderStatus === "Dispensed") {
+                        orderStatusBadge = '<span class="status-badge status-completed">✅ Ordered</span>';
+                    } else if (med.orderStatus === "Cancelled") {
+                        orderStatusBadge = '<span class="status-badge status-rejected">❌ Cancelled</span>';
+                    } else {
+                        orderStatusBadge = '<span class="status-badge status-ordered">🛒 Ordered</span>';
+                    }
+                } else {
+                    orderStatusBadge = '<span class="status-badge status-pending">📋 Not Ordered</span>';
+                }
 
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td><strong>${med.name}</strong></td>
                     <td>${statusBadge}</td>
+                    <td>${orderStatusBadge}</td>
                     <td>${med.quantity}</td>
                     <td>${med.instructions}</td>
-                    <td>${med.repeats}</td>
+                    <td>${med.repeatsLeft} of ${med.repeats}</td>
                 `;
                 tbody.appendChild(row);
             });
@@ -1393,7 +1454,7 @@
         } catch (error) {
             console.error('Error loading prescription medications:', error);
             const tbody = document.getElementById('viewMedicationsBody');
-            tbody.innerHTML = '<tr><td colspan="5" class="error-message">❌ Error loading medications</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="6" class="error-message">❌ Error loading medications</td></tr>';
         }
     }
 
@@ -1401,7 +1462,7 @@
     document.addEventListener("DOMContentLoaded", function () {
         setupFileUpload();
         setupEditFileUpload();
-        checkEmptyLists();
+        checkAndDisplayEmptyStates();
 
         // Allow clicking backdrop to close toast
         const backdrop = document.getElementById('toastBackdrop');
@@ -1839,8 +1900,8 @@
         }
     }
 
-    // Enhanced checkEmptyLists function
-    function checkEmptyLists() {
+    // Enhanced function to check and display empty states
+    function checkAndDisplayEmptyStates() {
         // Check processed prescriptions
         const processedSection = document.getElementById('processedPrescriptions');
         if (processedSection) {
@@ -1849,26 +1910,15 @@
             const hasRows = processedBody && processedBody.querySelectorAll('tr').length > 0;
             const emptyMessage = document.getElementById('noProcessedMessage');
 
-            if (!hasRows && !emptyMessage) {
-                // Only show empty message if there are no rows AND no empty message exists
-                const newEmptyMessage = document.createElement('p');
-                newEmptyMessage.id = 'noProcessedMessage';
-                newEmptyMessage.className = 'empty-state-message';
-                newEmptyMessage.innerHTML = '📋 No processed prescriptions found. <br><small>Your unprocessed prescriptions will appear here once reviewed by our pharmacy team.</small>';
-                newEmptyMessage.style.textAlign = 'center';
-                newEmptyMessage.style.padding = '40px';
-                newEmptyMessage.style.color = '#666';
-                newEmptyMessage.style.fontSize = '16px';
-                newEmptyMessage.style.background = '#f8f9fa';
-                newEmptyMessage.style.borderRadius = '10px';
-                newEmptyMessage.style.marginTop = '20px';
-
-                if (processedTable) {
-                    processedTable.remove();
+            if (!hasRows) {
+                if (!emptyMessage) {
+                    const newEmptyMessage = document.createElement('p');
+                    newEmptyMessage.id = 'noProcessedMessage';
+                    newEmptyMessage.className = 'empty-state-message';
+                    newEmptyMessage.innerHTML = '🎉 All medications have been ordered! <br><small>Your processed prescriptions will reappear when you upload new prescriptions that get processed.</small>';
+                    processedSection.appendChild(newEmptyMessage);
                 }
-                processedSection.appendChild(newEmptyMessage);
             } else if (hasRows && emptyMessage) {
-                // Remove empty message if rows exist
                 emptyMessage.remove();
             }
         }
@@ -1886,20 +1936,30 @@
                 newEmptyMessage.id = 'noUnprocessedMessage';
                 newEmptyMessage.className = 'empty-state-message';
                 newEmptyMessage.innerHTML = '📭 No unprocessed prescriptions found. <br><small>Upload a prescription to get started!</small>';
-                newEmptyMessage.style.textAlign = 'center';
-                newEmptyMessage.style.padding = '40px';
-                newEmptyMessage.style.color = '#666';
-                newEmptyMessage.style.fontSize = '16px';
-                newEmptyMessage.style.background = '#f8f9fa';
-                newEmptyMessage.style.borderRadius = '10px';
-                newEmptyMessage.style.marginTop = '20px';
-
-                if (unprocessedTable) {
-                    unprocessedTable.remove();
-                }
                 unprocessedPrescriptionsDiv.appendChild(newEmptyMessage);
             } else if (hasRows && emptyMessage) {
                 emptyMessage.remove();
+            }
+        }
+
+        // Check medication history
+        const historyContent = document.getElementById('historyContent');
+        if (historyContent) {
+            const historyTable = historyContent.querySelector('table');
+            const historyBody = historyContent.querySelector('tbody');
+            const hasRows = historyBody && historyBody.querySelectorAll('tr').length > 0;
+            const noHistoryDiv = historyContent.querySelector('.no-history');
+
+            if (!hasRows && !noHistoryDiv) {
+                const newNoHistory = document.createElement('div');
+                newNoHistory.className = 'no-history';
+                newNoHistory.innerHTML = `
+                    <p>📝 No medication history found</p>
+                    <small>Your medication order history will appear here once you start ordering medications.</small>
+                `;
+                historyContent.appendChild(newNoHistory);
+            } else if (hasRows && noHistoryDiv) {
+                noHistoryDiv.remove();
             }
         }
     }
@@ -1908,12 +1968,15 @@
     async function refreshPrescriptionsData() {
         try {
             console.log('🔄 Refreshing prescriptions data...');
+            showToast('🔄 Refreshing data...', 'info', 2000);
 
-            // Use full page reload to ensure data consistency
-            location.reload();
+            setTimeout(() => {
+                location.reload();
+            }, 1000);
 
         } catch (error) {
             console.error('❌ Error refreshing data:', error);
+            showToast('❌ Error refreshing data', 'error');
             location.reload();
         }
     }

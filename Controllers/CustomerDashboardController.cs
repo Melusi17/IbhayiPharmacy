@@ -29,19 +29,20 @@ namespace IbhayiPharmacy.Controllers
         }
 
 
-        // UPDATED: Upload Prescription Section - GET with order tracking AND medication history
+        // UPDATED: Upload Prescription Section - GET with proper model usage
+        [HttpGet]
         public async Task<IActionResult> UploadPrescription()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            // Get unprocessed prescriptions (existing code)
+            // Get unprocessed prescriptions
             var unprocessedPrescriptions = await _context.Prescriptions
                 .Where(p => p.ApplicationUserId == userId &&
                        (p.Status == null || p.Status == "Unprocessed" || p.Status == "Pending"))
                 .OrderByDescending(p => p.DateIssued)
                 .ToListAsync();
 
-            // Get processed prescriptions (existing code)
+            // Get processed prescriptions
             var processedPrescriptions = await _context.Prescriptions
                 .Where(p => p.ApplicationUserId == userId &&
                        (p.Status == "Processed" || p.Status == "Partially Processed"))
@@ -50,81 +51,56 @@ namespace IbhayiPharmacy.Controllers
                 .OrderByDescending(p => p.DateIssued)
                 .ToListAsync();
 
-            // Get all order lines for the user's prescriptions (existing code)
-            var prescriptionIds = processedPrescriptions.Select(p => p.PrescriptionID).ToList();
-            var orderLinesForPrescriptions = await _context.OrderLines
-                .Where(ol => prescriptionIds.Contains(ol.ScriptLine.PrescriptionID) && ol.Status != "Cancelled")
-                .Include(ol => ol.ScriptLine)
-                .ToListAsync();
+            // NEW: Filter out prescriptions where ALL script lines have been ordered
+            var filteredProcessedPrescriptions = new List<Prescription>();
 
-            // Group order lines by prescription ID (existing code)
-            var orderLinesByPrescription = orderLinesForPrescriptions
-                .GroupBy(ol => ol.ScriptLine.PrescriptionID)
-                .ToDictionary(g => g.Key, g => g.ToList());
-
-            // Calculate order status for each prescription (existing code)
             foreach (var prescription in processedPrescriptions)
             {
                 if (prescription.scriptLines != null && prescription.scriptLines.Any())
                 {
-                    var totalMedications = prescription.scriptLines.Count;
+                    // Check if any script lines haven't been ordered yet
+                    var hasUnorderedScriptLines = await _context.ScriptLines
+                        .Where(sl => sl.PrescriptionID == prescription.PrescriptionID &&
+                               sl.Status == "Approved")
+                        .AnyAsync(sl => !_context.OrderLines
+                            .Any(ol => ol.ScriptLineID == sl.ScriptLineID && ol.Status != "Cancelled"));
 
-                    // Count how many script lines have been ordered
-                    var orderedMedications = 0;
-                    if (orderLinesByPrescription.TryGetValue(prescription.PrescriptionID, out var orderLines))
+                    // Only include prescription if it has unordered script lines
+                    if (hasUnorderedScriptLines)
                     {
-                        // Get unique script lines that have been ordered
-                        var orderedScriptLineIds = orderLines.Select(ol => ol.ScriptLineID).Distinct();
-                        orderedMedications = prescription.scriptLines
-                            .Count(sl => orderedScriptLineIds.Contains(sl.ScriptLineID));
-                    }
+                        // Calculate order status for display
+                        var totalScriptLines = prescription.scriptLines.Count;
+                        var orderedScriptLines = await _context.OrderLines
+                            .Where(ol => prescription.scriptLines.Select(sl => sl.ScriptLineID).Contains(ol.ScriptLineID) &&
+                                   ol.Status != "Cancelled")
+                            .Select(ol => ol.ScriptLineID)
+                            .Distinct()
+                            .CountAsync();
 
-                    // Add dynamic properties
-                    prescription.IsFullyOrdered = orderedMedications == totalMedications;
-                    prescription.IsPartiallyOrdered = orderedMedications > 0 && orderedMedications < totalMedications;
+                        // Add dynamic properties using your existing pattern
+                        prescription.IsFullyOrdered = orderedScriptLines == totalScriptLines;
+                        prescription.IsPartiallyOrdered = orderedScriptLines > 0 && orderedScriptLines < totalScriptLines;
+
+                        filteredProcessedPrescriptions.Add(prescription);
+                    }
                 }
                 else
                 {
+                    // If no script lines, keep the prescription
                     prescription.IsFullyOrdered = false;
                     prescription.IsPartiallyOrdered = false;
+                    filteredProcessedPrescriptions.Add(prescription);
                 }
             }
 
-            // 🆕 NEW: Load Medication History Data
-            var medicationHistory = await _context.OrderLines
-                .Include(ol => ol.Medications)
-                .Include(ol => ol.ScriptLine)
-                    .ThenInclude(sl => sl.Prescriptions)
-                        .ThenInclude(p => p.Doctors)
-                .Include(ol => ol.Order)
-                    .ThenInclude(o => o.Customer)
-                .Where(ol => ol.Order.Customer.ApplicationUserId == userId)
-                .GroupBy(ol => new {
-                    ol.MedicationID,
-                    MedicationName = ol.Medications.MedicationName
-                })
-                .Select(g => new MedicationHistoryVM
-                {
-                    MedicationID = g.Key.MedicationID,
-                    MedicationName = g.Key.MedicationName,
-                    DoctorName = g.First().ScriptLine.Prescriptions.Doctors != null ?
-                        $"Dr. {g.First().ScriptLine.Prescriptions.Doctors.Name} {g.First().ScriptLine.Prescriptions.Doctors.Surname}" :
-                        "Unknown Doctor",
-                    LastOrderDate = g.Max(ol => ol.Order.OrderDate),
-                    TotalOrders = g.Count(),
-                    RepeatsUsed = g.Sum(ol => ol.ScriptLine.Repeats - ol.ScriptLine.RepeatsLeft),
-                    TotalRepeats = g.Sum(ol => ol.ScriptLine.Repeats),
-                    RepeatsLeft = g.Sum(ol => ol.ScriptLine.RepeatsLeft),
-                    IsActive = g.Any(ol => ol.ScriptLine.RepeatsLeft > 0)
-                })
-                .OrderByDescending(m => m.LastOrderDate)
-                .ToListAsync();
+            // Get medication history using proper View Model
+            var medicationHistory = await GetCompleteMedicationHistory(userId);
 
             var model = new CustomerDashboardVM
             {
                 UnprocessedPrescriptions = unprocessedPrescriptions,
-                ProcessedPrescriptions = processedPrescriptions,
-                MedicationHistory = medicationHistory // 🆕 Now properly populated
+                ProcessedPrescriptions = filteredProcessedPrescriptions,
+                MedicationHistory = medicationHistory
             };
 
             return View(model);
@@ -302,6 +278,7 @@ namespace IbhayiPharmacy.Controllers
 
 
         // API: Get medications for a specific prescription
+        // API: Get medications for a specific prescription - IMPROVED
         [HttpGet]
         public async Task<JsonResult> GetPrescriptionMedications(int prescriptionId)
         {
@@ -309,7 +286,7 @@ namespace IbhayiPharmacy.Controllers
             {
                 var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-                // First, verify the prescription exists and belongs to the user
+                // Verify the prescription exists and belongs to the user
                 var prescriptionExists = await _context.Prescriptions
                     .AnyAsync(p => p.PrescriptionID == prescriptionId && p.ApplicationUserId == userId);
 
@@ -318,7 +295,7 @@ namespace IbhayiPharmacy.Controllers
                     return Json(new { success = false, message = "Prescription not found or access denied" });
                 }
 
-                // Get script lines with medications - FIXED: Proper include and handling
+                // Get script lines with medications and check if they've been ordered
                 var medications = await _context.ScriptLines
                     .Where(sl => sl.PrescriptionID == prescriptionId)
                     .Include(sl => sl.Medications)
@@ -329,14 +306,22 @@ namespace IbhayiPharmacy.Controllers
                         name = sl.Medications.MedicationName ?? "Unknown Medication",
                         instructions = sl.Instructions ?? "Take as directed",
                         repeats = sl.Repeats,
+                        repeatsLeft = sl.RepeatsLeft,
                         price = sl.Medications.CurrentPrice,
                         status = sl.Status ?? "Pending",
                         rejectionReason = sl.RejectionReason ?? "",
-                        quantity = sl.Quantity
+                        quantity = sl.Quantity,
+                        // NEW: Check if this script line has been ordered
+                        isOrdered = _context.OrderLines.Any(ol => ol.ScriptLineID == sl.ScriptLineID && ol.Status != "Cancelled"),
+                        // NEW: Get order status if ordered
+                        orderStatus = _context.OrderLines
+                            .Where(ol => ol.ScriptLineID == sl.ScriptLineID && ol.Status != "Cancelled")
+                            .Select(ol => ol.Status)
+                            .FirstOrDefault() ?? "Not Ordered"
                     })
                     .ToListAsync();
 
-                return Json(medications);
+                return Json(new { success = true, medications });
             }
             catch (Exception ex)
             {
@@ -973,66 +958,78 @@ namespace IbhayiPharmacy.Controllers
             }
         }
 
+        [HttpGet]
         private async Task<List<MedicationHistoryVM>> GetCompleteMedicationHistory(string userId)
         {
-            // Get from OrderLines (orders that have been placed)
-            var orderLineHistory = await (from ol in _context.OrderLines
-                                          join o in _context.Orders on ol.OrderID equals o.OrderID
-                                          join c in _context.Customers on o.CustomerID equals c.CustormerID
-                                          join m in _context.Medications on ol.MedicationID equals m.MedcationID
-                                          join sl in _context.ScriptLines on ol.ScriptLineID equals sl.ScriptLineID
-                                          join p in _context.Prescriptions on sl.PrescriptionID equals p.PrescriptionID
-                                          join d in _context.Doctors on p.DoctorID equals d.DoctorID
-                                          where c.ApplicationUserId == userId
-                                          select new MedicationHistoryVM
-                                          {
-                                              MedicationID = m.MedcationID,
-                                              MedicationName = m.MedicationName,
-                                              DoctorName = $"Dr. {d.Name} {d.Surname}",
-                                              LastOrderDate = o.OrderDate,
-                                              TotalOrders = 1,
-                                              RepeatsUsed = sl.Repeats - sl.RepeatsLeft,
-                                              TotalRepeats = sl.Repeats,
-                                              RepeatsLeft = sl.RepeatsLeft,
-                                              IsActive = sl.RepeatsLeft > 0
-                                          }).ToListAsync();
+            var customer = await _context.Customers
+                .FirstOrDefaultAsync(c => c.ApplicationUserId == userId);
 
-            // Get from ScriptLines (approved medications that haven't been ordered yet)
-            var scriptLineHistory = await (from sl in _context.ScriptLines
-                                           join p in _context.Prescriptions on sl.PrescriptionID equals p.PrescriptionID
-                                           join m in _context.Medications on sl.MedicationID equals m.MedcationID
-                                           join d in _context.Doctors on p.DoctorID equals d.DoctorID
-                                           where p.ApplicationUserId == userId &&
-                                                 sl.Status == "Approved" &&
-                                                 !_context.OrderLines.Any(ol => ol.ScriptLineID == sl.ScriptLineID)
-                                           select new MedicationHistoryVM
-                                           {
-                                               MedicationID = m.MedcationID,
-                                               MedicationName = m.MedicationName,
-                                               DoctorName = $"Dr. {d.Name} {d.Surname}",
-                                               LastOrderDate = null,
-                                               TotalOrders = 0,
-                                               RepeatsUsed = sl.Repeats - sl.RepeatsLeft,
-                                               TotalRepeats = sl.Repeats,
-                                               RepeatsLeft = sl.RepeatsLeft,
-                                               IsActive = sl.RepeatsLeft > 0
-                                           }).ToListAsync();
+            if (customer == null) return new List<MedicationHistoryVM>();
 
-            // Combine both sources
-            var combinedHistory = orderLineHistory.Concat(scriptLineHistory)
-                .GroupBy(m => new { m.MedicationID, m.MedicationName })
+            // Get medication history from OrderLines (actual orders)
+            var orderHistory = await (from ol in _context.OrderLines
+                                      join o in _context.Orders on ol.OrderID equals o.OrderID
+                                      join sl in _context.ScriptLines on ol.ScriptLineID equals sl.ScriptLineID
+                                      join p in _context.Prescriptions on sl.PrescriptionID equals p.PrescriptionID
+                                      join d in _context.Doctors on p.DoctorID equals d.DoctorID
+                                      join m in _context.Medications on ol.MedicationID equals m.MedcationID
+                                      where o.CustomerID == customer.CustormerID &&
+                                            ol.Status != "Cancelled" &&
+                                            o.Status != "Cancelled"
+                                      select new
+                                      {
+                                          MedicationID = m.MedcationID,
+                                          MedicationName = m.MedicationName,
+                                          DoctorName = d.Name + " " + d.Surname,
+                                          OrderDate = o.OrderDate,
+                                          ScriptLine = sl,
+                                          OrderLine = ol
+                                      }).ToListAsync();
+
+            // Group by medication and create View Model
+            var medicationHistory = orderHistory
+                .GroupBy(x => new { x.MedicationID, x.MedicationName, x.DoctorName })
                 .Select(g => new MedicationHistoryVM
                 {
                     MedicationID = g.Key.MedicationID,
                     MedicationName = g.Key.MedicationName,
-                    DoctorName = g.First().DoctorName,
-                    LastOrderDate = g.Max(m => m.LastOrderDate),
-                    TotalOrders = g.Sum(m => m.TotalOrders),
-                    RepeatsUsed = g.Sum(m => m.RepeatsUsed),
-                    TotalRepeats = g.Sum(m => m.TotalRepeats),
-                    RepeatsLeft = g.Sum(m => m.RepeatsLeft),
-                    IsActive = g.Any(m => m.IsActive)
+                    DoctorName = "Dr. " + g.Key.DoctorName,
+                    LastOrderDate = g.Max(x => x.OrderDate),
+                    TotalOrders = g.Count(),
+                    RepeatsUsed = g.Sum(x => x.ScriptLine.Repeats - x.ScriptLine.RepeatsLeft),
+                    TotalRepeats = g.Sum(x => x.ScriptLine.Repeats),
+                    RepeatsLeft = g.Sum(x => x.ScriptLine.RepeatsLeft),
+                    IsActive = g.Any(x => x.ScriptLine.RepeatsLeft > 0)
                 })
+                .OrderByDescending(m => m.LastOrderDate)
+                .ThenBy(m => m.MedicationName)
+                .ToList();
+
+            // Get available medications from approved script lines that haven't been ordered
+            var availableMedications = await (from sl in _context.ScriptLines
+                                              join p in _context.Prescriptions on sl.PrescriptionID equals p.PrescriptionID
+                                              join m in _context.Medications on sl.MedicationID equals m.MedcationID
+                                              join d in _context.Doctors on p.DoctorID equals d.DoctorID
+                                              where p.ApplicationUserId == userId &&
+                                                    sl.Status == "Approved" &&
+                                                    sl.RepeatsLeft > 0 &&
+                                                    !_context.OrderLines.Any(ol => ol.ScriptLineID == sl.ScriptLineID && ol.Status != "Cancelled")
+                                              select new MedicationHistoryVM
+                                              {
+                                                  MedicationID = m.MedcationID,
+                                                  MedicationName = m.MedicationName,
+                                                  DoctorName = "Dr. " + d.Name + " " + d.Surname,
+                                                  LastOrderDate = null,
+                                                  TotalOrders = 0,
+                                                  RepeatsUsed = sl.Repeats - sl.RepeatsLeft,
+                                                  TotalRepeats = sl.Repeats,
+                                                  RepeatsLeft = sl.RepeatsLeft,
+                                                  IsActive = true
+                                              }).ToListAsync();
+
+            // Combine both lists, preferring order history over available medications
+            var combinedHistory = medicationHistory
+                .Concat(availableMedications.Where(am => !medicationHistory.Any(mh => mh.MedicationID == am.MedicationID)))
                 .OrderByDescending(m => m.LastOrderDate)
                 .ThenBy(m => m.MedicationName)
                 .ToList();

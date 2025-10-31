@@ -44,18 +44,15 @@
         }
 
             .sidebar.collapsed {
-                width: 60px;
+                width: 0;
                 overflow: hidden;
+                padding: 0;
             }
 
-                .sidebar.collapsed .sidebar-header h2,
-                .sidebar.collapsed .sidebar-nav a span,
-                .sidebar.collapsed .sidebar-footer p {
+                .sidebar.collapsed .sidebar-header,
+                .sidebar.collapsed .sidebar-nav,
+                .sidebar.collapsed .sidebar-footer {
                     display: none;
-                }
-
-                .sidebar.collapsed .sidebar-nav a {
-                    justify-content: center;
                 }
 
         .sidebar-header {
@@ -123,35 +120,15 @@
             align-items: center;
             justify-content: center;
             box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-        }
-
-        /* ===== LOGOUT FORM ===== */
-        .logout-form {
-            display: inline;
-        }
-
-        .btn-logout {
-            background: transparent;
-            border: none;
-            color: #ecf0f1;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin: 8px 0;
-            padding: 10px 15px;
-            border-radius: 5px;
             transition: all 0.3s;
-            width: 100%;
-            text-align: left;
-            font-size: 14px;
-            font-family: inherit;
+            z-index: 1001;
         }
 
-            .btn-logout:hover {
-                background-color: #34495e;
-                transform: translateX(5px);
-            }
+        /* Make sure toggle button stays visible when sidebar is collapsed */
+        .sidebar.collapsed .toggle-sidebar {
+            right: -15px;
+            background: #3498db;
+        }
 
         /* ===== TOPBAR ===== */
         .topbar {
@@ -171,12 +148,28 @@
         }
 
         .sidebar.collapsed + .topbar {
-            left: 60px;
+            left: 0;
         }
 
         .topbar span {
             font-weight: bold;
             color: #2c3e50;
+        }
+
+        /* Add a menu button in topbar for when sidebar is collapsed */
+        .menu-toggle {
+            display: none;
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 15px;
+        }
+
+        .sidebar.collapsed + .topbar .menu-toggle {
+            display: block;
         }
 
         /* ===== MAIN CONTENT ===== */
@@ -188,7 +181,7 @@
         }
 
         .sidebar.collapsed + .topbar + .main-content {
-            margin-left: 60px;
+            margin-left: 0;
         }
 
         /* ===== SEARCH SECTION ===== */
@@ -402,10 +395,38 @@
             margin-bottom: 20px;
         }
 
+        /* ===== LOGOUT FORM ===== */
+        .logout-form {
+            display: inline;
+        }
+
+        .btn-logout {
+            background: transparent;
+            border: none;
+            color: #ecf0f1;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 8px 0;
+            padding: 10px 15px;
+            border-radius: 5px;
+            transition: all 0.3s;
+            width: 100%;
+            text-align: left;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+            .btn-logout:hover {
+                background-color: #34495e;
+                transform: translateX(5px);
+            }
+
         /* ===== RESPONSIVE ===== */
         @@media (max-width: 768px) {
             .sidebar {
-                width: 60px;
+                width: 0;
             }
 
                 .sidebar:not(.collapsed) {
@@ -413,7 +434,7 @@
                 }
 
             .topbar {
-                left: 60px;
+                left: 0;
             }
 
             .sidebar:not(.collapsed) + .topbar {
@@ -421,7 +442,8 @@
             }
 
             .main-content {
-                margin-left: 60px;
+                margin-left: 0;
+                padding: 20px;
             }
 
             .sidebar:not(.collapsed) + .topbar + .main-content {
@@ -462,7 +484,7 @@
             <small style="color: #bdc3c7;">Dedicated Dictionary</small>
         </div>
         <nav class="sidebar-nav">
-            <a asp-controller="Pharmacy" asp-action="Index"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <a asp-controller="PharmacistDashboard" asp-action="Index" class="active"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
             <a asp-controller="WalkInPrescription" asp-action="Create"><i class="fas fa-tachometer-alt"></i> Walk In Prescription</a>
             <a asp-controller="PharmacistDispensing" asp-action="Index"><i class="fas fa-clipboard-list"></i> Orders</a>
             <a asp-controller="ScriptsProcessed" asp-action="Index"><i class="fas fa-file-prescription"></i> Unprocessed Scripts</a>
@@ -481,6 +503,9 @@
 
     <!-- TOPBAR -->
     <div class="topbar">
+        <button class="menu-toggle" onclick="toggleSidebar()">
+            <i class="fas fa-bars"></i> Menu
+        </button>
         <span>Processed Scripts</span>
         <div>Welcome, <strong>@userName</strong></div>
     </div>
@@ -548,62 +573,62 @@
         const patients = [
             @foreach (var patientGroup in Model.GroupBy(p => p.ApplicationUserId))
             {
-                            var firstPrescription = patientGroup.First();
-                            var patientName = $"{firstPrescription.ApplicationUser?.Name} {firstPrescription.ApplicationUser?.Surname}";
-                            var idNumber = firstPrescription.ApplicationUser?.IDNumber ?? "";
+                                var firstPrescription = patientGroup.First();
+                                var patientName = $"{firstPrescription.ApplicationUser?.Name} {firstPrescription.ApplicationUser?.Surname}";
+                                var idNumber = firstPrescription.ApplicationUser?.IDNumber ?? "";
 
-                            // Clean the data for JavaScript
-                            patientName = patientName.Replace("\"", "\\\"");
-                            idNumber = idNumber?.Replace("\"", "\\\"") ?? "";
+                                // Clean the data for JavaScript
+                                patientName = patientName.Replace("\"", "\\\"");
+                                idNumber = idNumber?.Replace("\"", "\\\"") ?? "";
 
-                            <text>
-                            {
-                                userId: "@firstPrescription.ApplicationUserId",
-                                id: "@idNumber",
-                                name: "@patientName",
-                                prescriptions: [
-                                    @foreach (var prescription in patientGroup)
-                                    {
-                                                    var statusClass = "process-unknown";
-                                                    var statusText = "Unknown";
+                                <text>
+                                {
+                                    userId: "@firstPrescription.ApplicationUserId",
+                                    id: "@idNumber",
+                                    name: "@patientName",
+                                    prescriptions: [
+                                        @foreach (var prescription in patientGroup)
+                                        {
+                                                            var statusClass = "process-unknown";
+                                                            var statusText = "Unknown";
 
-                                                    if (!string.IsNullOrEmpty(prescription.Status))
-                                                    {
-                                                                    statusClass = prescription.Status.ToLower() switch
-                                                                    {
-                                                                                "processed" => "process-yes",
-                                                                                "partially processed" => "process-partial",
-                                                                                "rejected" => "process-no",
-                                                                                "pending" => "process-pending",
-                                                                                _ => "process-unknown"
-                                                                    };
-                                                                    statusText = prescription.Status;
-                                                    }
+                                                            if (!string.IsNullOrEmpty(prescription.Status))
+                                                            {
+                                                                                statusClass = prescription.Status.ToLower() switch
+                                                                                {
+                                                                                                "processed" => "process-yes",
+                                                                                                "partially processed" => "process-partial",
+                                                                                                "rejected" => "process-no",
+                                                                                                "pending" => "process-pending",
+                                                                                                _ => "process-unknown"
+                                                                                };
+                                                                                statusText = prescription.Status;
+                                                            }
 
-                                                    var doctorName = prescription.Doctors != null ?
-                                                                                    $"Dr. {prescription.Doctors.Name} {prescription.Doctors.Surname}" :
-                                                                                    "Not assigned";
-                                                    doctorName = doctorName.Replace("\"", "\\\"");
+                                                            var doctorName = prescription.Doctors != null ?
+                                                                                                                            $"Dr. {prescription.Doctors.Name} {prescription.Doctors.Surname}" :
+                                                                                                                            "Not assigned";
+                                                            doctorName = doctorName.Replace("\"", "\\\"");
 
-                                                    var canDownload = (prescription.Script != null && prescription.Script.Length > 0);
+                                                            var canDownload = (prescription.Script != null && prescription.Script.Length > 0);
 
-                                                    <text>
-                                                    {
-                                                        date: "@prescription.DateIssued.ToString("yyyy-MM-dd")",
-                                                        file: "Prescription_@(prescription.PrescriptionID).pdf",
-                                                        processed: true,
-                                                        doctor: "@doctorName",
-                                                        status: "@statusText",
-                                                        statusClass: "@statusClass",
-                                                        statusText: "@statusText",
-                                                        canDownload: @canDownload.ToString().ToLower(),
-                                                        prescriptionId: @prescription.PrescriptionID
-                                                    },
-                                                    </text>
-                                    }
-                                ]
-                            },
-                            </text>
+                                                            <text>
+                                                            {
+                                                                date: "@prescription.DateIssued.ToString("yyyy-MM-dd")",
+                                                                file: "Prescription_@(prescription.PrescriptionID).pdf",
+                                                                processed: true,
+                                                                doctor: "@doctorName",
+                                                                status: "@statusText",
+                                                                statusClass: "@statusClass",
+                                                                statusText: "@statusText",
+                                                                canDownload: @canDownload.ToString().ToLower(),
+                                                                prescriptionId: @prescription.PrescriptionID
+                                                            },
+                                                            </text>
+                                        }
+                                    ]
+                                },
+                                </text>
             }
         ];
 
@@ -628,9 +653,10 @@
         // Toggle sidebar
         function toggleSidebar() {
             const sidebar = document.querySelector('.sidebar');
+            const toggleBtn = document.querySelector('.toggle-sidebar i');
+
             sidebar.classList.toggle('collapsed');
 
-            const toggleBtn = document.querySelector('.toggle-sidebar i');
             if (sidebar.classList.contains('collapsed')) {
                 toggleBtn.classList.remove('fa-chevron-left');
                 toggleBtn.classList.add('fa-chevron-right');

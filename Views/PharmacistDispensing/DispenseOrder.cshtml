@@ -1,7 +1,12 @@
 ﻿@model IbhayiPharmacy.Models.PharmacistVM.DispenseOrderVM
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
 @{
     ViewData["Title"] = "Process Order - Ibhayi Pharmacy";
     Layout = null;
+    var user = await UserManager.GetUserAsync(User);
+    var userName = user?.UserName ?? "Pharmacist";
 }
 
 <!DOCTYPE html>
@@ -23,7 +28,7 @@
             font-family: 'Segoe UI', sans-serif;
             background-color: #f4f6f9;
             color: #333;
-            overflow-x: hidden;
+            transition: all 0.3s;
         }
 
         /* ===== SIDEBAR ===== */
@@ -37,35 +42,26 @@
             left: 0;
             box-shadow: 2px 0 10px rgba(0,0,0,0.1);
             z-index: 1000;
-            transition: all 0.3s ease;
+            transition: all 0.3s;
         }
 
             .sidebar.collapsed {
-                width: 70px;
+                width: 0;
                 overflow: hidden;
+                padding: 0;
             }
 
-                .sidebar.collapsed .sidebar-header h2 span,
-                .sidebar.collapsed .sidebar-nav a span,
+                .sidebar.collapsed .sidebar-header,
+                .sidebar.collapsed .sidebar-nav,
                 .sidebar.collapsed .sidebar-footer {
                     display: none;
-                }
-
-                .sidebar.collapsed .sidebar-header h2 {
-                    justify-content: center;
-                }
-
-                .sidebar.collapsed .sidebar-nav a {
-                    justify-content: center;
-                    padding: 10px;
                 }
 
         .sidebar-header {
             padding: 0 20px 20px;
             border-bottom: 1px solid #34495e;
             margin-bottom: 15px;
-            display: flex;
-            flex-direction: column;
+            position: relative;
         }
 
         .sidebar h2 {
@@ -109,25 +105,31 @@
             padding: 0 20px;
             font-size: 12px;
             color: #7f8c8d;
-            transition: all 0.3s;
         }
 
         .toggle-sidebar {
             position: absolute;
-            top: 20px;
             right: -15px;
-            background: #2c3e50;
+            top: 20px;
+            background: #3498db;
             color: white;
             border: none;
             width: 30px;
             height: 30px;
             border-radius: 50%;
+            cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            cursor: pointer;
-            box-shadow: 0 0 5px rgba(0,0,0,0.2);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            transition: all 0.3s;
             z-index: 1001;
+        }
+
+        /* Make sure toggle button stays visible when sidebar is collapsed */
+        .sidebar.collapsed .toggle-sidebar {
+            right: -15px;
+            background: #3498db;
         }
 
         /* ===== TOPBAR ===== */
@@ -144,11 +146,11 @@
             justify-content: space-between;
             align-items: center;
             z-index: 999;
-            transition: all 0.3s ease;
+            transition: all 0.3s;
         }
 
         .sidebar.collapsed + .topbar {
-            left: 70px;
+            left: 0;
         }
 
         .topbar span {
@@ -161,11 +163,27 @@
             margin-left: 220px;
             margin-top: 60px;
             padding: 30px;
-            transition: all 0.3s ease;
+            transition: all 0.3s;
         }
 
-        .sidebar.collapsed ~ .main-content {
-            margin-left: 70px;
+        .sidebar.collapsed + .topbar + .main-content {
+            margin-left: 0;
+        }
+
+        /* Add a menu button in topbar for when sidebar is collapsed */
+        .menu-toggle {
+            display: none;
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 15px;
+        }
+
+        .sidebar.collapsed + .topbar .menu-toggle {
+            display: block;
         }
 
         /* ===== TWO-CARD LAYOUT ===== */
@@ -567,8 +585,61 @@
             color: #27ae60;
         }
 
+        /* Logout form styles */
+        .logout-form {
+            display: inline;
+        }
+
+        .btn-logout {
+            background: transparent;
+            border: none;
+            color: #ecf0f1;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 8px 0;
+            padding: 10px 15px;
+            border-radius: 5px;
+            transition: all 0.3s;
+            width: 100%;
+            text-align: left;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+            .btn-logout:hover {
+                background-color: #34495e;
+                transform: translateX(5px);
+            }
+
         /* ===== RESPONSIVE ===== */
-        @@media (max-width: 992px) {
+        @@media (max-width: 768px) {
+            .sidebar {
+                width: 0;
+            }
+
+                .sidebar:not(.collapsed) {
+                    width: 220px;
+                }
+
+            .topbar {
+                left: 0;
+            }
+
+            .sidebar:not(.collapsed) + .topbar {
+                left: 220px;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 20px;
+            }
+
+            .sidebar:not(.collapsed) + .topbar + .main-content {
+                margin-left: 220px;
+            }
+
             .patient-info-grid {
                 grid-template-columns: 1fr;
             }
@@ -587,23 +658,28 @@
 </head>
 <body>
     @Html.AntiForgeryToken()
+
     <!-- SIDEBAR -->
-    <div class="sidebar" id="sidebar">
-        <button class="toggle-sidebar" onclick="toggleSidebar()">
-            <i class="fas fa-chevron-left" id="sidebarIcon"></i>
-        </button>
+    <div class="sidebar">
         <div class="sidebar-header">
-            <h2><i class="fas fa-prescription-bottle-alt"></i> <span>Pharmacist Panel</span></h2>
+            <h2><i class="fas fa-prescription-bottle-alt"></i> Pharmacist Panel</h2>
+            <button class="toggle-sidebar" onclick="toggleSidebar()">
+                <i class="fas fa-chevron-left"></i>
+            </button>
             <small style="color: #bdc3c7;">Dedicated Dictionary</small>
         </div>
         <nav class="sidebar-nav">
-            <a asp-controller="Pharmacy" asp-action="Index"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <a asp-controller="PharmacistDashboard" asp-action="Index" class="active"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
             <a asp-controller="WalkInPrescription" asp-action="Create"><i class="fas fa-tachometer-alt"></i> Walk In Prescription</a>
             <a asp-controller="PharmacistDispensing" asp-action="Index"><i class="fas fa-clipboard-list"></i> Orders</a>
             <a asp-controller="ScriptsProcessed" asp-action="Index"><i class="fas fa-file-prescription"></i> Unprocessed Scripts</a>
             <a asp-controller="ScriptsProcessed" asp-action="ProcessedScripts"><i class="fas fa-boxes"></i> Processed Scripts</a>
             <a asp-controller="PharmacistDispensing" asp-action="CollectionTracking"><i class="fas fa-boxes"></i> Track Orders</a>
-            <a href="#"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            <form class="logout-form" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                <button type="submit" class="btn-logout">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </form>
         </nav>
         <div class="sidebar-footer">
             <p>Ibhayi Pharmacy v2.1</p>
@@ -612,8 +688,11 @@
 
     <!-- TOPBAR -->
     <div class="topbar">
+        <button class="menu-toggle" onclick="toggleSidebar()">
+            <i class="fas fa-bars"></i> Menu
+        </button>
         <span>Process Order - @Model.OrderNumber</span>
-        <div>Welcome, <strong>Pharmacist</strong></div>
+        <div>Welcome, <strong>@userName</strong></div>
     </div>
 
     <!-- MAIN CONTENT -->
@@ -888,16 +967,17 @@
 
         // Toggle sidebar
         function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            const icon = document.getElementById('sidebarIcon');
+            const sidebar = document.querySelector('.sidebar');
+            const toggleBtn = document.querySelector('.toggle-sidebar i');
 
             sidebar.classList.toggle('collapsed');
+
             if (sidebar.classList.contains('collapsed')) {
-                icon.classList.remove('fa-chevron-left');
-                icon.classList.add('fa-chevron-right');
+                toggleBtn.classList.remove('fa-chevron-left');
+                toggleBtn.classList.add('fa-chevron-right');
             } else {
-                icon.classList.remove('fa-chevron-right');
-                icon.classList.add('fa-chevron-left');
+                toggleBtn.classList.remove('fa-chevron-right');
+                toggleBtn.classList.add('fa-chevron-left');
             }
         }
 

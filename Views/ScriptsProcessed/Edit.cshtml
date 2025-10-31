@@ -126,6 +126,12 @@
             z-index: 1001;
         }
 
+        /* Make sure toggle button stays visible when sidebar is collapsed */
+        .sidebar.collapsed .toggle-sidebar {
+            right: -15px;
+            background: #3498db;
+        }
+
         /* ===== TOPBAR ===== */
         .topbar {
             background-color: #ffffff;
@@ -162,6 +168,22 @@
 
         .sidebar.collapsed + .topbar + .main-content {
             margin-left: 0;
+        }
+
+        /* Add a menu button in topbar for when sidebar is collapsed */
+        .menu-toggle {
+            display: none;
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 15px;
+        }
+
+        .sidebar.collapsed + .topbar .menu-toggle {
+            display: block;
         }
 
         /* ===== FORM LAYOUT ===== */
@@ -698,7 +720,7 @@
             border: 1px solid #e74c3c;
         }
 
-        /* ===== LOGOUT FORM ===== */
+        /* Logout form styles */
         .logout-form {
             display: inline;
         }
@@ -812,7 +834,7 @@
             <small style="color: #bdc3c7;">Dedicated Dictionary</small>
         </div>
         <nav class="sidebar-nav">
-            <a asp-controller="Pharmacy" asp-action="Index"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <a asp-controller="PharmacistDashboard" asp-action="Index" class="active"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
             <a asp-controller="WalkInPrescription" asp-action="Create"><i class="fas fa-tachometer-alt"></i> Walk In Prescription</a>
             <a asp-controller="PharmacistDispensing" asp-action="Index"><i class="fas fa-clipboard-list"></i> Orders</a>
             <a asp-controller="ScriptsProcessed" asp-action="Index"><i class="fas fa-file-prescription"></i> Unprocessed Scripts</a>
@@ -831,13 +853,11 @@
 
     <!-- TOPBAR -->
     <div class="topbar">
+        <button class="menu-toggle" onclick="toggleSidebar()">
+            <i class="fas fa-bars"></i> Menu
+        </button>
         <span>Process Prescription</span>
-        <div>
-            <button class="btn btn-add" onclick="toggleSidebar()" style="margin-right: 15px;">
-                <i class="fas fa-bars"></i> Toggle Sidebar
-            </button>
-            Welcome, <strong>@userName</strong>
-        </div>
+        <div>Welcome, <strong>@userName</strong></div>
     </div>
 
     <!-- MAIN CONTENT -->
@@ -1189,17 +1209,17 @@
         function initializeExistingRows() {
             @for (int i = 0; i < Model.ScriptLines.Count; i++)
             {
-                                var scriptLine = Model.ScriptLines[i];
-                                <text>
-                                const statusElement@(i) = document.getElementById('status-@i');
-                                if (statusElement@(i)) {
-                                    if ('@scriptLine.Status' === 'Approved') {
-                                        statusElement@(i).className = "status-indicator approved";
-                                    } else if ('@scriptLine.Status' === 'Rejected') {
-                                        statusElement@(i).className = "status-indicator declined";
+                                    var scriptLine = Model.ScriptLines[i];
+                                    <text>
+                                    const statusElement@(i) = document.getElementById('status-@i');
+                                    if (statusElement@(i)) {
+                                        if ('@scriptLine.Status' === 'Approved') {
+                                            statusElement@(i).className = "status-indicator approved";
+                                        } else if ('@scriptLine.Status' === 'Rejected') {
+                                            statusElement@(i).className = "status-indicator declined";
+                                        }
                                     }
-                                }
-                                </text>
+                                    </text>
             }
         }
 

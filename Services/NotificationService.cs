@@ -66,7 +66,7 @@ namespace IbhayiPharmacy.Services
 
                 notifications.ReadyForCollectionCount = readyOrders
                     .SelectMany(o => o.OrderLines)
-                    .Where(ol => ol.Status == "Approved" || ol.Status == "Completed")
+                    .Where(ol => ol.Status == "Approved" || ol.Status == "Dispensed")
                     .Count();
 
                 Console.WriteLine($"🔔 [Service] Ready for collection: {notifications.ReadyForCollectionCount}");

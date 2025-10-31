@@ -7,22 +7,25 @@ using Microsoft.AspNetCore.Identity;
 using IbhayiPharmacy.Models.PharmacyManagerVM;
 using Microsoft.Extensions.Options;
 using SmtpSettings = IbhayiPharmacy.Models.PharmacyManagerVM.SmtpSettings;
+using IbhayiPharmacy.Utility; // ADDED: For SD.Role_Pharmacist
 
-
-
-namespace PharmMan.Controllers
+namespace IbhayiPharmacy.Controllers
 {
     public class PharmacyManagerController : Controller
     {
         private readonly ApplicationDbContext _db;
-        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly UserManager<IdentityUser> _userManager; // ADDED: For role assignment
+        //private readonly RoleManager<IdentityRole> _roleManager;
         private readonly EmailService _email;
 
-        //public PharmacyManagerController(ApplicationDbContext db, IOptions<SmtpSettings> smtpSettings, EmailService email) //old version cauese error
-        public PharmacyManagerController(ApplicationDbContext db, IOptions<IbhayiPharmacy.Models.PharmacyManagerVM.SmtpSettings> smtpSettings, EmailService email)
+        public PharmacyManagerController(ApplicationDbContext db,
+            IOptions<IbhayiPharmacy.Models.PharmacyManagerVM.SmtpSettings> smtpSettings,
+            EmailService email,
+            UserManager<IdentityUser> userManager) // ADDED: Inject UserManager for role management
         {
             _db = db;
             _email = email;
+            _userManager = userManager; // ADDED: Store UserManager for use in methods
         }
 
         public IActionResult Index()
@@ -100,12 +103,12 @@ namespace PharmMan.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult EditPharmacyInfo(Pharmacy model)
         {
-            
-                _db.Pharmacies.Update(model);
-                _db.SaveChanges();
-                TempData["Success"] = "Pharmacy information updated successfully!";
-            
-    
+
+            _db.Pharmacies.Update(model);
+            _db.SaveChanges();
+            TempData["Success"] = "Pharmacy information updated successfully!";
+
+
 
             // Repopulate dropdown if validation fails
             var pharmacists = _db.Pharmacists
@@ -334,7 +337,7 @@ namespace PharmMan.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult DeleteConfirmed(Doctor doc)
         {
-            
+
             var doctor = _db.Doctors.FirstOrDefault(d => d.DoctorID == doc.DoctorID);
             if (doctor != null)
             {
@@ -361,43 +364,56 @@ namespace PharmMan.Controllers
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult AddPharmacists(Pharmacist pham)
+        public async Task<IActionResult> AddPharmacists(Pharmacist pham)
         {
+            // Store the plain text password BEFORE creating the user
+            string plainTextPassword = pham.ApplicationUser.PasswordHash;
+
             pham.ApplicationUser.UserName = pham.ApplicationUser.Email;
 
-            _db.Pharmacists.Add(pham);
-            _db.SaveChanges();
+            // Create user with ASP.NET Identity system
+            var result = await _userManager.CreateAsync(pham.ApplicationUser, plainTextPassword);
 
+            if (result.Succeeded)
+            {
+                // Assign the "Pharmacist" role to the newly created user
+                await _userManager.AddToRoleAsync(pham.ApplicationUser, SD.Role_Pharmacist);
 
-
+                // Set the ApplicationUserId after successful user creation
+                pham.ApplicationUserId = pham.ApplicationUser.Id;
+                _db.Pharmacists.Add(pham);
+                _db.SaveChanges();
 
                 var pharmacist = _db.Pharmacists
-            .FirstOrDefault(s => s.PharmacistID == pham.PharmacistID);
+                    .FirstOrDefault(s => s.PharmacistID == pham.PharmacistID);
 
-            if (pharmacist != null && !string.IsNullOrEmpty(pharmacist.ApplicationUser.Email))
-            {
-                var receiver = pharmacist.ApplicationUser.Email;
-                var subject = "PHARMACIST LOGIN DETAILS";
+                if (pharmacist != null && !string.IsNullOrEmpty(pharmacist.ApplicationUser.Email))
+                {
+                    var receiver = pharmacist.ApplicationUser.Email;
+                    var subject = "PHARMACIST LOGIN DETAILS";
 
+                    var message = "<h3>Temporary Password</h3>";
+                    message += $"<p>Dear {pharmacist.ApplicationUser.Name},</p>";
+                    message += $"<p>Your temporary password is: <strong>{plainTextPassword}</strong></p>"; // Use plain text here
+                    message += $"<p><strong>Role:</strong> Pharmacist</p>";
+                    message += $"<p>Please change your password after first login.</p>";
+                    message += $"</br>";
+                    message += $"<p>Best regards</p>";
 
+                    _email.SendEmailAsync(receiver, subject, message);
+                }
 
-
-                var message = "<h3>Temporary Password</h3>";
-                message += $"<p>Dear {pharmacist.ApplicationUser.Name},</p>";
-                message += $"<p>Your temporary password is: {pharmacist.ApplicationUser.PasswordHash}</p>";
-                message += $"</br>";
-                message += $"<p>Best regards</p>";
-
-                _email.SendEmailAsync(receiver, subject, message);
+                return RedirectToAction("ManagePharmacists");
             }
-
-
-
-
-
-            return RedirectToAction("ManagePharmacists");
-
-
+            else
+            {
+                // Handle Identity errors (like duplicate email, weak password, etc.)
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError(string.Empty, error.Description);
+                }
+                return View(pham);
+            }
         }
         [HttpGet]
         public IActionResult EditPharmacist(int id)
@@ -495,8 +511,8 @@ namespace PharmMan.Controllers
                 ModelState.AddModelError("", "Please add at least one medication.");
             }
 
-          
-       
+
+
             order.StockOrder.OrderDate = DateTime.Now;
             order.StockOrder.Status = "Ordered";
 
@@ -521,7 +537,7 @@ namespace PharmMan.Controllers
                 var receiver = supplier.EmailAddress; // ✅ use the email address
                 var subject = "Medication Order";
 
-                 
+
 
 
                 var message = "<h3>New Medication Order</h3>";
@@ -542,10 +558,10 @@ namespace PharmMan.Controllers
                 message += "<p>Please confirm and prepare the order for delivery.</p>";
                 message += "<p>Kind regards,<br/>Ibhayi Pharmacy</p>";
 
-                 _email.SendEmailAsync(receiver, subject, message);
+                _email.SendEmailAsync(receiver, subject, message);
             }
 
-             
+
 
             _db.SaveChanges();
 

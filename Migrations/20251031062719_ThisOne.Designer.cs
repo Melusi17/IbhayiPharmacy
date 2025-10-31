@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace IbhayiPharmacy.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251029215315_newDb")]
-    partial class newDb
+    [Migration("20251031062719_ThisOne")]
+    partial class ThisOne
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -95,12 +95,12 @@ namespace IbhayiPharmacy.Migrations
                         new
                         {
                             Active_IngredientID = 11,
-                            Name = "Glycerrol"
+                            Name = "Glycetrol"
                         },
                         new
                         {
                             Active_IngredientID = 12,
-                            Name = "Sonnexil"
+                            Name = "Somnexil"
                         },
                         new
                         {
@@ -211,6 +211,108 @@ namespace IbhayiPharmacy.Migrations
                     b.HasIndex("ApplicationUserId");
 
                     b.ToTable("Customers");
+
+                    b.HasData(
+                        new
+                        {
+                            CustormerID = 1,
+                            ApplicationUserId = "customer-1"
+                        },
+                        new
+                        {
+                            CustormerID = 2,
+                            ApplicationUserId = "customer-2"
+                        },
+                        new
+                        {
+                            CustormerID = 3,
+                            ApplicationUserId = "customer-3"
+                        },
+                        new
+                        {
+                            CustormerID = 4,
+                            ApplicationUserId = "customer-4"
+                        },
+                        new
+                        {
+                            CustormerID = 5,
+                            ApplicationUserId = "customer-5"
+                        },
+                        new
+                        {
+                            CustormerID = 6,
+                            ApplicationUserId = "customer-6"
+                        },
+                        new
+                        {
+                            CustormerID = 7,
+                            ApplicationUserId = "customer-7"
+                        },
+                        new
+                        {
+                            CustormerID = 8,
+                            ApplicationUserId = "customer-8"
+                        },
+                        new
+                        {
+                            CustormerID = 9,
+                            ApplicationUserId = "customer-9"
+                        },
+                        new
+                        {
+                            CustormerID = 10,
+                            ApplicationUserId = "customer-10"
+                        },
+                        new
+                        {
+                            CustormerID = 11,
+                            ApplicationUserId = "customer-11"
+                        },
+                        new
+                        {
+                            CustormerID = 12,
+                            ApplicationUserId = "customer-12"
+                        },
+                        new
+                        {
+                            CustormerID = 13,
+                            ApplicationUserId = "customer-13"
+                        },
+                        new
+                        {
+                            CustormerID = 14,
+                            ApplicationUserId = "customer-14"
+                        },
+                        new
+                        {
+                            CustormerID = 15,
+                            ApplicationUserId = "customer-15"
+                        },
+                        new
+                        {
+                            CustormerID = 16,
+                            ApplicationUserId = "customer-16"
+                        },
+                        new
+                        {
+                            CustormerID = 17,
+                            ApplicationUserId = "customer-17"
+                        },
+                        new
+                        {
+                            CustormerID = 18,
+                            ApplicationUserId = "customer-18"
+                        },
+                        new
+                        {
+                            CustormerID = 19,
+                            ApplicationUserId = "customer-19"
+                        },
+                        new
+                        {
+                            CustormerID = 20,
+                            ApplicationUserId = "customer-20"
+                        });
                 });
 
             modelBuilder.Entity("IbhayiPharmacy.Models.Custormer_Allergy", b =>
@@ -234,6 +336,44 @@ namespace IbhayiPharmacy.Migrations
                     b.HasIndex("CustomerID");
 
                     b.ToTable("Custormer_Allergies");
+
+                    b.HasData(
+                        new
+                        {
+                            Custormer_AllergyID = 1,
+                            Active_IngredientID = 11,
+                            CustomerID = 2
+                        },
+                        new
+                        {
+                            Custormer_AllergyID = 2,
+                            Active_IngredientID = 19,
+                            CustomerID = 7
+                        },
+                        new
+                        {
+                            Custormer_AllergyID = 3,
+                            Active_IngredientID = 28,
+                            CustomerID = 7
+                        },
+                        new
+                        {
+                            Custormer_AllergyID = 4,
+                            Active_IngredientID = 30,
+                            CustomerID = 7
+                        },
+                        new
+                        {
+                            Custormer_AllergyID = 5,
+                            Active_IngredientID = 14,
+                            CustomerID = 12
+                        },
+                        new
+                        {
+                            Custormer_AllergyID = 6,
+                            Active_IngredientID = 6,
+                            CustomerID = 12
+                        });
                 });
 
             modelBuilder.Entity("IbhayiPharmacy.Models.Doctor", b =>
@@ -461,7 +601,7 @@ namespace IbhayiPharmacy.Migrations
                         new
                         {
                             MedcationID = 1,
-                            CurrentPrice = 150,
+                            CurrentPrice = 2999,
                             DosageFormID = 1,
                             MedicationName = "CardioVex",
                             QuantityOnHand = 90,
@@ -472,7 +612,7 @@ namespace IbhayiPharmacy.Migrations
                         new
                         {
                             MedcationID = 2,
-                            CurrentPrice = 200,
+                            CurrentPrice = 1550,
                             DosageFormID = 1,
                             MedicationName = "Neurocalm",
                             QuantityOnHand = 100,
@@ -483,7 +623,7 @@ namespace IbhayiPharmacy.Migrations
                         new
                         {
                             MedcationID = 3,
-                            CurrentPrice = 180,
+                            CurrentPrice = 799,
                             DosageFormID = 12,
                             MedicationName = "Allerfree Duo",
                             QuantityOnHand = 100,
@@ -494,7 +634,7 @@ namespace IbhayiPharmacy.Migrations
                         new
                         {
                             MedcationID = 4,
-                            CurrentPrice = 95,
+                            CurrentPrice = 1999,
                             DosageFormID = 1,
                             MedicationName = "GastroEase",
                             QuantityOnHand = 470,
@@ -505,7 +645,7 @@ namespace IbhayiPharmacy.Migrations
                         new
                         {
                             MedcationID = 5,
-                            CurrentPrice = 120,
+                            CurrentPrice = 1000,
                             DosageFormID = 1,
                             MedicationName = "Respivent",
                             QuantityOnHand = 490,
@@ -516,7 +656,7 @@ namespace IbhayiPharmacy.Migrations
                         new
                         {
                             MedcationID = 6,
-                            CurrentPrice = 85,
+                            CurrentPrice = 5150,
                             DosageFormID = 1,
                             MedicationName = "Dermagard",
                             QuantityOnHand = 790,
@@ -527,7 +667,7 @@ namespace IbhayiPharmacy.Migrations
                         new
                         {
                             MedcationID = 7,
-                            CurrentPrice = 210,
+                            CurrentPrice = 3699,
                             DosageFormID = 1,
                             MedicationName = "Metaborex",
                             QuantityOnHand = 250,
@@ -538,7 +678,7 @@ namespace IbhayiPharmacy.Migrations
                         new
                         {
                             MedcationID = 8,
-                            CurrentPrice = 175,
+                            CurrentPrice = 1990,
                             DosageFormID = 1,
                             MedicationName = "Sleeptraze",
                             QuantityOnHand = 110,
@@ -549,7 +689,7 @@ namespace IbhayiPharmacy.Migrations
                         new
                         {
                             MedcationID = 9,
-                            CurrentPrice = 300,
+                            CurrentPrice = 2350,
                             DosageFormID = 3,
                             MedicationName = "OsteoFlex",
                             QuantityOnHand = 210,
@@ -560,7 +700,7 @@ namespace IbhayiPharmacy.Migrations
                         new
                         {
                             MedcationID = 10,
-                            CurrentPrice = 450,
+                            CurrentPrice = 6799,
                             DosageFormID = 9,
                             MedicationName = "Immunexin",
                             QuantityOnHand = 190,
@@ -571,7 +711,7 @@ namespace IbhayiPharmacy.Migrations
                         new
                         {
                             MedcationID = 11,
-                            CurrentPrice = 600,
+                            CurrentPrice = 4450,
                             DosageFormID = 11,
                             MedicationName = "CardioPlus",
                             QuantityOnHand = 600,
@@ -582,7 +722,7 @@ namespace IbhayiPharmacy.Migrations
                         new
                         {
                             MedcationID = 12,
-                            CurrentPrice = 350,
+                            CurrentPrice = 3499,
                             DosageFormID = 11,
                             MedicationName = "AllerCalm",
                             QuantityOnHand = 410,
@@ -593,7 +733,7 @@ namespace IbhayiPharmacy.Migrations
                         new
                         {
                             MedcationID = 13,
-                            CurrentPrice = 280,
+                            CurrentPrice = 4150,
                             DosageFormID = 9,
                             MedicationName = "RespirAid",
                             QuantityOnHand = 100,
@@ -604,7 +744,7 @@ namespace IbhayiPharmacy.Migrations
                         new
                         {
                             MedcationID = 14,
-                            CurrentPrice = 125,
+                            CurrentPrice = 6799,
                             DosageFormID = 5,
                             MedicationName = "DermaClear",
                             QuantityOnHand = 200,
@@ -615,7 +755,7 @@ namespace IbhayiPharmacy.Migrations
                         new
                         {
                             MedcationID = 15,
-                            CurrentPrice = 190,
+                            CurrentPrice = 1999,
                             DosageFormID = 2,
                             MedicationName = "OsteoPrime",
                             QuantityOnHand = 400,
@@ -692,105 +832,105 @@ namespace IbhayiPharmacy.Migrations
                             Medication_IngredientID = 6,
                             Active_IngredientID = 1,
                             MedicationID = 4,
-                            Strength = "Standard"
+                            Strength = "5mg"
                         },
                         new
                         {
                             Medication_IngredientID = 7,
                             Active_IngredientID = 7,
                             MedicationID = 5,
-                            Strength = "Standard"
+                            Strength = "100mg"
                         },
                         new
                         {
                             Medication_IngredientID = 8,
                             Active_IngredientID = 8,
                             MedicationID = 5,
-                            Strength = "Standard"
+                            Strength = "25mg"
                         },
                         new
                         {
                             Medication_IngredientID = 9,
                             Active_IngredientID = 9,
                             MedicationID = 6,
-                            Strength = "Standard"
+                            Strength = "1mg"
                         },
                         new
                         {
                             Medication_IngredientID = 10,
                             Active_IngredientID = 10,
                             MedicationID = 6,
-                            Strength = "Standard"
+                            Strength = "2mg"
                         },
                         new
                         {
                             Medication_IngredientID = 11,
                             Active_IngredientID = 11,
                             MedicationID = 7,
-                            Strength = "Standard"
+                            Strength = "10mg"
                         },
                         new
                         {
                             Medication_IngredientID = 12,
                             Active_IngredientID = 12,
                             MedicationID = 8,
-                            Strength = "Standard"
+                            Strength = "45mg"
                         },
                         new
                         {
                             Medication_IngredientID = 13,
                             Active_IngredientID = 13,
                             MedicationID = 9,
-                            Strength = "Standard"
+                            Strength = "200mg"
                         },
                         new
                         {
                             Medication_IngredientID = 14,
                             Active_IngredientID = 14,
                             MedicationID = 9,
-                            Strength = "Standard"
+                            Strength = "250mg"
                         },
                         new
                         {
                             Medication_IngredientID = 15,
                             Active_IngredientID = 15,
                             MedicationID = 10,
-                            Strength = "Standard"
+                            Strength = "20mg"
                         },
                         new
                         {
                             Medication_IngredientID = 16,
                             Active_IngredientID = 16,
                             MedicationID = 10,
-                            Strength = "Standard"
+                            Strength = "30mg"
                         },
                         new
                         {
                             Medication_IngredientID = 17,
                             Active_IngredientID = 13,
                             MedicationID = 11,
-                            Strength = "Standard"
+                            Strength = "50mg"
                         },
                         new
                         {
                             Medication_IngredientID = 18,
                             Active_IngredientID = 6,
                             MedicationID = 11,
-                            Strength = "Standard"
+                            Strength = "30mg"
                         },
                         new
                         {
                             Medication_IngredientID = 19,
                             Active_IngredientID = 4,
                             MedicationID = 12,
-                            Strength = "Standard"
+                            Strength = "50mg"
                         },
                         new
                         {
                             Medication_IngredientID = 20,
                             Active_IngredientID = 7,
                             MedicationID = 13,
-                            Strength = "Standard"
+                            Strength = "20mg"
                         },
                         new
                         {
@@ -941,6 +1081,26 @@ namespace IbhayiPharmacy.Migrations
                     b.HasIndex("ApplicationUserId");
 
                     b.ToTable("Pharmacists");
+
+                    b.HasData(
+                        new
+                        {
+                            PharmacistID = 1,
+                            ApplicationUserId = "pharmacist-1",
+                            HealthCouncilRegNo = "123456"
+                        },
+                        new
+                        {
+                            PharmacistID = 2,
+                            ApplicationUserId = "pharmacist-2",
+                            HealthCouncilRegNo = "234567"
+                        },
+                        new
+                        {
+                            PharmacistID = 3,
+                            ApplicationUserId = "pharmacist-3",
+                            HealthCouncilRegNo = "345678"
+                        });
                 });
 
             modelBuilder.Entity("IbhayiPharmacy.Models.Pharmacy", b =>
@@ -1006,6 +1166,14 @@ namespace IbhayiPharmacy.Migrations
                     b.HasIndex("ApplicationUserId");
 
                     b.ToTable("PharmacyManagers");
+
+                    b.HasData(
+                        new
+                        {
+                            PharmacyManagerID = 1,
+                            ApplicationUserId = "manager-1",
+                            HealthCouncilRegNo = "134679"
+                        });
                 });
 
             modelBuilder.Entity("IbhayiPharmacy.Models.PresScriptLine", b =>
@@ -1309,6 +1477,26 @@ namespace IbhayiPharmacy.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "role-customer",
+                            Name = "Customer",
+                            NormalizedName = "CUSTOMER"
+                        },
+                        new
+                        {
+                            Id = "role-pharmacist",
+                            Name = "Pharmacist",
+                            NormalizedName = "PHARMACIST"
+                        },
+                        new
+                        {
+                            Id = "role-manager",
+                            Name = "Pharmacy Manager",
+                            NormalizedName = "PHARMACY MANAGER"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -1470,6 +1658,128 @@ namespace IbhayiPharmacy.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("AspNetUserRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            UserId = "customer-1",
+                            RoleId = "role-customer"
+                        },
+                        new
+                        {
+                            UserId = "customer-2",
+                            RoleId = "role-customer"
+                        },
+                        new
+                        {
+                            UserId = "customer-3",
+                            RoleId = "role-customer"
+                        },
+                        new
+                        {
+                            UserId = "customer-4",
+                            RoleId = "role-customer"
+                        },
+                        new
+                        {
+                            UserId = "customer-5",
+                            RoleId = "role-customer"
+                        },
+                        new
+                        {
+                            UserId = "customer-6",
+                            RoleId = "role-customer"
+                        },
+                        new
+                        {
+                            UserId = "customer-7",
+                            RoleId = "role-customer"
+                        },
+                        new
+                        {
+                            UserId = "customer-8",
+                            RoleId = "role-customer"
+                        },
+                        new
+                        {
+                            UserId = "customer-9",
+                            RoleId = "role-customer"
+                        },
+                        new
+                        {
+                            UserId = "customer-10",
+                            RoleId = "role-customer"
+                        },
+                        new
+                        {
+                            UserId = "customer-11",
+                            RoleId = "role-customer"
+                        },
+                        new
+                        {
+                            UserId = "customer-12",
+                            RoleId = "role-customer"
+                        },
+                        new
+                        {
+                            UserId = "customer-13",
+                            RoleId = "role-customer"
+                        },
+                        new
+                        {
+                            UserId = "customer-14",
+                            RoleId = "role-customer"
+                        },
+                        new
+                        {
+                            UserId = "customer-15",
+                            RoleId = "role-customer"
+                        },
+                        new
+                        {
+                            UserId = "customer-16",
+                            RoleId = "role-customer"
+                        },
+                        new
+                        {
+                            UserId = "customer-17",
+                            RoleId = "role-customer"
+                        },
+                        new
+                        {
+                            UserId = "customer-18",
+                            RoleId = "role-customer"
+                        },
+                        new
+                        {
+                            UserId = "customer-19",
+                            RoleId = "role-customer"
+                        },
+                        new
+                        {
+                            UserId = "customer-20",
+                            RoleId = "role-customer"
+                        },
+                        new
+                        {
+                            UserId = "pharmacist-1",
+                            RoleId = "role-pharmacist"
+                        },
+                        new
+                        {
+                            UserId = "pharmacist-2",
+                            RoleId = "role-pharmacist"
+                        },
+                        new
+                        {
+                            UserId = "pharmacist-3",
+                            RoleId = "role-pharmacist"
+                        },
+                        new
+                        {
+                            UserId = "manager-1",
+                            RoleId = "role-manager"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
@@ -1514,6 +1824,488 @@ namespace IbhayiPharmacy.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasDiscriminator().HasValue("ApplicationUser");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "customer-1",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "052d572b-93a4-49ae-bcc0-0e19494e57fc",
+                            Email = "thabo.mokoena@example.com",
+                            EmailConfirmed = true,
+                            LockoutEnabled = false,
+                            NormalizedEmail = "THABO.MOKOENA@EXAMPLE.COM",
+                            NormalizedUserName = "THABO.MOKOENA@EXAMPLE.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEIviiuA+LTDA0jrUT8VV7hQljBafjDsW62py9AQ5M2xBjlb0tYHvur6nopryPMQ1bA==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "b6c18fe8-715c-4086-8f4c-513d5784da11",
+                            TwoFactorEnabled = false,
+                            UserName = "thabo.mokoena@example.com",
+                            CellphoneNumber = "082 345 6789",
+                            IDNumber = "8805125123087",
+                            Name = "Thabo",
+                            Surname = "Mokoena"
+                        },
+                        new
+                        {
+                            Id = "customer-2",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "95677a98-db7b-48ad-b5c6-866eede59d2a",
+                            Email = "lerato.khumalo@example.com",
+                            EmailConfirmed = true,
+                            LockoutEnabled = false,
+                            NormalizedEmail = "LERATO.KHUMALO@EXAMPLE.COM",
+                            NormalizedUserName = "LERATO.KHUMALO@EXAMPLE.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAENRh8hF1J4MQ50BrLCfa5sxH/4r8zxWdqKpg9Cyf/ngcto+s6nUlCgB0H4jvJEoIXg==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "f8dd97f7-59dd-4549-97c8-18db91abcb29",
+                            TwoFactorEnabled = false,
+                            UserName = "lerato.khumalo@example.com",
+                            CellphoneNumber = "083 567 8910",
+                            IDNumber = "9503140321089",
+                            Name = "Lerato",
+                            Surname = "Khumalo"
+                        },
+                        new
+                        {
+                            Id = "customer-3",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "6e2613dd-7fe8-4eb6-9215-82094af2a2d0",
+                            Email = "sipho.dlamini@example.com",
+                            EmailConfirmed = true,
+                            LockoutEnabled = false,
+                            NormalizedEmail = "SIPHO.DLAMINI@EXAMPLE.COM",
+                            NormalizedUserName = "SIPHO.DLAMINI@EXAMPLE.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEOe2QbT5j38x6vPdkkxzdVZefV8K2b+6AhG3d7oH7u7m5HshFWX8znq6A0H/d+9MuQ==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "2e075ba1-7c48-4775-8349-35707bc8c7a9",
+                            TwoFactorEnabled = false,
+                            UserName = "sipho.dlamini@example.com",
+                            CellphoneNumber = "084 123 4567",
+                            IDNumber = "7902106123081",
+                            Name = "Sipho",
+                            Surname = "Dlamini"
+                        },
+                        new
+                        {
+                            Id = "customer-4",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "8691ebe5-ff93-4f8d-be9f-362233c3b2be",
+                            Email = "naledi.maseko@example.com",
+                            EmailConfirmed = true,
+                            LockoutEnabled = false,
+                            NormalizedEmail = "NALEDI.MASEKO@EXAMPLE.COM",
+                            NormalizedUserName = "NALEDI.MASEKO@EXAMPLE.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEI9l+XMTldqxwKw59hEaXALMBH6nhRbBtBHERM4oCQqkOA+PQBOxi3eh5cPVO6T9Xw==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "46c3a4de-a21b-4185-ad4b-b7a5585f0348",
+                            TwoFactorEnabled = false,
+                            UserName = "naledi.maseko@example.com",
+                            CellphoneNumber = "081 234 9876",
+                            IDNumber = "9107280023085",
+                            Name = "Naledi",
+                            Surname = "Maseko"
+                        },
+                        new
+                        {
+                            Id = "customer-5",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "ad355f78-bf81-43e3-bc8f-afde3269c127",
+                            Email = "pieter.vdm@example.com",
+                            EmailConfirmed = true,
+                            LockoutEnabled = false,
+                            NormalizedEmail = "PIETER.VDM@EXAMPLE.COM",
+                            NormalizedUserName = "PIETER.VDM@EXAMPLE.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEPujAw6PzpCwXE0t401cTfsLh1wdXHjingrlLRg/1TohaZ8WgLjrmEmkKLqTePUBgA==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "6c06187b-eefd-4f09-affb-ea57d0c5eb26",
+                            TwoFactorEnabled = false,
+                            UserName = "pieter.vdm@example.com",
+                            CellphoneNumber = "072 345 1234",
+                            IDNumber = "8306195023082",
+                            Name = "Pieter",
+                            Surname = "van der Merwe"
+                        },
+                        new
+                        {
+                            Id = "customer-6",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "deeb7888-f494-465c-b0b6-d42f2dca801e",
+                            Email = "karabo.nkosi@example.com",
+                            EmailConfirmed = true,
+                            LockoutEnabled = false,
+                            NormalizedEmail = "KARABO.NKOSI@EXAMPLE.COM",
+                            NormalizedUserName = "KARABO.NKOSI@EXAMPLE.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEHUZ+hbvXI6WG/mfb5Z1wozoTVAYDl/uKMPUYTYz/8A7jcbub5dCrd+E3uD9aEFy2Q==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "c05b0ffd-293e-482f-a00c-4a9421bdbe09",
+                            TwoFactorEnabled = false,
+                            UserName = "karabo.nkosi@example.com",
+                            CellphoneNumber = "079 876 5432",
+                            IDNumber = "9701063123084",
+                            Name = "Karabo",
+                            Surname = "Nkosi"
+                        },
+                        new
+                        {
+                            Id = "customer-7",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "02257b13-eb78-4097-8caa-5919b0d77ce6",
+                            Email = "annelise.botha@example.com",
+                            EmailConfirmed = true,
+                            LockoutEnabled = false,
+                            NormalizedEmail = "ANNELISE.BOTHA@EXAMPLE.COM",
+                            NormalizedUserName = "ANNELISE.BOTHA@EXAMPLE.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEEtc+UWUzLg7dqiJY72z1NypTFmb2zfe2lXM2xm71xgO/L/J2RyQoJn7X8EZ+SCrTw==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "a85b22b0-9761-4797-81e4-fae14c3eb059",
+                            TwoFactorEnabled = false,
+                            UserName = "annelise.botha@example.com",
+                            CellphoneNumber = "078 234 5678",
+                            IDNumber = "8609031023086",
+                            Name = "Annelise",
+                            Surname = "Botha"
+                        },
+                        new
+                        {
+                            Id = "customer-8",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "3523ad50-ffaa-404d-bbd9-14938ffc1d4d",
+                            Email = "kagiso.motloung@example.com",
+                            EmailConfirmed = true,
+                            LockoutEnabled = false,
+                            NormalizedEmail = "KAGISO.MOTLOUNG@EXAMPLE.COM",
+                            NormalizedUserName = "KAGISO.MOTLOUNG@EXAMPLE.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAELISodxlR06IcDrLWfOxgcBGdvRsJ+kUN5ME42H43EhQWZ/sond2xNf9G5DHuEKsdQ==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "147efb10-5887-4212-8834-a585986fcd26",
+                            TwoFactorEnabled = false,
+                            UserName = "kagiso.motloung@example.com",
+                            CellphoneNumber = "084 567 8901",
+                            IDNumber = "0005016123080",
+                            Name = "Kagiso",
+                            Surname = "Motloung"
+                        },
+                        new
+                        {
+                            Id = "customer-9",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "bf718971-7188-4714-ab07-fd4a7b5ccc30",
+                            Email = "sibusiso.gumede@example.com",
+                            EmailConfirmed = true,
+                            LockoutEnabled = false,
+                            NormalizedEmail = "SIBUSISO.GUMEDE@EXAMPLE.COM",
+                            NormalizedUserName = "SIBUSISO.GUMEDE@EXAMPLE.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEGLn1jnJOywjz1O3ZziYzeKAi2oSas8ETPuzUYvpWrBdg+uFiQSpmyVwLN+mF5Rtxg==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "dd6cf372-de39-4ee9-ba42-7c3b93e96ec3",
+                            TwoFactorEnabled = false,
+                            UserName = "sibusiso.gumede@example.com",
+                            CellphoneNumber = "071 234 8901",
+                            IDNumber = "9204174123083",
+                            Name = "Sibusiso",
+                            Surname = "Gumede"
+                        },
+                        new
+                        {
+                            Id = "customer-10",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "a92fb0e1-c0fb-47c9-8478-00dec85b074a",
+                            Email = "michelle.pretorius@example.com",
+                            EmailConfirmed = true,
+                            LockoutEnabled = false,
+                            NormalizedEmail = "MICHELLE.PRETORIUS@EXAMPLE.COM",
+                            NormalizedUserName = "MICHELLE.PRETORIUS@EXAMPLE.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEH2S27GWkc9AyyhF4Y+H3khEb5lXlhLgSGAWSW8xZ9UHkIc439fbrj8nCzLMCbUPsg==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "7dd48ef1-7012-4a06-944e-a80fba50a38f",
+                            TwoFactorEnabled = false,
+                            UserName = "michelle.pretorius@example.com",
+                            CellphoneNumber = "073 456 7890",
+                            IDNumber = "8508232023088",
+                            Name = "Michelle",
+                            Surname = "Pretorius"
+                        },
+                        new
+                        {
+                            Id = "customer-11",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "b74e3fc8-20e6-4f65-b7b6-8ed30874f28d",
+                            Email = "vusi.zulu@example.com",
+                            EmailConfirmed = true,
+                            LockoutEnabled = false,
+                            NormalizedEmail = "VUSI.ZULU@EXAMPLE.COM",
+                            NormalizedUserName = "VUSI.ZULU@EXAMPLE.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAENBecj5oioz/pqrZLGgpEmCulexDARYBusjTcjhBeV0Bl8btaZ48XaO5JP8N28Q9nw==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "459bea80-7861-4b15-aedf-9ce71e06363f",
+                            TwoFactorEnabled = false,
+                            UserName = "vusi.zulu@example.com",
+                            CellphoneNumber = "082 987 6543",
+                            IDNumber = "8803115123089",
+                            Name = "Vusi",
+                            Surname = "Zulu"
+                        },
+                        new
+                        {
+                            Id = "customer-12",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "b4e23be7-d04d-4fa0-865a-0722aaaadbcf",
+                            Email = "aisha.jacobs@example.com",
+                            EmailConfirmed = true,
+                            LockoutEnabled = false,
+                            NormalizedEmail = "AISHA.JACOBS@EXAMPLE.COM",
+                            NormalizedUserName = "AISHA.JACOBS@EXAMPLE.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEH3YdCGxhVzdMb4aNDX3OCpp/PpayP7ce9lqaRO1p7B2T9PH6wiceBEAkuDx5+omvQ==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "ae394ae8-62a5-49a4-9a1f-5c8886d58497",
+                            TwoFactorEnabled = false,
+                            UserName = "aisha.jacobs@example.com",
+                            CellphoneNumber = "079 123 4567",
+                            IDNumber = "9909020323082",
+                            Name = "Aisha",
+                            Surname = "Jacobs"
+                        },
+                        new
+                        {
+                            Id = "customer-13",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "7c38a9e4-6222-4fca-8983-9224c745facf",
+                            Email = "johan.deklerk@example.com",
+                            EmailConfirmed = true,
+                            LockoutEnabled = false,
+                            NormalizedEmail = "JOHAN.DEKLERK@EXAMPLE.COM",
+                            NormalizedUserName = "JOHAN.DEKLERK@EXAMPLE.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEDjE8tDkQxfMa7z3/W4j6de/jHikpCp1/+8iJH/e4vRFD9DUxvFf59zURjmwaWQFVA==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "0a2605b6-1e58-4b3e-aee7-0ad46b07c282",
+                            TwoFactorEnabled = false,
+                            UserName = "johan.deklerk@example.com",
+                            CellphoneNumber = "074 567 8901",
+                            IDNumber = "8702054023087",
+                            Name = "Johan",
+                            Surname = "de Klerk"
+                        },
+                        new
+                        {
+                            Id = "customer-14",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "70c65b58-3c1d-478c-8774-a022c0a9d623",
+                            Email = "thandiwe.sithole@example.com",
+                            EmailConfirmed = true,
+                            LockoutEnabled = false,
+                            NormalizedEmail = "THANDIWE.SITHOLE@EXAMPLE.COM",
+                            NormalizedUserName = "THANDIWE.SITHOLE@EXAMPLE.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEFO2CJ43klmpB5ctbuxPwUhKVHqSPQxMJ50Yj4EJNFlF4pNpVkeNbkY1yHwgzGPUjQ==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "d5cb6c0d-f7c2-43b8-bc6b-bc7b6ae74f36",
+                            TwoFactorEnabled = false,
+                            UserName = "thandiwe.sithole@example.com",
+                            CellphoneNumber = "078 987 6543",
+                            IDNumber = "9306203123086",
+                            Name = "Thandiwe",
+                            Surname = "Sithole"
+                        },
+                        new
+                        {
+                            Id = "customer-15",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "1aefab9c-3c84-439c-ad1f-1bd2966c492b",
+                            Email = "riaan.vw@example.com",
+                            EmailConfirmed = true,
+                            LockoutEnabled = false,
+                            NormalizedEmail = "RIAAN.VW@EXAMPLE.COM",
+                            NormalizedUserName = "RIAAN.VW@EXAMPLE.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEFieQ/13S22DRMii8IPq19GSXpLz0Aedfgl9lPCo6cgWNH6a/uo6a/RjvIEmjUFDvw==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "aee01418-35fc-430c-8a94-f6b6fea266fa",
+                            TwoFactorEnabled = false,
+                            UserName = "riaan.vw@example.com",
+                            CellphoneNumber = "071 345 6789",
+                            IDNumber = "8108305023081",
+                            Name = "Riaan",
+                            Surname = "van Wyk"
+                        },
+                        new
+                        {
+                            Id = "customer-16",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "e815ed75-b714-47ed-a947-12b6da711b0e",
+                            Email = "palesa.molefe@example.com",
+                            EmailConfirmed = true,
+                            LockoutEnabled = false,
+                            NormalizedEmail = "PALESA.MOLEFE@EXAMPLE.COM",
+                            NormalizedUserName = "PALESA.MOLEFE@EXAMPLE.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEH8RArku0Xj6F7ZYOCdFaeGwVkCEVteiFw7pbiaClv/nKQE5bFpRIo1nbCVD+Y2QlQ==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "86a8e031-e80a-43ac-893e-47358afc0aad",
+                            TwoFactorEnabled = false,
+                            UserName = "palesa.molefe@example.com",
+                            CellphoneNumber = "083 234 5678",
+                            IDNumber = "9501151023084",
+                            Name = "Palesa",
+                            Surname = "Molefe"
+                        },
+                        new
+                        {
+                            Id = "customer-17",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "4e11d66c-ebb8-4460-aacb-5ab23a8c65af",
+                            Email = "kobus.smit@example.com",
+                            EmailConfirmed = true,
+                            LockoutEnabled = false,
+                            NormalizedEmail = "KOBUS.SMIT@EXAMPLE.COM",
+                            NormalizedUserName = "KOBUS.SMIT@EXAMPLE.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEAFBFN4uAEm7BiPnBgf+qRG1l4BXw0SCTB3O6efX37Fbd2/s7d+TJnNtFILPTDvhqw==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "fbe18bb7-3633-416c-8f98-f052017f00e5",
+                            TwoFactorEnabled = false,
+                            UserName = "kobus.smit@example.com",
+                            CellphoneNumber = "072 987 1234",
+                            IDNumber = "7909094023083",
+                            Name = "Kobus",
+                            Surname = "Smit"
+                        },
+                        new
+                        {
+                            Id = "customer-18",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "e5e07a4b-7af2-4115-a71c-c99c201938d9",
+                            Email = "zanele.mthembu@example.com",
+                            EmailConfirmed = true,
+                            LockoutEnabled = false,
+                            NormalizedEmail = "ZANELE.MTHEMBU@EXAMPLE.COM",
+                            NormalizedUserName = "ZANELE.MTHEMBU@EXAMPLE.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEFFQ7wy/5VZxKK7u4kGYfRRk/rzKvqi8ZktCwhti96zyl9JxjoWPyggm1B7VsFLKmQ==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "cdf83dac-6d34-41e4-9dde-f572f5f86990",
+                            TwoFactorEnabled = false,
+                            UserName = "zanele.mthembu@example.com",
+                            CellphoneNumber = "079 456 7890",
+                            IDNumber = "9604232123085",
+                            Name = "Zanele",
+                            Surname = "Mthembu"
+                        },
+                        new
+                        {
+                            Id = "customer-19",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "c32323e4-487c-423f-984b-1ddb13d1ee82",
+                            Email = "annelise@example.com",
+                            EmailConfirmed = true,
+                            LockoutEnabled = false,
+                            NormalizedEmail = "ANNELISE@EXAMPLE.COM",
+                            NormalizedUserName = "ANNELISE@EXAMPLE.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEH+4btonsZLghzX88tmnJlScUbaEbgS7My1ics5zsbiOzZ5RdL4Kn+QVchjZWm2edA==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "e714ee6b-891f-406d-951a-57934e13b4f4",
+                            TwoFactorEnabled = false,
+                            UserName = "annelise@example.com",
+                            CellphoneNumber = "074 123 4567",
+                            IDNumber = "8407125023080",
+                            Name = "Annelise",
+                            Surname = "Botha"
+                        },
+                        new
+                        {
+                            Id = "customer-20",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "334eb0c0-11f3-44ec-9aaf-5fcd8be58482",
+                            Email = "nomsa.ndlovu@example.com",
+                            EmailConfirmed = true,
+                            LockoutEnabled = false,
+                            NormalizedEmail = "NOMSA.NDLOVU@EXAMPLE.COM",
+                            NormalizedUserName = "NOMSA.NDLOVU@EXAMPLE.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEJtJEB9CPWFgLS5nQgB+8cSEUjHvsgKIE+Kw5LsOxvdkHqkYDYKvphriV1GUwoNINw==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "1222c2b7-acba-4503-9f7f-1a9a35a02c29",
+                            TwoFactorEnabled = false,
+                            UserName = "nomsa.ndlovu@example.com",
+                            CellphoneNumber = "081 567 8901",
+                            IDNumber = "9703280123088",
+                            Name = "Nomsa",
+                            Surname = "Ndlovu"
+                        },
+                        new
+                        {
+                            Id = "pharmacist-1",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "844ed146-3c41-416a-be10-c529c074ca2f",
+                            Email = "lindile@example.com",
+                            EmailConfirmed = true,
+                            LockoutEnabled = false,
+                            NormalizedEmail = "LINDILE@EXAMPLE.COM",
+                            NormalizedUserName = "LINDILE@EXAMPLE.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAECkSLyKsqsZbeB2bXmpG2HUntCBOK6pcn3LZN69W6PdzwE1sNq6FCzfHQ12UH0cNkA==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "f428ccf8-e43f-42ea-bb4b-ffb8d9c48a68",
+                            TwoFactorEnabled = false,
+                            UserName = "lindile@example.com",
+                            CellphoneNumber = "061 2345 678",
+                            IDNumber = "1234567890123",
+                            Name = "Lindile",
+                            Surname = "Hadebe"
+                        },
+                        new
+                        {
+                            Id = "pharmacist-2",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "e5f57adb-b6f5-4168-af98-4c99896750ef",
+                            Email = "dorothy@example.com",
+                            EmailConfirmed = true,
+                            LockoutEnabled = false,
+                            NormalizedEmail = "DOROTHY@EXAMPLE.COM",
+                            NormalizedUserName = "DOROTHY@EXAMPLE.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEIil4+6nzRAi/7kDC5NMiHxmhgiGelshZeHIN1kUPFEaOUoYbKAQagNsQKVRdJlnSQ==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "377f7d0e-1563-4ce4-ad2a-1596c5dbbf7e",
+                            TwoFactorEnabled = false,
+                            UserName = "dorothy@example.com",
+                            CellphoneNumber = "062 2345 678",
+                            IDNumber = "1234567890124",
+                            Name = "Dorothy",
+                            Surname = "Daniels"
+                        },
+                        new
+                        {
+                            Id = "pharmacist-3",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "0b3111db-8b45-4290-9de1-c5ed33a1e9c0",
+                            Email = "marcel@example.com",
+                            EmailConfirmed = true,
+                            LockoutEnabled = false,
+                            NormalizedEmail = "MARCEL@EXAMPLE.COM",
+                            NormalizedUserName = "MARCEL@EXAMPLE.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEIlNxliCPciDG4eDm1P0Q8UuCb4JjQRn4+j6Y9WzbSj6IVEFojY3ZdtJCOuhl8RJJg==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "323b63f7-5dd5-446a-b157-9e8ee40f2ab0",
+                            TwoFactorEnabled = false,
+                            UserName = "marcel@example.com",
+                            CellphoneNumber = "063 2345 678",
+                            IDNumber = "1234567890125",
+                            Name = "Marcel",
+                            Surname = "Van Niekerk"
+                        },
+                        new
+                        {
+                            Id = "manager-1",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "5cc20415-699b-4936-b56f-cfc24e7e6f13",
+                            Email = "john.doe@example.com",
+                            EmailConfirmed = true,
+                            LockoutEnabled = false,
+                            NormalizedEmail = "JOHN.DOE@EXAMPLE.COM",
+                            NormalizedUserName = "JOHN.DOE@EXAMPLE.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEPNuprJYWnTzq8b3QfZEXyo2yOVcrh4xSTgivm+z3RtWpQzXIUSHO3x7tGhIdYUrhg==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "04858c77-2a87-4a5d-8f8e-22448901e27e",
+                            TwoFactorEnabled = false,
+                            UserName = "john.doe@example.com",
+                            CellphoneNumber = "082 289 4758",
+                            IDNumber = "1234567890126",
+                            Name = "John",
+                            Surname = "Doe"
+                        });
                 });
 
             modelBuilder.Entity("IbhayiPharmacy.Models.Customer", b =>
