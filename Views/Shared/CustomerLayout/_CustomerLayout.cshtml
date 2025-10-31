@@ -48,8 +48,7 @@
                         <img src="~/css/img/Customer_img/Profile.png" alt="Profile" />
                     </div>
                     <div id="profileMenu" class="profile-menu hidden">
-                        <a asp-controller="Customer" asp-action="profile" class="sidebar-button">👤 Account</a>
-                        <a asp-controller="Home" asp-action="Index" class="sidebar-button">🚪 Logout</a>
+                    <a asp-area="Identity" asp-page="/Account/Profile" class="sidebar-button">👤 My Profile</a>
                     </div>
                 </div>
 
