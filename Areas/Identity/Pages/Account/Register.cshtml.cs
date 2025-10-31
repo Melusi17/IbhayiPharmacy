@@ -81,7 +81,7 @@ namespace IbhayiPharmacy.Areas.Identity.Pages.Account
             [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
             public string ConfirmPassword { get; set; }
 
-            public string? Role { get; set; }
+            public string Role { get; set; } = SD.Role_Customer; // Automatically set to Customer
 
             [ValidateNever]
             public IEnumerable<SelectListItem> Rolelist { get; set; }
@@ -95,10 +95,7 @@ namespace IbhayiPharmacy.Areas.Identity.Pages.Account
             [Required]
             public string IDNumber { get; set; }
 
-            public string? CellphoneNumber { get; set; }
-
-            // NEW: Health Council Registration Number for Pharmacist/Pharmacy Manager
-            public string? HealthCouncilRegNo { get; set; }
+            public string CellphoneNumber { get; set; }
 
             public List<int> SelectedAllergyIds { get; set; } = new List<int>();
 
@@ -108,21 +105,23 @@ namespace IbhayiPharmacy.Areas.Identity.Pages.Account
 
         public async Task OnGetAsync(string returnUrl = null)
         {
-            // FIXED: Use proper async/await instead of .GetAwaiter().GetResult()
+            // Ensure Customer role exists
             if (!await _roleManager.RoleExistsAsync(SD.Role_Customer))
             {
                 await _roleManager.CreateAsync(new IdentityRole(SD.Role_Customer));
-                await _roleManager.CreateAsync(new IdentityRole(SD.Role_Pharmacist));
-                await _roleManager.CreateAsync(new IdentityRole(SD.Role_PharmacyManager));
             }
 
             Input = new InputModel
             {
-                Rolelist = _roleManager.Roles.Select(r => r.Name).Select(n => new SelectListItem
+                Rolelist = new List<SelectListItem> // Only show Customer role
                 {
-                    Text = n,
-                    Value = n
-                }),
+                    new SelectListItem
+                    {
+                        Text = SD.Role_Customer,
+                        Value = SD.Role_Customer,
+                        Selected = true
+                    }
+                },
                 AllergyList = _db.Active_Ingredients.Select(a => new SelectListItem
                 {
                     Text = a.Name,
@@ -155,30 +154,23 @@ namespace IbhayiPharmacy.Areas.Identity.Pages.Account
 
                 if (result.Succeeded)
                 {
-                    _logger.LogInformation("ApplicationUser created a new account with password.");
+                    _logger.LogInformation("Customer created a new account with password.");
 
-                    // Handle role assignment
-                    if (!String.IsNullOrEmpty(Input.Role))
-                    {
-                        await _userManager.AddToRoleAsync(user, Input.Role);
-                    }
-                    else
-                    {
-                        await _userManager.AddToRoleAsync(user, SD.Role_Customer);
-                    }
+                    // Automatically assign Customer role
+                    await _userManager.AddToRoleAsync(user, SD.Role_Customer);
 
-                    // Handle customer allergies if user is a customer
-                    if (Input.Role == SD.Role_Customer && Input.SelectedAllergyIds != null && Input.SelectedAllergyIds.Any())
+                    // Handle customer allergies - if no allergies selected, it's recorded as 'none'
+                    // Create customer record
+                    var customer = new Customer
                     {
-                        // Create customer record first
-                        var customer = new Customer
-                        {
-                            ApplicationUserId = user.Id
-                        };
-                        _db.Customers.Add(customer);
-                        await _db.SaveChangesAsync(); // Save to get the CustomerID
+                        ApplicationUserId = user.Id
+                    };
+                    _db.Customers.Add(customer);
+                    await _db.SaveChangesAsync(); // Save to get the CustomerID
 
-                        // Add all selected allergies
+                    // Add selected allergies if any
+                    if (Input.SelectedAllergyIds != null && Input.SelectedAllergyIds.Any())
+                    {
                         foreach (var allergyId in Input.SelectedAllergyIds)
                         {
                             var customerAllergy = new Custormer_Allergy
@@ -190,44 +182,7 @@ namespace IbhayiPharmacy.Areas.Identity.Pages.Account
                         }
                         await _db.SaveChangesAsync();
                     }
-
-                    // NEW: Handle Pharmacist registration
-                    if (Input.Role == SD.Role_Pharmacist)
-                    {
-                        if (string.IsNullOrEmpty(Input.HealthCouncilRegNo))
-                        {
-                            ModelState.AddModelError(string.Empty, "Health Council Registration Number is required for Pharmacist role.");
-                            await _userManager.DeleteAsync(user); // Rollback user creation
-                            return await RebuildPageAsync();
-                        }
-
-                        var pharmacist = new Pharmacist
-                        {
-                            ApplicationUserId = user.Id,
-                            HealthCouncilRegNo = Input.HealthCouncilRegNo
-                        };
-                        _db.Pharmacists.Add(pharmacist);
-                        await _db.SaveChangesAsync();
-                    }
-
-                    // NEW: Handle Pharmacy Manager registration
-                    if (Input.Role == SD.Role_PharmacyManager)
-                    {
-                        if (string.IsNullOrEmpty(Input.HealthCouncilRegNo))
-                        {
-                            ModelState.AddModelError(string.Empty, "Health Council Registration Number is required for Pharmacy Manager role.");
-                            await _userManager.DeleteAsync(user); // Rollback user creation
-                            return await RebuildPageAsync();
-                        }
-
-                        var pharmacyManager = new PharmacyManager
-                        {
-                            ApplicationUserId = user.Id,
-                            HealthCouncilRegNo = Input.HealthCouncilRegNo
-                        };
-                        _db.PharmacyManagers.Add(pharmacyManager);
-                        await _db.SaveChangesAsync();
-                    }
+                    // If no allergies selected, no records are created - this represents 'none'
 
                     var userId = await _userManager.GetUserIdAsync(user);
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
@@ -270,11 +225,15 @@ namespace IbhayiPharmacy.Areas.Identity.Pages.Account
                 Value = a.Active_IngredientID.ToString()
             });
 
-            Input.Rolelist = _roleManager.Roles.Select(r => r.Name).Select(n => new SelectListItem
+            Input.Rolelist = new List<SelectListItem>
             {
-                Text = n,
-                Value = n
-            });
+                new SelectListItem
+                {
+                    Text = SD.Role_Customer,
+                    Value = SD.Role_Customer,
+                    Selected = true
+                }
+            };
 
             return Page();
         }

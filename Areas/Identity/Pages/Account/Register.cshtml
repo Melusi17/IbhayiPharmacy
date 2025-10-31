@@ -74,23 +74,6 @@
         padding-bottom: 10px;
         border-bottom: 2px solid #00aaff;
     }
-
-    .hidden-section {
-        display: none;
-    }
-
-    .role-based-section {
-        opacity: 0;
-        height: 0;
-        overflow: hidden;
-        transition: all 0.3s ease;
-    }
-
-        .role-based-section.active {
-            opacity: 1;
-            height: auto;
-            overflow: visible;
-        }
 </style>
 
 <body>
@@ -99,8 +82,8 @@
             <div class="card-header w-100 py-3">
                 <div class="row">
                     <div class="col-12 text-center">
-                        <h2 class="text-white py-2 pb-1">@ViewData["Title"]</h2>
-                        <p class="text-white mb-0">Create a new account to get started</p>
+                        <h2 class="text-white py-2 pb-1">Welcome to Ibhayi Pharmacy!</h2>
+                        <p class="text-white mb-0">Let's get you set up with your personal account so we can take better care of you</p>
                     </div>
                 </div>
             </div>
@@ -110,6 +93,9 @@
                     <h3 class="section-title text-center">Account Information</h3>
 
                     <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+
+                    <!-- Hidden Role Field - Automatically set to Customer -->
+                    <input type="hidden" asp-for="Input.Role" value="Customer" />
 
                     <!-- Basic Information Section -->
                     <div class="row mb-4">
@@ -169,25 +155,20 @@
                         </div>
                     </div>
 
-                    <!-- Role Selection Section -->
-                    <h3 class="section-title text-center mt-4">Role Selection</h3>
+                    <!-- Allergy Information Section -->
+                    <h3 class="section-title text-center mt-4">Allergy Information</h3>
                     <div class="row mb-4">
                         <div class="col-12">
-                            <div class="form-floating mb-3">
-                                <select asp-for="Input.Role" asp-items="@Model.Input.Rolelist" class="form-select" id="roleSelect">
-                                    <option disabled selected>-Select Your Role-</option>
-                                </select>
-                                <label asp-for="Input.Role" class="ms-2 text-muted">User Role</label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Dynamic Role-Based Sections -->
-                    <div id="dynamicSectionsContainer">
-                        <!-- Customer Section - Allergies -->
-                        <div class="role-based-section" id="customerSection">
                             <div class="dynamic-section">
-                                <h4 class="mb-3"><i class="bi bi-heart-pulse me-2"></i>Allergy Information</h4>
+                                <div class="mt-3 p-3 bg-light rounded">
+                                    <small class="text-muted">
+                                        <i class="bi bi-shield-check me-1"></i>
+                                        <strong>Privacy Note:</strong> Your allergy information is kept confidential and only used to ensure your safety when dispensing medications.
+                                    </small>
+                                </div>
+
+                   
+                                <p class="text-muted mb-3">If you do not have any allergies to the following active ingredients, you do not need to make a selection. Your profile will be automatically updated to indicate 'No Known Allergies'.</p>
                                 <label class="form-label mb-3 fw-semibold">Select any allergies you have:</label>
                                 <div class="allergy-checkboxes">
                                     @if (Model.Input.AllergyList != null && Model.Input.AllergyList.Any())
@@ -200,7 +181,7 @@
                                                        value="@allergy.Value"
                                                        id="allergy_@allergy.Value"
                                                        name="Input.SelectedAllergyIds"
-                                                       @(Model.Input.SelectedAllergyIds != null && Model.Input.SelectedAllergyIds.Contains(int.Parse(allergy.Value)) ? "checked" : "")>
+                                                @(Model.Input.SelectedAllergyIds != null && Model.Input.SelectedAllergyIds.Contains(int.Parse(allergy.Value)) ? "checked" : "")>
                                                 <label class="form-check-label" for="allergy_@allergy.Value">
                                                     @allergy.Text
                                                 </label>
@@ -215,27 +196,12 @@
                                 <span asp-validation-for="Input.SelectedAllergyIds" class="text-danger"></span>
                             </div>
                         </div>
-
-                        <!-- Pharmacist/Manager Section - Health Council Registration -->
-                        <div class="role-based-section" id="professionalSection">
-                            <div class="dynamic-section">
-                                <h4 class="mb-3"><i class="bi bi-file-medical me-2"></i>Professional Registration</h4>
-                                <div class="form-floating mb-3">
-                                    <input asp-for="Input.HealthCouncilRegNo" class="form-control" placeholder="HC12345678" />
-                                    <label asp-for="Input.HealthCouncilRegNo" class="ms-2 text-muted">Health Council Registration Number</label>
-                                    <span asp-validation-for="Input.HealthCouncilRegNo" class="text-danger"></span>
-                                    <div class="form-text">
-                                        <i class="bi bi-info-circle me-1"></i>Required for Pharmacist and Pharmacy Manager roles
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
                     </div>
 
                     <!-- Submit Button -->
                     <div class="col-12 mt-4">
                         <button id="registerSubmit" type="submit" class="btn btn-primary btn-lg">
-                            <i class="bi bi-person-plus me-2"></i>Create Account
+                            <i class="bi bi-person-plus me-2"></i>Create Customer Account
                         </button>
                     </div>
                 </form>
@@ -244,46 +210,4 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const roleSelect = document.querySelector('#roleSelect');
-            const customerSection = document.querySelector('#customerSection');
-            const professionalSection = document.querySelector('#professionalSection');
-            const dynamicContainer = document.querySelector('#dynamicSectionsContainer');
-
-            function toggleSections() {
-                const selectedRole = roleSelect.value; // FIXED: Use .value instead of .text
-
-                // Hide all sections first
-                customerSection.classList.remove('active');
-                professionalSection.classList.remove('active');
-
-                // Clear fields when switching roles
-                if (selectedRole !== 'Customer') {
-                    document.querySelectorAll('input[name="Input.SelectedAllergyIds"]:checked').forEach(checkbox => {
-                        checkbox.checked = false;
-                    });
-                }
-
-                if (selectedRole !== 'Pharmacist' && selectedRole !== 'Pharmacy Manager') {
-                    document.querySelector('#Input_HealthCouncilRegNo').value = '';
-                }
-
-                // Show appropriate section based on role
-                if (selectedRole === 'Customer') {
-                    customerSection.classList.add('active');
-                } else if (selectedRole === 'Pharmacist' || selectedRole === 'Pharmacy Manager') {
-                    professionalSection.classList.add('active');
-                }
-            }
-
-            if (roleSelect) {
-                // Initial setup
-                toggleSections();
-
-                // Add event listener for role changes
-                roleSelect.addEventListener('change', toggleSections);
-            }
-        });
-    </script>
 </body>
