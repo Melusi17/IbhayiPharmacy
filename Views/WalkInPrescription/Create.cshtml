@@ -918,8 +918,8 @@
             <small style="color: #bdc3c7;">Dedicated Dictionary</small>
         </div>
         <nav class="sidebar-nav">
-            <a asp-controller="Pharmacy" asp-action="Index"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
-            <a asp-controller="WalkInPrescription" asp-action="Create" class="active"><i class="fas fa-tachometer-alt"></i> Walk In Prescription</a>
+            <a asp-controller="PharmacistDashboard" asp-action="Index" class="active"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <a asp-controller="WalkInPrescription" asp-action="Create"><i class="fas fa-tachometer-alt"></i> Walk In Prescription</a>
             <a asp-controller="PharmacistDispensing" asp-action="Index"><i class="fas fa-clipboard-list"></i> Orders</a>
             <a asp-controller="ScriptsProcessed" asp-action="Index"><i class="fas fa-file-prescription"></i> Unprocessed Scripts</a>
             <a asp-controller="ScriptsProcessed" asp-action="ProcessedScripts"><i class="fas fa-boxes"></i> Processed Scripts</a>
@@ -1367,6 +1367,16 @@
                 const selectedOption = allergySelect.options[allergySelect.selectedIndex];
 
                 if (selectedOption && selectedOption.value) {
+                    // Handle "No Allergies" selection
+                    if (selectedOption.value === "0") {
+                        selectedAllergies = []; // Clear all allergies
+                        updateAllergyCart();
+                        // Show confirmation message
+                        const allergyCart = document.getElementById('allergyCart');
+                        allergyCart.innerHTML = '<li style="color: #27ae60; font-weight: bold;">✓ No allergies recorded</li>';
+                        return;
+                    }
+
                     const allergyId = parseInt(selectedOption.value);
                     const allergyName = selectedOption.textContent;
 
@@ -1377,6 +1387,19 @@
                             name: allergyName
                         });
                         updateAllergyCart();
+                    }
+                }
+            });
+
+            // Clear "No Allergies" status when selecting a specific allergy
+            document.getElementById('allergySelect').addEventListener('change', function() {
+                const selectedOption = this.options[this.selectedIndex];
+                if (selectedOption.value !== "0") {
+                    // Remove any "No Allergies" visual indicator
+                    const allergyCart = document.getElementById('allergyCart');
+                    const noAllergyItem = allergyCart.querySelector('li[style*="color: #27ae60"]');
+                    if (noAllergyItem) {
+                        noAllergyItem.remove();
                     }
                 }
             });
@@ -1403,6 +1426,12 @@
             const allergyCart = document.getElementById('allergyCart');
             allergyCart.innerHTML = '';
 
+            if (selectedAllergies.length === 0) {
+                // Show "No Allergies" when cart is empty
+                allergyCart.innerHTML = '<li style="color: #27ae60; font-weight: bold;">✓ No allergies recorded</li>';
+                return;
+            }
+
             selectedAllergies.forEach((allergy, index) => {
                 const li = document.createElement('li');
                 li.textContent = allergy.name;
@@ -1423,14 +1452,17 @@
             updateAllergyCart();
         }
 
-        // Load real allergy options from database
+        // Load real allergy options from database with "No Allergies" option
         async function loadAllergyOptions() {
             try {
                 const response = await fetch('@Url.Action("GetAllergyOptions", "WalkInPrescription")');
                 const allergyOptions = await response.json();
 
                 const allergySelect = document.getElementById('allergySelect');
-                allergySelect.innerHTML = '<option value="" disabled selected>Select an allergy</option>';
+                allergySelect.innerHTML = `
+                    <option value="" disabled selected>Select an allergy</option>
+                    <option value="0">--- No Allergies ---</option>
+                `;
 
                 allergyOptions.forEach(allergy => {
                     const option = document.createElement('option');
@@ -1494,7 +1526,6 @@
             }
         }
 
-        // [Rest of the existing JavaScript functions remain exactly the same...]
         // Setup searchable dropdown functionality
         function setupSearchableDropdowns() {
             // Customer search

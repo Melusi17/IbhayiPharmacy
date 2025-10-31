@@ -270,7 +270,7 @@ namespace IbhayiPharmacy.Controllers
             catch (Exception ex)
             {
                 TempData["ErrorMessage"] = $"Error loading order: {ex.Message}";
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(CollectionTracking));
             }
         }
 

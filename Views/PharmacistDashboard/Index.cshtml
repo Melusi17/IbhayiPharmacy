@@ -1,0 +1,858 @@
+﻿@model IbhayiPharmacy.Models.PharmacistVM.PharmacistDashboardVM
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
+@{
+    ViewData["Title"] = "Pharmacist Dashboard - Ibhayi Pharmacy";
+    Layout = null;
+    var user = await UserManager.GetUserAsync(User);
+    var userName = user?.UserName ?? "Pharmacist";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Pharmacist Dashboard - Ibhayi Pharmacy</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* ===== GLOBAL STYLES ===== */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f4f6f9;
+            color: #333;
+            transition: all 0.3s;
+        }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            width: 220px;
+            background: linear-gradient(to bottom, #22586A, #22586A);
+            height: 100vh;
+            padding: 20px 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+            transition: all 0.3s;
+        }
+
+            .sidebar.collapsed {
+                width: 0;
+                overflow: hidden;
+                padding: 0;
+            }
+
+                .sidebar.collapsed .sidebar-header,
+                .sidebar.collapsed .sidebar-nav,
+                .sidebar.collapsed .sidebar-footer {
+                    display: none;
+                }
+
+        .sidebar-header {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid #34495e;
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        .sidebar h2 {
+            font-size: 22px;
+            margin: 0;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+            .sidebar h2 i {
+                color: #3498db;
+            }
+
+        .sidebar-nav {
+            padding: 0 10px;
+        }
+
+        .sidebar a {
+            color: #ecf0f1;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 8px 0;
+            padding: 10px 15px;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+
+            .sidebar a:hover, .sidebar a.active {
+                background-color: #34495e;
+                transform: translateX(5px);
+            }
+
+        .sidebar-footer {
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+            padding: 0 20px;
+            font-size: 12px;
+            color: #7f8c8d;
+        }
+
+        .toggle-sidebar {
+            position: absolute;
+            right: -15px;
+            top: 20px;
+            background: #3498db;
+            color: white;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            transition: all 0.3s;
+            z-index: 1001;
+        }
+
+        .sidebar.collapsed .toggle-sidebar {
+            right: -15px;
+            background: #3498db;
+        }
+
+        /* ===== TOPBAR ===== */
+        .topbar {
+            background-color: #ffffff;
+            height: 60px;
+            padding: 0 20px;
+            position: fixed;
+            left: 220px;
+            right: 0;
+            top: 0;
+            border-bottom: 1px solid #ccc;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 999;
+            transition: all 0.3s;
+        }
+
+        .sidebar.collapsed + .topbar {
+            left: 0;
+        }
+
+        .topbar span {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        .main-content {
+            margin-left: 220px;
+            margin-top: 60px;
+            padding: 30px;
+            transition: all 0.3s;
+        }
+
+        .sidebar.collapsed + .topbar + .main-content {
+            margin-left: 0;
+        }
+
+        .menu-toggle {
+            display: none;
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 15px;
+        }
+
+        .sidebar.collapsed + .topbar .menu-toggle {
+            display: block;
+        }
+
+        /* ===== DASHBOARD STYLES ===== */
+        .welcome-section {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+            .welcome-section h1 {
+                font-size: 2.5rem;
+                margin-bottom: 10px;
+            }
+
+            .welcome-section p {
+                font-size: 1.1rem;
+                opacity: 0.9;
+            }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+            border-left: 4px solid #3498db;
+            transition: transform 0.2s;
+        }
+
+            .stat-card:hover {
+                transform: translateY(-5px);
+            }
+
+            .stat-card.pending {
+                border-left-color: #e74c3c;
+            }
+
+            .stat-card.ready {
+                border-left-color: #27ae60;
+            }
+
+            .stat-card.scripts {
+                border-left-color: #f39c12;
+            }
+
+            .stat-card.stock {
+                border-left-color: #9b59b6;
+            }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .stat-card.pending .stat-number {
+            color: #e74c3c;
+        }
+
+        .stat-card.ready .stat-number {
+            color: #27ae60;
+        }
+
+        .stat-card.scripts .stat-number {
+            color: #f39c12;
+        }
+
+        .stat-card.stock .stat-number {
+            color: #9b59b6;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .action-btn {
+            background: white;
+            border: none;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+            .action-btn:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+                background: #3498db;
+                color: white;
+            }
+
+            .action-btn i {
+                font-size: 2rem;
+                margin-bottom: 10px;
+                display: block;
+            }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+        }
+
+        .chart-container {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+            .chart-container h3 {
+                margin-bottom: 20px;
+                color: #2c3e50;
+                border-bottom: 2px solid #3498db;
+                padding-bottom: 10px;
+            }
+
+        .activity-list {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+            .activity-list h3 {
+                margin-bottom: 20px;
+                color: #2c3e50;
+                border-bottom: 2px solid #3498db;
+                padding-bottom: 10px;
+            }
+
+        .activity-item {
+            padding: 15px;
+            border-left: 4px solid #3498db;
+            margin-bottom: 15px;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+
+            .activity-item.order {
+                border-left-color: #27ae60;
+            }
+
+            .activity-item.prescription {
+                border-left-color: #f39c12;
+            }
+
+            .activity-item.rejection {
+                border-left-color: #e74c3c;
+            }
+
+        .activity-type {
+            font-weight: bold;
+            color: #3498db;
+            margin-bottom: 5px;
+        }
+
+        .activity-item.order .activity-type {
+            color: #27ae60;
+        }
+
+        .activity-item.prescription .activity-type {
+            color: #f39c12;
+        }
+
+        .activity-item.rejection .activity-type {
+            color: #e74c3c;
+        }
+
+        .activity-date {
+            color: #666;
+            font-size: 0.8rem;
+        }
+
+        .list-section {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+            .list-section h3 {
+                margin-bottom: 20px;
+                color: #2c3e50;
+                border-bottom: 2px solid #3498db;
+                padding-bottom: 10px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+        .view-all {
+            font-size: 0.8rem;
+            color: #3498db;
+            text-decoration: none;
+        }
+
+        .list-item {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+            .list-item:last-child {
+                border-bottom: none;
+            }
+
+        .item-details h4 {
+            margin-bottom: 5px;
+            color: #2c3e50;
+        }
+
+        .item-details p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .item-status {
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-ready {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-unprocessed {
+            background: #ffeeba;
+            color: #856404;
+        }
+
+        .status-low {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-critical {
+            background: #e74c3c;
+            color: white;
+        }
+
+        /* Logout form styles */
+        .logout-form {
+            display: inline;
+        }
+
+        .btn-logout {
+            background: transparent;
+            border: none;
+            color: #ecf0f1;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 8px 0;
+            padding: 10px 15px;
+            border-radius: 5px;
+            transition: all 0.3s;
+            width: 100%;
+            text-align: left;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+            .btn-logout:hover {
+                background-color: #34495e;
+                transform: translateX(5px);
+            }
+
+        /* ===== RESPONSIVE ===== */
+        @@media (max-width: 768px) {
+            .sidebar {
+                width: 0;
+            }
+
+                .sidebar:not(.collapsed) {
+                    width: 220px;
+                }
+
+            .topbar {
+                left: 0;
+            }
+
+            .sidebar:not(.collapsed) + .topbar {
+                left: 220px;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 20px;
+            }
+
+            .sidebar:not(.collapsed) + .topbar + .main-content {
+                margin-left: 220px;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .quick-actions {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    @Html.AntiForgeryToken()
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2><i class="fas fa-prescription-bottle-alt"></i> Pharmacist Panel</h2>
+            <button class="toggle-sidebar" onclick="toggleSidebar()">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <small style="color: #bdc3c7;">Dedicated Dictionary</small>
+        </div>
+        <nav class="sidebar-nav">
+            <a asp-controller="PharmacistDashboard" asp-action="Index" class="active"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <a asp-controller="WalkInPrescription" asp-action="Create"><i class="fas fa-tachometer-alt"></i> Walk In Prescription</a>
+            <a asp-controller="PharmacistDispensing" asp-action="Index"><i class="fas fa-clipboard-list"></i> Orders</a>
+            <a asp-controller="ScriptsProcessed" asp-action="Index"><i class="fas fa-file-prescription"></i> Unprocessed Scripts</a>
+            <a asp-controller="ScriptsProcessed" asp-action="ProcessedScripts"><i class="fas fa-boxes"></i> Processed Scripts</a>
+            <a asp-controller="PharmacistDispensing" asp-action="CollectionTracking"><i class="fas fa-boxes"></i> Track Orders</a>
+            <form class="logout-form" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                <button type="submit" class="btn-logout">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </form>
+        </nav>
+        <div class="sidebar-footer">
+            <p>Ibhayi Pharmacy v2.1</p>
+        </div>
+    </div>
+
+    <!-- TOPBAR -->
+    <div class="topbar">
+        <button class="menu-toggle" onclick="toggleSidebar()">
+            <i class="fas fa-bars"></i> Menu
+        </button>
+        <span>Pharmacist Dashboard</span>
+        <div>Welcome, <strong>@userName</strong></div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+        <!-- Welcome Section -->
+        <div class="welcome-section">
+            <h1>Welcome back, @userName! 👋</h1>
+            <p>Here's what's happening in your pharmacy today.</p>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="stats-grid">
+            <div class="stat-card pending">
+                <div class="stat-number">@Model.TotalPendingOrders</div>
+                <div class="stat-label">Pending Orders</div>
+                <small>Awaiting processing</small>
+            </div>
+            <div class="stat-card ready">
+                <div class="stat-number">@Model.TotalReadyForCollection</div>
+                <div class="stat-label">Ready for Collection</div>
+                <small>Orders ready for customers</small>
+            </div>
+            <div class="stat-card scripts">
+                <div class="stat-number">@Model.TotalUnprocessedScripts</div>
+                <div class="stat-label">Unprocessed Scripts</div>
+                <small>Prescriptions to review</small>
+            </div>
+            <div class="stat-card stock">
+                <div class="stat-number">@Model.TotalLowStockItems</div>
+                <div class="stat-label">Low Stock Items</div>
+                <small>Need reordering</small>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <a href="@Url.Action("QuickProcessPrescription", "PharmacistDashboard")" class="action-btn">
+                <i class="fas fa-file-prescription"></i>
+                <div>Process Next Script</div>
+            </a>
+            <a href="@Url.Action("QuickProcessOrder", "PharmacistDashboard")" class="action-btn">
+                <i class="fas fa-clipboard-list"></i>
+                <div>Process Next Order</div>
+            </a>
+            <a href="@Url.Action("QuickViewCollections", "PharmacistDashboard")" class="action-btn">
+                <i class="fas fa-boxes"></i>
+                <div>View Collections</div>
+            </a>
+            <a href="@Url.Action("QuickViewProcessedScripts", "PharmacistDashboard")" class="action-btn">
+                <i class="fas fa-history"></i>
+                <div>Processed History</div>
+            </a>
+        </div>
+
+        <div class="dashboard-grid">
+            <!-- Left Column -->
+            <div>
+                <!-- Charts Section -->
+                <div class="chart-container">
+                    <h3>Orders Overview</h3>
+                    <canvas id="ordersChart" width="400" height="200"></canvas>
+                </div>
+
+                <!-- Recent Lists -->
+                <div class="list-section">
+                    <h3>
+                        Pending Orders
+                        <a href="@Url.Action("Index", "PharmacistDispensing")" class="view-all">View All</a>
+                    </h3>
+                    @if (Model.PendingOrders.Any())
+                    {
+                        @foreach (var order in Model.PendingOrders.Take(5))
+                        {
+                            <div class="list-item">
+                                <div class="item-details">
+                                    <h4>@order.OrderNumber</h4>
+                                    <p>@order.Customer?.ApplicationUser?.Name @order.Customer?.ApplicationUser?.Surname</p>
+                                    <small>@order.OrderDate.ToString("dd MMM yyyy HH:mm")</small>
+                                </div>
+                                <span class="item-status status-pending">Pending</span>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <p style="text-align: center; color: #666; padding: 20px;">No pending orders</p>
+                    }
+                </div>
+
+                <div class="list-section">
+                    <h3>
+                        Unprocessed Scripts
+                        <a href="@Url.Action("Index", "ScriptsProcessed")" class="view-all">View All</a>
+                    </h3>
+                    @if (Model.UnprocessedPrescriptions.Any())
+                    {
+                        @foreach (var script in Model.UnprocessedPrescriptions.Take(5))
+                        {
+                            <div class="list-item">
+                                <div class="item-details">
+                                    <h4>Prescription #@script.PrescriptionID.ToString("D3")</h4>
+                                    <p>@script.ApplicationUser?.Name @script.ApplicationUser?.Surname</p>
+                                    <small>@script.DateIssued.ToString("dd MMM yyyy")</small>
+                                </div>
+                                <span class="item-status status-unprocessed">Unprocessed</span>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <p style="text-align: center; color: #666; padding: 20px;">No unprocessed scripts</p>
+                    }
+                </div>
+            </div>
+
+            <!-- Right Column -->
+            <div>
+                <!-- Activity Feed -->
+                <div class="activity-list">
+                    <h3>Recent Activity</h3>
+                    <div id="activityFeed">
+                        <p style="text-align: center; color: #666; padding: 20px;">Loading activity...</p>
+                    </div>
+                </div>
+
+                <!-- Low Stock Alert -->
+                <div class="list-section">
+                    <h3>Low Stock Alerts</h3>
+                    @if (Model.LowStockMedications.Any())
+                    {
+                        @foreach (var med in Model.LowStockMedications.Take(5))
+                        {
+                            var stockStatus = med.QuantityOnHand == 0 ? "critical" : "low";
+                            <div class="list-item">
+                                <div class="item-details">
+                                    <h4>@med.MedicationName</h4>
+                                    <p>Stock: @med.QuantityOnHand (Reorder: @med.ReOrderLevel)</p>
+                                </div>
+                                <span class="item-status status-@stockStatus">
+                                    @if (med.QuantityOnHand == 0)
+                                    {
+                                        <text>Out of Stock</text>
+                                    }
+                                    else
+                                    {
+                                        <text>Low Stock</text>
+                                    }
+                                </span>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <p style="text-align: center; color: #666; padding: 20px;">All stock levels are good</p>
+                    }
+                </div>
+
+                <!-- Today's Summary -->
+                <div class="list-section">
+                    <h3>Today's Summary</h3>
+                    <div class="list-item">
+                        <div class="item-details">
+                            <h4>Orders Processed</h4>
+                            <p>Completed today</p>
+                        </div>
+                        <span class="stat-number" style="color: #27ae60;">@Model.TodayProcessedOrders</span>
+                    </div>
+                    <div class="list-item">
+                        <div class="item-details">
+                            <h4>Scripts Processed</h4>
+                            <p>Completed today</p>
+                        </div>
+                        <span class="stat-number" style="color: #f39c12;">@Model.TodayProcessedScripts</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Toggle sidebar
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            const toggleBtn = document.querySelector('.toggle-sidebar i');
+
+            sidebar.classList.toggle('collapsed');
+
+            if (sidebar.classList.contains('collapsed')) {
+                toggleBtn.classList.remove('fa-chevron-left');
+                toggleBtn.classList.add('fa-chevron-right');
+            } else {
+                toggleBtn.classList.remove('fa-chevron-right');
+                toggleBtn.classList.add('fa-chevron-left');
+            }
+        }
+
+        // Load dashboard statistics and charts
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDashboardStats();
+            loadRecentActivity();
+        });
+
+        async function loadDashboardStats() {
+            try {
+                const response = await fetch('@Url.Action("GetDashboardStats", "PharmacistDashboard")');
+                const data = await response.json();
+
+                if (data.success) {
+                    renderCharts(data);
+                }
+            } catch (error) {
+                console.error('Error loading dashboard stats:', error);
+            }
+        }
+
+        async function loadRecentActivity() {
+            try {
+                const response = await fetch('@Url.Action("GetRecentActivity", "PharmacistDashboard")');
+                const data = await response.json();
+
+                if (data.success) {
+                    renderActivityFeed(data.activity);
+                }
+            } catch (error) {
+                console.error('Error loading recent activity:', error);
+            }
+        }
+
+        function renderCharts(data) {
+            // Orders by Status Chart
+            const ordersCtx = document.getElementById('ordersChart').getContext('2d');
+            new Chart(ordersCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: data.ordersByStatus.map(item => item.Status),
+                    datasets: [{
+                        data: data.ordersByStatus.map(item => item.Count),
+                        backgroundColor: [
+                            '#e74c3c', // Pending
+                            '#27ae60', // Ready for Collection
+                            '#f39c12', // Collected
+                            '#3498db'  // Other
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderActivityFeed(activities) {
+            const activityFeed = document.getElementById('activityFeed');
+
+            if (!activities || activities.length === 0) {
+                activityFeed.innerHTML = '<p style="text-align: center; color: #666; padding: 20px;">No recent activity</p>';
+                return;
+            }
+
+            let html = '';
+            activities.forEach(activity => {
+                const typeClass = activity.Type.toLowerCase();
+                const icon = typeClass === 'order' ? '📦' : '📋';
+                const date = new Date(activity.Date).toLocaleDateString() + ' ' + new Date(activity.Date).toLocaleTimeString();
+
+                html += `
+                    <div class="activity-item ${typeClass}">
+                        <div class="activity-type">${icon} ${activity.Type}</div>
+                        <div>${activity.Description}</div>
+                        <div class="activity-date">${date}</div>
+                        <small>Status: ${activity.Status}</small>
+                    </div>
+                `;
+            });
+
+            activityFeed.innerHTML = html;
+        }
+
+        // Auto-refresh every 2 minutes
+        setInterval(() => {
+            loadDashboardStats();
+            loadRecentActivity();
+        }, 120000);
+    </script>
+</body>
+</html>

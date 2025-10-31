@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace IbhayiPharmacy.Migrations
 {
     /// <inheritdoc />
-    public partial class NewDB : Migration
+    public partial class ThisOne : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -648,8 +648,8 @@ namespace IbhayiPharmacy.Migrations
                     { 8, "Alveclear" },
                     { 9, "Epidraxol" },
                     { 10, "Cortizane" },
-                    { 11, "Glycerrol" },
-                    { 12, "Sonnexil" },
+                    { 11, "Glycetrol" },
+                    { 12, "Somnexil" },
                     { 13, "Calcitrine" },
                     { 14, "Phospholax" },
                     { 15, "Virocelin" },
@@ -668,6 +668,47 @@ namespace IbhayiPharmacy.Migrations
                     { 28, "Myvetrin" },
                     { 29, "Draxolene" },
                     { 30, "Veltraxin" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "AspNetRoles",
+                columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
+                values: new object[,]
+                {
+                    { "role-customer", null, "Customer", "CUSTOMER" },
+                    { "role-manager", null, "Pharmacy Manager", "PHARMACY MANAGER" },
+                    { "role-pharmacist", null, "Pharmacist", "PHARMACIST" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "AspNetUsers",
+                columns: new[] { "Id", "AccessFailedCount", "Active_IngredientID", "CellphoneNumber", "ConcurrencyStamp", "Discriminator", "Email", "EmailConfirmed", "IDNumber", "LockoutEnabled", "LockoutEnd", "Name", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "Surname", "TwoFactorEnabled", "UserName" },
+                values: new object[,]
+                {
+                    { "customer-1", 0, null, "082 345 6789", "052d572b-93a4-49ae-bcc0-0e19494e57fc", "ApplicationUser", "thabo.mokoena@example.com", true, "8805125123087", false, null, "Thabo", "THABO.MOKOENA@EXAMPLE.COM", "THABO.MOKOENA@EXAMPLE.COM", "AQAAAAIAAYagAAAAEIviiuA+LTDA0jrUT8VV7hQljBafjDsW62py9AQ5M2xBjlb0tYHvur6nopryPMQ1bA==", null, false, "b6c18fe8-715c-4086-8f4c-513d5784da11", "Mokoena", false, "thabo.mokoena@example.com" },
+                    { "customer-10", 0, null, "073 456 7890", "a92fb0e1-c0fb-47c9-8478-00dec85b074a", "ApplicationUser", "michelle.pretorius@example.com", true, "8508232023088", false, null, "Michelle", "MICHELLE.PRETORIUS@EXAMPLE.COM", "MICHELLE.PRETORIUS@EXAMPLE.COM", "AQAAAAIAAYagAAAAEH2S27GWkc9AyyhF4Y+H3khEb5lXlhLgSGAWSW8xZ9UHkIc439fbrj8nCzLMCbUPsg==", null, false, "7dd48ef1-7012-4a06-944e-a80fba50a38f", "Pretorius", false, "michelle.pretorius@example.com" },
+                    { "customer-11", 0, null, "082 987 6543", "b74e3fc8-20e6-4f65-b7b6-8ed30874f28d", "ApplicationUser", "vusi.zulu@example.com", true, "8803115123089", false, null, "Vusi", "VUSI.ZULU@EXAMPLE.COM", "VUSI.ZULU@EXAMPLE.COM", "AQAAAAIAAYagAAAAENBecj5oioz/pqrZLGgpEmCulexDARYBusjTcjhBeV0Bl8btaZ48XaO5JP8N28Q9nw==", null, false, "459bea80-7861-4b15-aedf-9ce71e06363f", "Zulu", false, "vusi.zulu@example.com" },
+                    { "customer-12", 0, null, "079 123 4567", "b4e23be7-d04d-4fa0-865a-0722aaaadbcf", "ApplicationUser", "aisha.jacobs@example.com", true, "9909020323082", false, null, "Aisha", "AISHA.JACOBS@EXAMPLE.COM", "AISHA.JACOBS@EXAMPLE.COM", "AQAAAAIAAYagAAAAEH3YdCGxhVzdMb4aNDX3OCpp/PpayP7ce9lqaRO1p7B2T9PH6wiceBEAkuDx5+omvQ==", null, false, "ae394ae8-62a5-49a4-9a1f-5c8886d58497", "Jacobs", false, "aisha.jacobs@example.com" },
+                    { "customer-13", 0, null, "074 567 8901", "7c38a9e4-6222-4fca-8983-9224c745facf", "ApplicationUser", "johan.deklerk@example.com", true, "8702054023087", false, null, "Johan", "JOHAN.DEKLERK@EXAMPLE.COM", "JOHAN.DEKLERK@EXAMPLE.COM", "AQAAAAIAAYagAAAAEDjE8tDkQxfMa7z3/W4j6de/jHikpCp1/+8iJH/e4vRFD9DUxvFf59zURjmwaWQFVA==", null, false, "0a2605b6-1e58-4b3e-aee7-0ad46b07c282", "de Klerk", false, "johan.deklerk@example.com" },
+                    { "customer-14", 0, null, "078 987 6543", "70c65b58-3c1d-478c-8774-a022c0a9d623", "ApplicationUser", "thandiwe.sithole@example.com", true, "9306203123086", false, null, "Thandiwe", "THANDIWE.SITHOLE@EXAMPLE.COM", "THANDIWE.SITHOLE@EXAMPLE.COM", "AQAAAAIAAYagAAAAEFO2CJ43klmpB5ctbuxPwUhKVHqSPQxMJ50Yj4EJNFlF4pNpVkeNbkY1yHwgzGPUjQ==", null, false, "d5cb6c0d-f7c2-43b8-bc6b-bc7b6ae74f36", "Sithole", false, "thandiwe.sithole@example.com" },
+                    { "customer-15", 0, null, "071 345 6789", "1aefab9c-3c84-439c-ad1f-1bd2966c492b", "ApplicationUser", "riaan.vw@example.com", true, "8108305023081", false, null, "Riaan", "RIAAN.VW@EXAMPLE.COM", "RIAAN.VW@EXAMPLE.COM", "AQAAAAIAAYagAAAAEFieQ/13S22DRMii8IPq19GSXpLz0Aedfgl9lPCo6cgWNH6a/uo6a/RjvIEmjUFDvw==", null, false, "aee01418-35fc-430c-8a94-f6b6fea266fa", "van Wyk", false, "riaan.vw@example.com" },
+                    { "customer-16", 0, null, "083 234 5678", "e815ed75-b714-47ed-a947-12b6da711b0e", "ApplicationUser", "palesa.molefe@example.com", true, "9501151023084", false, null, "Palesa", "PALESA.MOLEFE@EXAMPLE.COM", "PALESA.MOLEFE@EXAMPLE.COM", "AQAAAAIAAYagAAAAEH8RArku0Xj6F7ZYOCdFaeGwVkCEVteiFw7pbiaClv/nKQE5bFpRIo1nbCVD+Y2QlQ==", null, false, "86a8e031-e80a-43ac-893e-47358afc0aad", "Molefe", false, "palesa.molefe@example.com" },
+                    { "customer-17", 0, null, "072 987 1234", "4e11d66c-ebb8-4460-aacb-5ab23a8c65af", "ApplicationUser", "kobus.smit@example.com", true, "7909094023083", false, null, "Kobus", "KOBUS.SMIT@EXAMPLE.COM", "KOBUS.SMIT@EXAMPLE.COM", "AQAAAAIAAYagAAAAEAFBFN4uAEm7BiPnBgf+qRG1l4BXw0SCTB3O6efX37Fbd2/s7d+TJnNtFILPTDvhqw==", null, false, "fbe18bb7-3633-416c-8f98-f052017f00e5", "Smit", false, "kobus.smit@example.com" },
+                    { "customer-18", 0, null, "079 456 7890", "e5e07a4b-7af2-4115-a71c-c99c201938d9", "ApplicationUser", "zanele.mthembu@example.com", true, "9604232123085", false, null, "Zanele", "ZANELE.MTHEMBU@EXAMPLE.COM", "ZANELE.MTHEMBU@EXAMPLE.COM", "AQAAAAIAAYagAAAAEFFQ7wy/5VZxKK7u4kGYfRRk/rzKvqi8ZktCwhti96zyl9JxjoWPyggm1B7VsFLKmQ==", null, false, "cdf83dac-6d34-41e4-9dde-f572f5f86990", "Mthembu", false, "zanele.mthembu@example.com" },
+                    { "customer-19", 0, null, "074 123 4567", "c32323e4-487c-423f-984b-1ddb13d1ee82", "ApplicationUser", "annelise@example.com", true, "8407125023080", false, null, "Annelise", "ANNELISE@EXAMPLE.COM", "ANNELISE@EXAMPLE.COM", "AQAAAAIAAYagAAAAEH+4btonsZLghzX88tmnJlScUbaEbgS7My1ics5zsbiOzZ5RdL4Kn+QVchjZWm2edA==", null, false, "e714ee6b-891f-406d-951a-57934e13b4f4", "Botha", false, "annelise@example.com" },
+                    { "customer-2", 0, null, "083 567 8910", "95677a98-db7b-48ad-b5c6-866eede59d2a", "ApplicationUser", "lerato.khumalo@example.com", true, "9503140321089", false, null, "Lerato", "LERATO.KHUMALO@EXAMPLE.COM", "LERATO.KHUMALO@EXAMPLE.COM", "AQAAAAIAAYagAAAAENRh8hF1J4MQ50BrLCfa5sxH/4r8zxWdqKpg9Cyf/ngcto+s6nUlCgB0H4jvJEoIXg==", null, false, "f8dd97f7-59dd-4549-97c8-18db91abcb29", "Khumalo", false, "lerato.khumalo@example.com" },
+                    { "customer-20", 0, null, "081 567 8901", "334eb0c0-11f3-44ec-9aaf-5fcd8be58482", "ApplicationUser", "nomsa.ndlovu@example.com", true, "9703280123088", false, null, "Nomsa", "NOMSA.NDLOVU@EXAMPLE.COM", "NOMSA.NDLOVU@EXAMPLE.COM", "AQAAAAIAAYagAAAAEJtJEB9CPWFgLS5nQgB+8cSEUjHvsgKIE+Kw5LsOxvdkHqkYDYKvphriV1GUwoNINw==", null, false, "1222c2b7-acba-4503-9f7f-1a9a35a02c29", "Ndlovu", false, "nomsa.ndlovu@example.com" },
+                    { "customer-3", 0, null, "084 123 4567", "6e2613dd-7fe8-4eb6-9215-82094af2a2d0", "ApplicationUser", "sipho.dlamini@example.com", true, "7902106123081", false, null, "Sipho", "SIPHO.DLAMINI@EXAMPLE.COM", "SIPHO.DLAMINI@EXAMPLE.COM", "AQAAAAIAAYagAAAAEOe2QbT5j38x6vPdkkxzdVZefV8K2b+6AhG3d7oH7u7m5HshFWX8znq6A0H/d+9MuQ==", null, false, "2e075ba1-7c48-4775-8349-35707bc8c7a9", "Dlamini", false, "sipho.dlamini@example.com" },
+                    { "customer-4", 0, null, "081 234 9876", "8691ebe5-ff93-4f8d-be9f-362233c3b2be", "ApplicationUser", "naledi.maseko@example.com", true, "9107280023085", false, null, "Naledi", "NALEDI.MASEKO@EXAMPLE.COM", "NALEDI.MASEKO@EXAMPLE.COM", "AQAAAAIAAYagAAAAEI9l+XMTldqxwKw59hEaXALMBH6nhRbBtBHERM4oCQqkOA+PQBOxi3eh5cPVO6T9Xw==", null, false, "46c3a4de-a21b-4185-ad4b-b7a5585f0348", "Maseko", false, "naledi.maseko@example.com" },
+                    { "customer-5", 0, null, "072 345 1234", "ad355f78-bf81-43e3-bc8f-afde3269c127", "ApplicationUser", "pieter.vdm@example.com", true, "8306195023082", false, null, "Pieter", "PIETER.VDM@EXAMPLE.COM", "PIETER.VDM@EXAMPLE.COM", "AQAAAAIAAYagAAAAEPujAw6PzpCwXE0t401cTfsLh1wdXHjingrlLRg/1TohaZ8WgLjrmEmkKLqTePUBgA==", null, false, "6c06187b-eefd-4f09-affb-ea57d0c5eb26", "van der Merwe", false, "pieter.vdm@example.com" },
+                    { "customer-6", 0, null, "079 876 5432", "deeb7888-f494-465c-b0b6-d42f2dca801e", "ApplicationUser", "karabo.nkosi@example.com", true, "9701063123084", false, null, "Karabo", "KARABO.NKOSI@EXAMPLE.COM", "KARABO.NKOSI@EXAMPLE.COM", "AQAAAAIAAYagAAAAEHUZ+hbvXI6WG/mfb5Z1wozoTVAYDl/uKMPUYTYz/8A7jcbub5dCrd+E3uD9aEFy2Q==", null, false, "c05b0ffd-293e-482f-a00c-4a9421bdbe09", "Nkosi", false, "karabo.nkosi@example.com" },
+                    { "customer-7", 0, null, "078 234 5678", "02257b13-eb78-4097-8caa-5919b0d77ce6", "ApplicationUser", "annelise.botha@example.com", true, "8609031023086", false, null, "Annelise", "ANNELISE.BOTHA@EXAMPLE.COM", "ANNELISE.BOTHA@EXAMPLE.COM", "AQAAAAIAAYagAAAAEEtc+UWUzLg7dqiJY72z1NypTFmb2zfe2lXM2xm71xgO/L/J2RyQoJn7X8EZ+SCrTw==", null, false, "a85b22b0-9761-4797-81e4-fae14c3eb059", "Botha", false, "annelise.botha@example.com" },
+                    { "customer-8", 0, null, "084 567 8901", "3523ad50-ffaa-404d-bbd9-14938ffc1d4d", "ApplicationUser", "kagiso.motloung@example.com", true, "0005016123080", false, null, "Kagiso", "KAGISO.MOTLOUNG@EXAMPLE.COM", "KAGISO.MOTLOUNG@EXAMPLE.COM", "AQAAAAIAAYagAAAAELISodxlR06IcDrLWfOxgcBGdvRsJ+kUN5ME42H43EhQWZ/sond2xNf9G5DHuEKsdQ==", null, false, "147efb10-5887-4212-8834-a585986fcd26", "Motloung", false, "kagiso.motloung@example.com" },
+                    { "customer-9", 0, null, "071 234 8901", "bf718971-7188-4714-ab07-fd4a7b5ccc30", "ApplicationUser", "sibusiso.gumede@example.com", true, "9204174123083", false, null, "Sibusiso", "SIBUSISO.GUMEDE@EXAMPLE.COM", "SIBUSISO.GUMEDE@EXAMPLE.COM", "AQAAAAIAAYagAAAAEGLn1jnJOywjz1O3ZziYzeKAi2oSas8ETPuzUYvpWrBdg+uFiQSpmyVwLN+mF5Rtxg==", null, false, "dd6cf372-de39-4ee9-ba42-7c3b93e96ec3", "Gumede", false, "sibusiso.gumede@example.com" },
+                    { "manager-1", 0, null, "082 289 4758", "5cc20415-699b-4936-b56f-cfc24e7e6f13", "ApplicationUser", "john.doe@example.com", true, "1234567890126", false, null, "John", "JOHN.DOE@EXAMPLE.COM", "JOHN.DOE@EXAMPLE.COM", "AQAAAAIAAYagAAAAEPNuprJYWnTzq8b3QfZEXyo2yOVcrh4xSTgivm+z3RtWpQzXIUSHO3x7tGhIdYUrhg==", null, false, "04858c77-2a87-4a5d-8f8e-22448901e27e", "Doe", false, "john.doe@example.com" },
+                    { "pharmacist-1", 0, null, "061 2345 678", "844ed146-3c41-416a-be10-c529c074ca2f", "ApplicationUser", "lindile@example.com", true, "1234567890123", false, null, "Lindile", "LINDILE@EXAMPLE.COM", "LINDILE@EXAMPLE.COM", "AQAAAAIAAYagAAAAECkSLyKsqsZbeB2bXmpG2HUntCBOK6pcn3LZN69W6PdzwE1sNq6FCzfHQ12UH0cNkA==", null, false, "f428ccf8-e43f-42ea-bb4b-ffb8d9c48a68", "Hadebe", false, "lindile@example.com" },
+                    { "pharmacist-2", 0, null, "062 2345 678", "e5f57adb-b6f5-4168-af98-4c99896750ef", "ApplicationUser", "dorothy@example.com", true, "1234567890124", false, null, "Dorothy", "DOROTHY@EXAMPLE.COM", "DOROTHY@EXAMPLE.COM", "AQAAAAIAAYagAAAAEIil4+6nzRAi/7kDC5NMiHxmhgiGelshZeHIN1kUPFEaOUoYbKAQagNsQKVRdJlnSQ==", null, false, "377f7d0e-1563-4ce4-ad2a-1596c5dbbf7e", "Daniels", false, "dorothy@example.com" },
+                    { "pharmacist-3", 0, null, "063 2345 678", "0b3111db-8b45-4290-9de1-c5ed33a1e9c0", "ApplicationUser", "marcel@example.com", true, "1234567890125", false, null, "Marcel", "MARCEL@EXAMPLE.COM", "MARCEL@EXAMPLE.COM", "AQAAAAIAAYagAAAAEIlNxliCPciDG4eDm1P0Q8UuCb4JjQRn4+j6Y9WzbSj6IVEFojY3ZdtJCOuhl8RJJg==", null, false, "323b63f7-5dd5-446a-b157-9e8ee40f2ab0", "Van Niekerk", false, "marcel@example.com" }
                 });
 
             migrationBuilder.InsertData(
@@ -716,25 +757,111 @@ namespace IbhayiPharmacy.Migrations
                 });
 
             migrationBuilder.InsertData(
+                table: "AspNetUserRoles",
+                columns: new[] { "RoleId", "UserId" },
+                values: new object[,]
+                {
+                    { "role-customer", "customer-1" },
+                    { "role-customer", "customer-10" },
+                    { "role-customer", "customer-11" },
+                    { "role-customer", "customer-12" },
+                    { "role-customer", "customer-13" },
+                    { "role-customer", "customer-14" },
+                    { "role-customer", "customer-15" },
+                    { "role-customer", "customer-16" },
+                    { "role-customer", "customer-17" },
+                    { "role-customer", "customer-18" },
+                    { "role-customer", "customer-19" },
+                    { "role-customer", "customer-2" },
+                    { "role-customer", "customer-20" },
+                    { "role-customer", "customer-3" },
+                    { "role-customer", "customer-4" },
+                    { "role-customer", "customer-5" },
+                    { "role-customer", "customer-6" },
+                    { "role-customer", "customer-7" },
+                    { "role-customer", "customer-8" },
+                    { "role-customer", "customer-9" },
+                    { "role-manager", "manager-1" },
+                    { "role-pharmacist", "pharmacist-1" },
+                    { "role-pharmacist", "pharmacist-2" },
+                    { "role-pharmacist", "pharmacist-3" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Customers",
+                columns: new[] { "CustormerID", "ApplicationUserId" },
+                values: new object[,]
+                {
+                    { 1, "customer-1" },
+                    { 2, "customer-2" },
+                    { 3, "customer-3" },
+                    { 4, "customer-4" },
+                    { 5, "customer-5" },
+                    { 6, "customer-6" },
+                    { 7, "customer-7" },
+                    { 8, "customer-8" },
+                    { 9, "customer-9" },
+                    { 10, "customer-10" },
+                    { 11, "customer-11" },
+                    { 12, "customer-12" },
+                    { 13, "customer-13" },
+                    { 14, "customer-14" },
+                    { 15, "customer-15" },
+                    { 16, "customer-16" },
+                    { 17, "customer-17" },
+                    { 18, "customer-18" },
+                    { 19, "customer-19" },
+                    { 20, "customer-20" }
+                });
+
+            migrationBuilder.InsertData(
                 table: "Medications",
                 columns: new[] { "MedcationID", "CurrentPrice", "DosageFormID", "MedicationName", "QuantityOnHand", "ReOrderLevel", "Schedule", "SupplierID" },
                 values: new object[,]
                 {
-                    { 1, 150, 1, "CardioVex", 90, 100, "6", 1 },
-                    { 2, 200, 1, "Neurocalm", 100, 110, "2", 2 },
-                    { 3, 180, 12, "Allerfree Duo", 100, 150, "0", 3 },
-                    { 4, 95, 1, "GastroEase", 470, 400, "3", 4 },
-                    { 5, 120, 1, "Respivent", 490, 300, "3", 5 },
-                    { 6, 85, 1, "Dermagard", 790, 600, "3", 2 },
-                    { 7, 210, 1, "Metaborex", 250, 200, "4", 2 },
-                    { 8, 175, 1, "Sleeptraze", 110, 100, "2", 2 },
-                    { 9, 300, 3, "OsteoFlex", 210, 200, "3", 2 },
-                    { 10, 450, 9, "Immunexin", 190, 200, "6", 2 },
-                    { 11, 600, 11, "CardioPlus", 600, 500, "6", 2 },
-                    { 12, 350, 11, "AllerCalm", 410, 400, "6", 2 },
-                    { 13, 280, 9, "RespirAid", 100, 100, "6", 2 },
-                    { 14, 125, 5, "DermaClear", 200, 100, "6", 2 },
-                    { 15, 190, 2, "OsteoPrime", 400, 100, "6", 2 }
+                    { 1, 2999, 1, "CardioVex", 90, 100, "6", 1 },
+                    { 2, 1550, 1, "Neurocalm", 100, 110, "2", 2 },
+                    { 3, 799, 12, "Allerfree Duo", 100, 150, "0", 3 },
+                    { 4, 1999, 1, "GastroEase", 470, 400, "3", 4 },
+                    { 5, 1000, 1, "Respivent", 490, 300, "3", 5 },
+                    { 6, 5150, 1, "Dermagard", 790, 600, "3", 2 },
+                    { 7, 3699, 1, "Metaborex", 250, 200, "4", 2 },
+                    { 8, 1990, 1, "Sleeptraze", 110, 100, "2", 2 },
+                    { 9, 2350, 3, "OsteoFlex", 210, 200, "3", 2 },
+                    { 10, 6799, 9, "Immunexin", 190, 200, "6", 2 },
+                    { 11, 4450, 11, "CardioPlus", 600, 500, "6", 2 },
+                    { 12, 3499, 11, "AllerCalm", 410, 400, "6", 2 },
+                    { 13, 4150, 9, "RespirAid", 100, 100, "6", 2 },
+                    { 14, 6799, 5, "DermaClear", 200, 100, "6", 2 },
+                    { 15, 1999, 2, "OsteoPrime", 400, 100, "6", 2 }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Pharmacists",
+                columns: new[] { "PharmacistID", "ApplicationUserId", "HealthCouncilRegNo" },
+                values: new object[,]
+                {
+                    { 1, "pharmacist-1", "123456" },
+                    { 2, "pharmacist-2", "234567" },
+                    { 3, "pharmacist-3", "345678" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "PharmacyManagers",
+                columns: new[] { "PharmacyManagerID", "ApplicationUserId", "HealthCouncilRegNo" },
+                values: new object[] { 1, "manager-1", "134679" });
+
+            migrationBuilder.InsertData(
+                table: "Custormer_Allergies",
+                columns: new[] { "Custormer_AllergyID", "Active_IngredientID", "CustomerID" },
+                values: new object[,]
+                {
+                    { 1, 11, 2 },
+                    { 2, 19, 7 },
+                    { 3, 28, 7 },
+                    { 4, 30, 7 },
+                    { 5, 14, 12 },
+                    { 6, 6, 12 }
                 });
 
             migrationBuilder.InsertData(
@@ -747,21 +874,21 @@ namespace IbhayiPharmacy.Migrations
                     { 3, 3, 2, "50mg" },
                     { 4, 4, 3, "325mg" },
                     { 5, 5, 3, "453.6g" },
-                    { 6, 1, 4, "Standard" },
-                    { 7, 7, 5, "Standard" },
-                    { 8, 8, 5, "Standard" },
-                    { 9, 9, 6, "Standard" },
-                    { 10, 10, 6, "Standard" },
-                    { 11, 11, 7, "Standard" },
-                    { 12, 12, 8, "Standard" },
-                    { 13, 13, 9, "Standard" },
-                    { 14, 14, 9, "Standard" },
-                    { 15, 15, 10, "Standard" },
-                    { 16, 16, 10, "Standard" },
-                    { 17, 13, 11, "Standard" },
-                    { 18, 6, 11, "Standard" },
-                    { 19, 4, 12, "Standard" },
-                    { 20, 7, 13, "Standard" },
+                    { 6, 1, 4, "5mg" },
+                    { 7, 7, 5, "100mg" },
+                    { 8, 8, 5, "25mg" },
+                    { 9, 9, 6, "1mg" },
+                    { 10, 10, 6, "2mg" },
+                    { 11, 11, 7, "10mg" },
+                    { 12, 12, 8, "45mg" },
+                    { 13, 13, 9, "200mg" },
+                    { 14, 14, 9, "250mg" },
+                    { 15, 15, 10, "20mg" },
+                    { 16, 16, 10, "30mg" },
+                    { 17, 13, 11, "50mg" },
+                    { 18, 6, 11, "30mg" },
+                    { 19, 4, 12, "50mg" },
+                    { 20, 7, 13, "20mg" },
                     { 21, 9, 14, "20mg" },
                     { 22, 13, 15, "20mg" }
                 });

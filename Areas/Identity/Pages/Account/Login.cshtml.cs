@@ -129,7 +129,7 @@ namespace IbhayiPharmacy.Areas.Identity.Pages.Account
                         }
                         else if (await _userManager.IsInRoleAsync(user, "Pharmacist"))
                         {
-                            return RedirectToAction("Index", "PharmacistDispensing");
+                            return RedirectToAction("Index", "PharmacistDashboard");
                         }
                         else if (await _userManager.IsInRoleAsync(user, "Pharmacy Manager"))
                         {

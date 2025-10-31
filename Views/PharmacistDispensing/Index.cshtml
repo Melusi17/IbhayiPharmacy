@@ -503,8 +503,8 @@
             <small style="color: #bdc3c7;">Dedicated Dictionary</small>
         </div>
         <nav class="sidebar-nav">
-            <a asp-controller="Pharmacy" asp-action="Index"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
-            <a asp-controller="WalkInPrescription" asp-action="Create" class="active"><i class="fas fa-tachometer-alt"></i> Walk In Prescription</a>
+            <a asp-controller="PharmacistDashboard" asp-action="Index" class="active"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <a asp-controller="WalkInPrescription" asp-action="Create"><i class="fas fa-tachometer-alt"></i> Walk In Prescription</a>
             <a asp-controller="PharmacistDispensing" asp-action="Index"><i class="fas fa-clipboard-list"></i> Orders</a>
             <a asp-controller="ScriptsProcessed" asp-action="Index"><i class="fas fa-file-prescription"></i> Unprocessed Scripts</a>
             <a asp-controller="ScriptsProcessed" asp-action="ProcessedScripts"><i class="fas fa-boxes"></i> Processed Scripts</a>
@@ -765,6 +765,9 @@
                     // Only show action button for orders that can be processed
                     const canProcess = order.status === 'Ordered';
 
+                    // Generate the URL using server-side URL helper
+                    const processOrderUrl = '@Url.Action("DispenseOrder", "PharmacistDispensing")' + '/' + order.orderId;
+
                     row.innerHTML = `
                         <td class="order-number">
                             <i class="fas fa-receipt"></i> ${order.orderNumber || 'N/A'}
@@ -779,7 +782,7 @@
                         <td>
                             <div class="action-buttons">
                                 ${canProcess ? `
-                                    <a href="/PharmacistDispensing/DispenseOrder/${order.orderId}" class="btn btn-dispensary">
+                                    <a href="${processOrderUrl}" class="btn btn-dispensary">
                                         <i class="fas fa-clinic-medical"></i> Process Order
                                     </a>
                                 ` : `
