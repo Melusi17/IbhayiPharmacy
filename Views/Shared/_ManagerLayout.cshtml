@@ -195,7 +195,9 @@
         <span><b>Pharmacy Manager</b></span>
         <div>
             Welcome,
-            <strong>@User.Identity?.Name</strong>
+            <a asp-controller="PharmacyManager" asp-action="EditProfile">
+                <strong>@User.Identity?.Name</strong>
+            </a>
         </div>
     </div>
 

@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Identity;
 
 namespace IbhayiPharmacy.Models.PharmacyManagerVM
 {
@@ -14,7 +15,28 @@ namespace IbhayiPharmacy.Models.PharmacyManagerVM
         public virtual Medication Medication { get; set; }
 
     }
+    public class ManagerProfile
+    {
+        [Key]
+        public int ProfileID { get; set; }
 
+        [Required]
+        public string UserId { get; set; } // FK to IdentityUser.Id
+
+        [ForeignKey("UserId")]
+        public IdentityUser User { get; set; }
+
+        [Required]
+        public string Name { get; set; }
+
+        [Required]
+        public string Surname { get; set; }
+
+        [Required]
+        public string IDNumber { get; set; }
+
+        public string? CellphoneNumber { get; set; }
+    }
     public class SmtpSettings
     {
         public string Host { get; set; }

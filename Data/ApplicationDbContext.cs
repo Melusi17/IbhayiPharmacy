@@ -1,4 +1,5 @@
 ﻿using IbhayiPharmacy.Models;
+using IbhayiPharmacy.Models.PharmacyManagerVM;
 using IbhayiPharmacy.Utility;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -38,7 +39,7 @@ namespace IbhayiPharmacy.Data
         public DbSet<StockOrder> StockOrders { get; set; }
         public DbSet<StockOrderDetail> StockOrderDetails { get; set; }
         public DbSet<ScriptLine> ScriptLines { get; set; }
-
+        public DbSet<ManagerProfile> ManagerProfiles { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

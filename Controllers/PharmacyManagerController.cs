@@ -37,6 +37,49 @@ namespace IbhayiPharmacy.Controllers
         {
             return View();
         }
+        [HttpGet]
+        public async Task<IActionResult> EditProfile()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return RedirectToAction("Login", "Account");
+
+            var profile = _db.ManagerProfiles.FirstOrDefault(p => p.UserId == user.Id);
+            if (profile == null)
+            {
+                // If no profile exists, create one
+                profile = new ManagerProfile { UserId = user.Id };
+                _db.ManagerProfiles.Add(profile);
+                _db.SaveChanges();
+            }
+
+            return View(profile);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditProfile(ManagerProfile model)
+        {
+            if (!ModelState.IsValid) return View(model);
+
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return RedirectToAction("Login", "Account");
+
+            var profile = _db.ManagerProfiles.FirstOrDefault(p => p.UserId == user.Id);
+            if (profile == null) return NotFound();
+
+            profile.Name = model.Name;
+            profile.Surname = model.Surname;
+            profile.IDNumber = model.IDNumber;
+            profile.CellphoneNumber = model.CellphoneNumber;
+
+            _db.SaveChanges();
+            TempData["SuccessMessage"] = "Profile updated successfully.";
+
+            return RedirectToAction("Dashboard", "PharmacyManager");
+        }
+
+
+
         public IActionResult PharmacyInfo()
         {
             var pharmacies = _db.Pharmacies
@@ -621,7 +664,7 @@ namespace IbhayiPharmacy.Controllers
 
 
             var supplier = _db.Suppliers
-        .FirstOrDefault(s => s.SupplierID == order.StockOrder.SupplierID);
+            .FirstOrDefault(s => s.SupplierID == order.StockOrder.SupplierID);
 
             if (supplier != null && !string.IsNullOrEmpty(supplier.EmailAddress))
             {
