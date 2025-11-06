@@ -155,6 +155,30 @@ namespace IbhayiPharmacy.Controllers
 
             return View(active);
         }
+        // GET: Confirm Delete
+        public IActionResult DeleteActiveIngredient(int id)
+        {
+            var ingredient = _db.Active_Ingredients.FirstOrDefault(a => a.Active_IngredientID == id);
+            if (ingredient == null)
+                return NotFound();
+
+            return View(ingredient);
+        }
+
+        // POST: Perform Delete
+        [HttpPost, ActionName("DeleteActiveIngredient")]
+        [ValidateAntiForgeryToken]
+        public IActionResult DeleteConfirmed(int id)
+        {
+            var ingredient = _db.Active_Ingredients.FirstOrDefault(a => a.Active_IngredientID == id);
+            if (ingredient == null)
+                return NotFound();
+
+            _db.Active_Ingredients.Remove(ingredient);
+            _db.SaveChanges();
+
+            return RedirectToAction("ActiveIngredients");
+        }
 
 
 
@@ -183,6 +207,32 @@ namespace IbhayiPharmacy.Controllers
             }
             return View(form);
         }
+
+        // GET: Confirm Delete
+        public IActionResult DeleteDosageForm(int id)
+        {
+            var form = _db.DosageForms.FirstOrDefault(f => f.DosageFormID == id);
+            if (form == null)
+                return NotFound();
+
+            return View(form);
+        }
+
+        // POST: Perform Delete
+        [HttpPost, ActionName("DeleteDosageForm")]
+        [ValidateAntiForgeryToken]
+        public IActionResult DeleteDosageConfirmed(int id)
+        {
+            var form = _db.DosageForms.FirstOrDefault(f => f.DosageFormID == id);
+            if (form == null)
+                return NotFound();
+
+            _db.DosageForms.Remove(form);
+            _db.SaveChanges();
+
+            return RedirectToAction("DosageForms");
+        }
+
 
 
 
@@ -599,6 +649,7 @@ namespace IbhayiPharmacy.Controllers
             _db.SaveChanges();
             return RedirectToAction("StockManagement");
         }
+
 
 
 

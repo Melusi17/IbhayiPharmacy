@@ -219,12 +219,14 @@
 
         <button class=" sidebar-item dropdown-btn">Medication <img style="height:10px;" src="~/css/img/Manager_img/arrow-down-sign-to-navigate.png" /></span></button>
         <div class="dropdown-container">
+            <a asp-controller="PharmacyManager" asp-action="AddSuppliers">Add Suppliers</a>
             <a asp-controller="PharmacyManager" asp-action="AddActiveIngredients">Add Active indredients</a>
             <a asp-controller="PharmacyManager" asp-action="AddDosageForms">Add Dosage Form</a>
             <a asp-controller="PharmacyManager" asp-action="AddMedication">Add Medication</a>
         </div>
         <button class=" sidebar-item dropdown-btn">Stock & Orders <img style="height:10px;" src="~/css/img/Manager_img/arrow-down-sign-to-navigate.png" /></span></button>
         <div class="dropdown-container">
+
             <a asp-controller="PharmacyManager" asp-action="Orders">Order Medication</a>
             <a asp-controller="PharmacyManager" asp-action="StockManagement">Manage Stock</a>
 

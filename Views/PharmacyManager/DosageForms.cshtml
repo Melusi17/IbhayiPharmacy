@@ -4,12 +4,11 @@
     ViewData["Title"] = "Dosage Forms";
     Layout = "~/Views/Shared/_ManagerLayout.cshtml";
 }
-
+<a asp-action="AddDosageForms" class="btn btn-sm btn-success">+ Add New Form</a>
 <div class="container mt-4">
     <div class="card p-3">
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h5 class="title-underline">Existing Dosage Forms</h5>
-            <a asp-action="AddDosageForms" class="btn btn-sm btn-success">+ Add New Form</a>
         </div>
 
         <div class="card-body">

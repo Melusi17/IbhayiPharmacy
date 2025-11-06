@@ -1,0 +1,23 @@
+﻿@model IbhayiPharmacy.Models.DosageForm
+
+@{
+    ViewData["Title"] = "Delete Dosage Form";
+    Layout = "~/Views/Shared/_ManagerLayout.cshtml";
+}
+
+<div class="container mt-4">
+    <div class="card p-4 shadow-sm">
+        <h5 class="title-underline text-danger mb-3">Delete Dosage Form</h5>
+        <p>Are you sure you want to delete the dosage form:</p>
+
+        <div class="alert alert-warning">
+            <strong>@Model.DosageFormName</strong>
+        </div>
+
+        <form asp-action="DeleteDosageConfirmed" method="post">
+            <input type="hidden" name="id" value="@Model.DosageFormID" />
+            <button type="submit" class="btn btn-danger">Yes, Delete</button>
+            <a asp-action="DosageForms" class="btn btn-secondary ms-2">Cancel</a>
+        </form>
+    </div>
+</div>

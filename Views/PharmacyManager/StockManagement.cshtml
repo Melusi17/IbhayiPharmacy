@@ -6,13 +6,11 @@
 }
 
 <div class="container">
-    <!-- Search / Header -->
     <div class="card p-3 mb-4">
         <h5 class="title-underline">Stock Management</h5>
         <input type="text" class="form-control" placeholder="Search medication...">
     </div>
 
-    <!-- Stock Table -->
     <div class="card p-3">
         <h6 class="title-underline">Medication Stock Levels</h6>
 
@@ -36,16 +34,13 @@
                         <td>@med.DosageForm?.DosageFormName</td>
                         <td>@med.QuantityOnHand</td>
                         <td>@med.ReOrderLevel</td>
-                        <td style="width: 120px;">
-                            <input type="number" class="form-control form-control-sm" name="NewStock_@med.MedcationID" placeholder="e.g. 150">
-                        </td>
-                        <td style="width: 120px;">
-                            <input type="number" class="form-control form-control-sm" name="Increment_@med.MedcationID" placeholder="e.g. 20">
-                        </td>
-                        <td>
-                            <form asp-action="UpdateStock" method="post" class="d-inline">
+                        <td colspan="3">
+                            <form asp-action="UpdateStock" method="post" class="d-flex align-items-center gap-2">
                                 <input type="hidden" name="id" value="@med.MedcationID" />
-                                <input type="hidden" name="newStock" value="" />
+
+                                <input type="number" name="newStock" class="form-control form-control-sm" placeholder="Set stock (e.g. 150)" style="width: 130px;" />
+                                <input type="number" name="increment" class="form-control form-control-sm" placeholder="Add (e.g. 20)" style="width: 100px;" />
+
                                 <button type="submit" class="btn btn-sm btn-success">Apply</button>
                             </form>
                         </td>

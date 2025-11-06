@@ -6,8 +6,6 @@
 }
 
 <div class="container mt-4">
-     
-
     <form method="get" asp-action="Reports">
         <label><strong>Group By:</strong></label>
         <select name="groupBy" class="form-select d-inline-block" style="width:250px;">
@@ -17,77 +15,105 @@
             <option value="Supplier" selected="@(Model.GroupBy == "Supplier")">Supplier</option>
         </select>
         <button type="submit" class="btn btn-primary m-2">Generate</button>
+
+        <!-- PDF Download Button -->
+        <button type="button" id="downloadReport" class="btn btn-danger">
+            <i class="bi bi-file-earmark-pdf"></i> Download as PDF
+        </button>
     </form>
 
     <hr />
 
-    @if (Model.Groups.Any())
-    {
-        
-        int grandTotal = 0;
-
-        foreach (var group in Model.Groups)
+    <div class="report-container">
+        @if (Model.Groups.Any())
         {
-            <div class="card mb-4 shadow-sm">
-                <div class="card-header bg-secondary text-white">
-                    <h5>@group.GroupName</h5>
-                </div>
-                <div class="card-body p-0">
-                    <table class="table table-bordered table-striped mb-0">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Medication Name</th>
-                                <th>Schedule</th>
-                                <th>Dosage Form</th>
-                                <th>Supplier</th>
-                                <th>Reorder Level</th>
-                                <th>Quantity On Hand</th>
-                                <th>Current Price</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @{
-                                int subtotal = 0;
-                            }
+            int grandTotal = 0;
 
-                            @foreach (var item in group.Medications)
-                            {
-                                subtotal += item.QuantityOnHand;
+            foreach (var group in Model.Groups)
+            {
+                <div class="card mb-4 shadow-sm">
+                    <div class="card-header bg-secondary text-white">
+                        <h5>@group.GroupName</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <table class="table table-bordered table-striped mb-0">
+                            <thead class="table-light">
                                 <tr>
-                                    <td>@item.MedicationName</td>
-                                    <td>@item.Schedule</td>
-                                    <td>@item.DosageForm.DosageFormName</td>
-                                    <td>@item.Supplier.SupplierName</td>
-                                    <td>@item.ReOrderLevel</td>
-                                    <td>@item.QuantityOnHand</td>
-                                    <td>R @item.CurrentPrice</td>
+                                    <th>Medication Name</th>
+                                    <th>Schedule</th>
+                                    <th>Dosage Form</th>
+                                    <th>Supplier</th>
+                                    <th>Reorder Level</th>
+                                    <th>Quantity On Hand</th>
+                                    <th>Current Price</th>
                                 </tr>
-                            }
+                            </thead>
+                            <tbody>
+                                @{
+                                    int subtotal = 0;
+                                }
 
-                            <tr class="fw-bold table-secondary">
-                                <td colspan="5" class="text-end">Sub-total:</td>
-                                <td>@subtotal</td>
-                                <td></td>
-                            </tr>
+                                @foreach (var item in group.Medications)
+                                {
+                                    subtotal += item.QuantityOnHand;
+                                    <tr>
+                                        <td>@item.MedicationName</td>
+                                        <td>@item.Schedule</td>
+                                        <td>@item.DosageForm.DosageFormName</td>
+                                        <td>@item.Supplier.SupplierName</td>
+                                        <td>@item.ReOrderLevel</td>
+                                        <td>@item.QuantityOnHand</td>
+                                        <td>R @item.CurrentPrice</td>
+                                    </tr>
+                                }
 
-                           
-                            @{
-                                grandTotal += subtotal;
-                            }
-                        </tbody>
-                    </table>
+                                <tr class="fw-bold table-secondary">
+                                    <td colspan="5" class="text-end">Sub-total:</td>
+                                    <td>@subtotal</td>
+                                    <td></td>
+                                </tr>
+
+                                @{
+                                    grandTotal += subtotal;
+                                }
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
+            }
+
+            <div class="text-end mt-3 fw-bold">
+                GRAND TOTAL: @grandTotal
             </div>
         }
-
-        
-        <div class="text-end mt-3 fw-bold">
-            GRAND TOTAL: @grandTotal
-        </div>
-    }
-    else
-    {
-        <p>No medications found.</p>
-    }
-
+        else
+        {
+            <p>No medications found.</p>
+        }
+    </div>
 </div>
+
+<!-- html2pdf.js Script -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+<script>
+    document.getElementById('downloadReport').addEventListener('click', function() {
+        var element = document.querySelector('.report-container');
+
+        var opt = {
+            margin: 0.5,
+            filename: 'MedicationStockReport.pdf',
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2 },
+            jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+        };
+
+        html2pdf().from(element).set(opt).toPdf().get('pdf').then(function(pdf) {
+            var totalPages = pdf.internal.getNumberOfPages();
+            for (var i = 1; i <= totalPages; i++) {
+                pdf.setPage(i);
+                pdf.setFontSize(10);
+                pdf.text('Page ' + i + ' of ' + totalPages, pdf.internal.pageSize.getWidth() / 2, pdf.internal.pageSize.getHeight() - 10, { align: 'center' });
+            }
+        }).save();
+    });
+</script>
