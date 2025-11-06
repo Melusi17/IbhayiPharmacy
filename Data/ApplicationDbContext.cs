@@ -159,7 +159,7 @@ namespace IbhayiPharmacy.Data
                 new ApplicationUser { Id = "pharmacist-1", UserName = "lindile@example.com", NormalizedUserName = "LINDILE@EXAMPLE.COM", Email = "lindile@example.com", NormalizedEmail = "LINDILE@EXAMPLE.COM", EmailConfirmed = true, PasswordHash = GetPasswordHash("Hadebe123!"), SecurityStamp = Guid.NewGuid().ToString(), Name = "Lindile", Surname = "Hadebe", IDNumber = "1234567890123", CellphoneNumber = "061 2345 678" },
                 new ApplicationUser { Id = "pharmacist-2", UserName = "dorothy@example.com", NormalizedUserName = "DOROTHY@EXAMPLE.COM", Email = "dorothy@example.com", NormalizedEmail = "DOROTHY@EXAMPLE.COM", EmailConfirmed = true, PasswordHash = GetPasswordHash("Daniels123!"), SecurityStamp = Guid.NewGuid().ToString(), Name = "Dorothy", Surname = "Daniels", IDNumber = "1234567890124", CellphoneNumber = "062 2345 678" },
                 new ApplicationUser { Id = "pharmacist-3", UserName = "marcel@example.com", NormalizedUserName = "MARCEL@EXAMPLE.COM", Email = "marcel@example.com", NormalizedEmail = "MARCEL@EXAMPLE.COM", EmailConfirmed = true, PasswordHash = GetPasswordHash("VanNiekerk123!"), SecurityStamp = Guid.NewGuid().ToString(), Name = "Marcel", Surname = "Van Niekerk", IDNumber = "1234567890125", CellphoneNumber = "063 2345 678" },
-                new ApplicationUser { Id = "pharmacist-4", UserName = "s224113038@mandela.ac.za", NormalizedUserName = "S224113038@MANDELA.AC.ZA", Email = "s224113038@mandela.ac.za", NormalizedEmail = "S224113038MANDELA.AC.ZA", EmailConfirmed = true, PasswordHash = GetPasswordHash("Mamba123!"), SecurityStamp = Guid.NewGuid().ToString(), Name = "Melusi", Surname = "Mamba", IDNumber = "1234567890125", CellphoneNumber = "063 2345 678" },
+                new ApplicationUser { Id = "pharmacist-4", UserName = "s224113038@mandela.ac.za", NormalizedUserName = "S224113038@MANDELA.AC.ZA", Email = "s224113038@mandela.ac.za", NormalizedEmail = "S224113038@MANDELA.AC.ZA", EmailConfirmed = true, PasswordHash = GetPasswordHash("Mamba123!"), SecurityStamp = Guid.NewGuid().ToString(), Name = "Melusi", Surname = "Mamba", IDNumber = "2201461182425424", CellphoneNumber = "063 2345 678" },
 
                 // Pharmacy Manager
                 new ApplicationUser { Id = "manager-1", UserName = "s224378449@mandela.ac.za", NormalizedUserName = "S224378449@MANDELA.AC.ZA", Email = "s224378449@mandela.ac.za", NormalizedEmail = "S224378449@MANDELA.AC.ZA", EmailConfirmed = true, PasswordHash = GetPasswordHash("Majila123!"), SecurityStamp = Guid.NewGuid().ToString(), Name = "Mbasa", Surname = "Majila", IDNumber = "1234567890126", CellphoneNumber = "082 289 4758" }
@@ -193,6 +193,7 @@ namespace IbhayiPharmacy.Data
                 new IdentityUserRole<string> { UserId = "pharmacist-1", RoleId = "role-pharmacist" },
                 new IdentityUserRole<string> { UserId = "pharmacist-2", RoleId = "role-pharmacist" },
                 new IdentityUserRole<string> { UserId = "pharmacist-3", RoleId = "role-pharmacist" },
+                new IdentityUserRole<string> { UserId = "pharmacist-4", RoleId = "role-pharmacist" },
 
                 // Manager Role
                 new IdentityUserRole<string> { UserId = "manager-1", RoleId = "role-manager" }

@@ -849,12 +849,14 @@
             <small style="color: #bdc3c7;">Dedicated Dictionary</small>
         </div>
         <nav class="sidebar-nav">
-            <a asp-controller="PharmacistDashboard" asp-action="Index" class="active"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <a asp-controller="PharmacistDashboard" asp-action="Index"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
             <a asp-controller="WalkInPrescription" asp-action="Create"><i class="fas fa-tachometer-alt"></i> Walk In Prescription</a>
             <a asp-controller="PharmacistDispensing" asp-action="Index"><i class="fas fa-clipboard-list"></i> Orders</a>
             <a asp-controller="ScriptsProcessed" asp-action="Index"><i class="fas fa-file-prescription"></i> Unprocessed Scripts</a>
             <a asp-controller="ScriptsProcessed" asp-action="ProcessedScripts"><i class="fas fa-boxes"></i> Processed Scripts</a>
             <a asp-controller="PharmacistDispensing" asp-action="CollectionTracking"><i class="fas fa-boxes"></i> Track Orders</a>
+            <a asp-controller="PharmacistReport" asp-action="Index"><i class="fas fa-chart-bar"></i> Reports</a>
+            <a asp-controller="PharmacistProfile" asp-action="ChangePassword" class="active"><i class="fas fa-key"></i> Change Password</a>
             <form class="logout-form" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
                 <button type="submit" class="btn-logout">
                     <i class="fas fa-sign-out-alt"></i> Logout

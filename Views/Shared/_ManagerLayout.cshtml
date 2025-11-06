@@ -9,27 +9,26 @@
     <link rel="stylesheet" href="~/PharmMan.styles.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-   
+
 
         body {
             margin: 0;
             background-color: #f4f6f9;
-            
             color: #333;
-            overflow:scroll;
-        } 
-
-     
-
-      /*  .sidebar {
-            width: 15em;
-            height: 100vh;
-            background: #00695c;
-            padding-top: 2rem;
-            position: fixed;
+            overflow: scroll;
         }
-        */
-       
+
+
+
+        /*  .sidebar {
+                    width: 15em;
+                    height: 100vh;
+                    background: #00695c;
+                    padding-top: 2rem;
+                    position: fixed;
+                }
+                */
+
         .main-content {
             margin-left: 220px;
             padding: 2rem;
@@ -37,10 +36,8 @@
 
         .card {
             background: white;
-           
             border-radius: 6px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            
         }
 
         h1, h2 {
@@ -48,11 +45,11 @@
         }
 
         .btn {
-           /*  background-color: #00695c; */
+            /*  background-color: #00695c; */
             background-color: #1f9f77;
             color: white;
             border: none;
-           /*  padding: 0.6rem 1.2rem; */
+            /*  padding: 0.6rem 1.2rem; */
             border-radius: 3px;
             cursor: pointer;
             margin-right: 10px;
@@ -63,26 +60,24 @@
 
             .btn:hover {
                 background-color: #00695c;
-                
             }
 
         .wrapper {
             display: flex;
             padding-top: 2em;
             height: 100vh;
-        } 
+        }
 
-      
 
-       
 
-       /*   ===== SIDEBAR =====  */
+
+
+        /*   ===== SIDEBAR =====  */
         .sidebar {
             width: 220px;
-         /*    background: linear-gradient(to bottom, #22586a, #1a252f); */
+            /*    background: linear-gradient(to bottom, #22586a, #1a252f); */
             background: linear-gradient(to bottom, #22586A, #22586A);
             height: 100vh;
-           
             position: fixed;
             top: 0;
             left: 0;
@@ -98,14 +93,13 @@
             gap: 12px;
             margin-bottom: 8px;
             padding: 10px 15px;
-           
             transition: all 0.3s;
-           border:none;
+            border: none;
             background: none;
             width: 100%;
         }
 
-         
+
 
         .sidebar a {
             display: block;
@@ -134,14 +128,13 @@
                 font-size: 14px;
                 text-decoration: none;
                 color: #fff;
-               
             }
 
-          
-     /*    .sidebar-nav {
-            padding: 0 10px;
-        }
- */
+
+        /*    .sidebar-nav {
+                    padding: 0 10px;
+                }
+         */
         .sidebar-footer {
             position: absolute;
             bottom: 20px;
@@ -150,14 +143,13 @@
             font-size: 12px;
             color: #7f8c8d;
         }
-                
-        .title-underline{
+
+        .title-underline {
             color: #2c3e50;
             margin-top: 0;
             border-bottom: 2px solid #3498db;
             padding-bottom: 10px;
             margin-bottom: 20px;
-            
         }
 
         .topbar {
@@ -175,36 +167,36 @@
             z-index: 999;
         }
 
-           /*  ==== Allerts ====== */
+        /*  ==== Allerts ====== */
         .alert-warning {
             background-color: #fff3cd;
             border-left: 4px solid #ffc107;
             color: #856404;
         }
 
-       /*  ===== Tables ===== */
+        /*  ===== Tables ===== */
         .tables {
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
         }
-        .tables th
-          {
-            background: #3498db;
-            color: white;
-            padding: 12px;
-            text-align: left;
-        }
+
+            .tables th {
+                background: #3498db;
+                color: white;
+                padding: 12px;
+                text-align: left;
+            }
     </style>
 </head>
 <body>
- 
 
-
-
-    <div   class="topbar">
+    <div class="topbar">
         <span><b>Pharmacy Manager</b></span>
-        <div b-0kim8ztmh6="">Welcome, <strong b-0kim8ztmh6="">Name</strong></div>
+        <div>
+            Welcome,
+            <strong>@User.Identity?.Name</strong>
+        </div>
     </div>
 
     <div class="sidebar">
@@ -214,8 +206,8 @@
         </div>
         <br />
         <br />
-       
-       
+
+
         <a class="sidebar-item p-3" asp-controller="PharmacyManager" asp-action="index">Home</a>
 
         <button class=" sidebar-item dropdown-btn">Pharmacy <span><img style="height:10px;" src="~/css/img/Manager_img/arrow-down-sign-to-navigate.png" /></span></button>
@@ -241,19 +233,15 @@
         <a class="sidebar-item p-3" asp-controller="Home" asp-action="Index"><i class="fas fa-sign-out-alt"></i> Logout</a>
     </div>
 
-
-
-
-
     <div style="    margin-left: 220px;
     margin-top: 50px;
     padding: 30px;">
-            <main role="main" class="pb-3">
-                @RenderBody()
-            </main>
-        </div>
-      
-    
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+
     @*    <footer class="border-top footer   text-muted">
         <div class="container">
             &copy; 2025 - PharmMan - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>

@@ -455,7 +455,6 @@ namespace IbhayiPharmacy.Controllers
         }
 
         // EMAIL METHOD: Send prescription status update
-        // EMAIL METHOD: Send prescription status update
         private void SendPrescriptionStatusEmail(Prescription prescription, string status)
         {
             try
@@ -949,6 +948,7 @@ namespace IbhayiPharmacy.Controllers
                     .Include(p => p.ApplicationUser)
                     .Include(p => p.Doctors)
                     .Include(p => p.scriptLines)
+                        .ThenInclude(sl => sl.Medications)  // CRITICAL FIX: Include Medications
                     .Where(p => p.Status == "Processed" || p.Status == "Partially Processed" || p.Status == "Rejected")
                     .OrderByDescending(p => p.DateIssued)
                     .ToListAsync();
@@ -971,7 +971,7 @@ namespace IbhayiPharmacy.Controllers
                     .Include(p => p.ApplicationUser)
                     .Include(p => p.Doctors)
                     .Include(p => p.scriptLines)
-                        .ThenInclude(sl => sl.Medications)
+                        .ThenInclude(sl => sl.Medications)  // CRITICAL FIX: Include Medications
                     .FirstOrDefaultAsync(p => p.PrescriptionID == id);
 
                 if (prescription == null)
@@ -992,7 +992,7 @@ namespace IbhayiPharmacy.Controllers
                     Status = prescription.Status ?? "Unknown",
                     ScriptLines = prescription.scriptLines.Select(sl => new ProcessedScriptLineVM
                     {
-                        MedicationName = sl.Medications?.MedicationName ?? "Unknown",
+                        MedicationName = sl.Medications?.MedicationName,
                         Quantity = sl.Quantity,
                         Instructions = sl.Instructions ?? "",
                         Status = sl.Status ?? "Pending",
@@ -1001,6 +1001,9 @@ namespace IbhayiPharmacy.Controllers
                         RejectedDate = sl.RejectedDate
                     }).ToList()
                 };
+
+                // ADDED: Pass the PDF data to the view
+                ViewBag.PrescriptionPdf = prescription.Script;
 
                 return View(viewModel);
             }

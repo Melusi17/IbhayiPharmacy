@@ -1,0 +1,852 @@
+﻿@model IbhayiPharmacy.Models.PharmacistVM.ProcessedPrescriptionVM
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
+@{
+    ViewData["Title"] = "Processed Prescription Details";
+    Layout = null;
+    var user = await UserManager.GetUserAsync(User);
+    var userName = user?.UserName ?? "Pharmacist";
+    var userEmail = user?.Email ?? "No email";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Processed Prescription Details - Ibhayi Pharmacy</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* ===== GLOBAL STYLES ===== */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f4f6f9;
+            color: #333;
+            transition: all 0.3s;
+        }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            width: 220px;
+            background: linear-gradient(to bottom, #22586A, #22586A);
+            height: 100vh;
+            padding: 20px 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+            transition: all 0.3s;
+        }
+
+            .sidebar.collapsed {
+                width: 0;
+                overflow: hidden;
+                padding: 0;
+            }
+
+                .sidebar.collapsed .sidebar-header,
+                .sidebar.collapsed .sidebar-nav,
+                .sidebar.collapsed .sidebar-footer {
+                    display: none;
+                }
+
+        .sidebar-header {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid #34495e;
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        .sidebar h2 {
+            font-size: 22px;
+            margin: 0;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+            .sidebar h2 i {
+                color: #3498db;
+            }
+
+        .sidebar-nav {
+            padding: 0 10px;
+        }
+
+        .sidebar a {
+            color: #ecf0f1;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 8px 0;
+            padding: 10px 15px;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+
+            .sidebar a:hover, .sidebar a.active {
+                background-color: #34495e;
+                transform: translateX(5px);
+            }
+
+        .sidebar-footer {
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+            padding: 0 20px;
+            font-size: 12px;
+            color: #7f8c8d;
+        }
+
+        .toggle-sidebar {
+            position: absolute;
+            right: -15px;
+            top: 20px;
+            background: #3498db;
+            color: white;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            transition: all 0.3s;
+            z-index: 1001;
+        }
+
+        /* Make sure toggle button stays visible when sidebar is collapsed */
+        .sidebar.collapsed .toggle-sidebar {
+            right: -15px;
+            background: #3498db;
+        }
+
+        /* ===== TOPBAR ===== */
+        .topbar {
+            background-color: #ffffff;
+            height: 60px;
+            padding: 0 20px;
+            position: fixed;
+            left: 220px;
+            right: 0;
+            top: 0;
+            border-bottom: 1px solid #ccc;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 999;
+            transition: all 0.3s;
+        }
+
+        .sidebar.collapsed + .topbar {
+            left: 0;
+        }
+
+        .topbar span {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        /* Add a menu button in topbar for when sidebar is collapsed */
+        .menu-toggle {
+            display: none;
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 15px;
+        }
+
+        .sidebar.collapsed + .topbar .menu-toggle {
+            display: block;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+        }
+
+        .user-email {
+            color: #3498db;
+            font-weight: 500;
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        .main-content {
+            margin-left: 220px;
+            margin-top: 60px;
+            padding: 30px;
+            transition: all 0.3s;
+        }
+
+        .sidebar.collapsed + .topbar + .main-content {
+            margin-left: 0;
+        }
+
+        /* ===== FORM LAYOUT ===== */
+        .form-container {
+            display: grid;
+            grid-template-areas:
+                "customer pdf"
+                "medications pdf"
+                "actions actions";
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: auto 1fr auto;
+            gap: 25px;
+            max-width: 1800px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+        }
+
+        .customer-card {
+            grid-area: customer;
+            min-height: 200px;
+        }
+
+        .pdf-card {
+            grid-area: pdf;
+            height: 600px;
+            overflow: hidden;
+            border: 2px solid #3498db;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .medications-card {
+            grid-area: medications;
+            min-height: 400px;
+        }
+
+        .actions-card {
+            grid-area: actions;
+        }
+
+        h3 {
+            color: #2c3e50;
+            margin-top: 0;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1.4em;
+        }
+
+        /* ===== CUSTOMER INFO ===== */
+        .customer-info {
+            margin-bottom: 20px;
+        }
+
+            .customer-info p {
+                margin-bottom: 12px;
+                padding: 8px 0;
+                border-bottom: 1px solid #f8f9fa;
+            }
+
+            .customer-info strong {
+                display: inline-block;
+                width: 140px;
+                color: #2c3e50;
+            }
+
+        /* ===== PDF VIEWER ===== */
+        .pdf-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        #pdfViewer {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #e1e8ed;
+        }
+
+        .pdf-controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-download {
+            background: #3498db;
+            color: white;
+        }
+
+        .btn-print {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .btn-back {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            opacity: 0.9;
+        }
+
+        /* ===== MEDICATION CARDS ===== */
+        .medication-card {
+            background: white;
+            border: 1px solid #e1e8ed;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+            border-left: 4px solid #ddd;
+        }
+
+            .medication-card:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            }
+
+        .medication-approved {
+            border-left-color: #28a745;
+            background: linear-gradient(135deg, #f8fff9, #e8f5e8);
+        }
+
+        .medication-rejected {
+            border-left-color: #dc3545;
+            background: linear-gradient(135deg, #fff5f5, #ffe6e6);
+        }
+
+        .medication-pending {
+            border-left-color: #ffc107;
+            background: linear-gradient(135deg, #fffef0, #fff9e6);
+        }
+
+        .medication-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .medication-name {
+            font-size: 18px;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+
+        .medication-status {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-approved {
+            background: #28a745;
+            color: white;
+        }
+
+        .status-rejected {
+            background: #dc3545;
+            color: white;
+        }
+
+        .status-pending {
+            background: #ffc107;
+            color: #212529;
+        }
+
+        .medication-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .detail-label {
+            font-size: 11px;
+            color: #6c757d;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .detail-value {
+            font-size: 14px;
+            color: #495057;
+            font-weight: 500;
+        }
+
+        .rejection-reason {
+            background: #fff5f5;
+            border: 1px solid #f5c6cb;
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 10px;
+        }
+
+        .reason-label {
+            font-size: 12px;
+            color: #dc3545;
+            font-weight: 700;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .reason-text {
+            font-size: 14px;
+            color: #721c24;
+            line-height: 1.4;
+        }
+
+        .timestamp {
+            font-size: 12px;
+            color: #6c757d;
+            font-style: italic;
+            margin-top: 5px;
+        }
+
+        .no-medications {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+        }
+
+            .no-medications i {
+                font-size: 48px;
+                margin-bottom: 15px;
+                color: #bdc3c7;
+            }
+
+        /* ===== ACTION BUTTONS ===== */
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            padding: 20px 0;
+        }
+
+        /* Logout form styles */
+        .logout-form {
+            display: inline;
+        }
+
+        .btn-logout {
+            background: transparent;
+            border: none;
+            color: #ecf0f1;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 8px 0;
+            padding: 10px 15px;
+            border-radius: 5px;
+            transition: all 0.3s;
+            width: 100%;
+            text-align: left;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+            .btn-logout:hover {
+                background-color: #34495e;
+                transform: translateX(5px);
+            }
+
+        /* ===== RESPONSIVE ===== */
+        @@media (max-width: 1200px) {
+            .form-container {
+                grid-template-areas:
+                    "customer"
+                    "pdf"
+                    "medications"
+                    "actions";
+                grid-template-columns: 1fr;
+                grid-template-rows: auto;
+            }
+
+            .pdf-card {
+                height: 500px;
+            }
+        }
+
+        @@media (max-width: 768px) {
+            .sidebar {
+                width: 0;
+            }
+
+                .sidebar:not(.collapsed) {
+                    width: 220px;
+                }
+
+            .topbar {
+                left: 0;
+            }
+
+            .sidebar:not(.collapsed) + .topbar {
+                left: 220px;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 20px;
+            }
+
+            .sidebar:not(.collapsed) + .topbar + .main-content {
+                margin-left: 220px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .btn {
+                justify-content: center;
+            }
+
+            .user-info {
+                flex-direction: column;
+                gap: 5px;
+                text-align: right;
+            }
+
+            .user-email {
+                font-size: 12px;
+            }
+
+            .medication-details {
+                grid-template-columns: 1fr;
+            }
+
+            .pdf-card {
+                height: 400px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2><i class="fas fa-prescription-bottle-alt"></i> Pharmacist Panel</h2>
+            <button class="toggle-sidebar" onclick="toggleSidebar()">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <small style="color: #bdc3c7;">Dedicated Dictionary</small>
+        </div>
+        <nav class="sidebar-nav">
+            <a asp-controller="PharmacistDashboard" asp-action="Index"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <a asp-controller="WalkInPrescription" asp-action="Create"><i class="fas fa-tachometer-alt"></i> Walk In Prescription</a>
+            <a asp-controller="PharmacistDispensing" asp-action="Index"><i class="fas fa-clipboard-list"></i> Orders</a>
+            <a asp-controller="ScriptsProcessed" asp-action="Index"><i class="fas fa-file-prescription"></i> Unprocessed Scripts</a>
+            <a asp-controller="ScriptsProcessed" asp-action="ProcessedScripts" class="active"><i class="fas fa-boxes"></i> Processed Scripts</a>
+            <a asp-controller="PharmacistDispensing" asp-action="CollectionTracking"><i class="fas fa-boxes"></i> Track Orders</a>
+            <a asp-controller="PharmacistReport" asp-action="Index"><i class="fas fa-chart-bar"></i> Reports</a>
+            <a asp-controller="PharmacistProfile" asp-action="ChangePassword"><i class="fas fa-key"></i> Change Password</a>
+            <form class="logout-form" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                <button type="submit" class="btn-logout">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </form>
+        </nav>
+        <div class="sidebar-footer">
+            <p>Ibhayi Pharmacy v2.1</p>
+        </div>
+    </div>
+
+    <!-- TOPBAR -->
+    <div class="topbar">
+        <button class="menu-toggle" onclick="toggleSidebar()">
+            <i class="fas fa-bars"></i> Menu
+        </button>
+        <span>Processed Prescription Details</span>
+        <div class="user-info">
+            <div>Welcome, <strong>@userName</strong></div>
+            <div class="user-email">@userEmail</div>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+        <div class="form-container">
+            <!-- CUSTOMER CARD -->
+            <div class="card customer-card">
+                <h3><i class="fas fa-user-injured"></i> Customer Information</h3>
+                <div class="customer-info">
+                    <p><strong>Patient Name:</strong> @Model.PatientName</p>
+                    <p><strong>ID Number:</strong> @Model.IDNumber</p>
+                    <p><strong>Email:</strong> @Model.Email</p>
+                    <p><strong>Prescription Date:</strong> @Model.DateIssued.ToString("dd MMMM yyyy")</p>
+                    <p><strong>Doctor:</strong> @Model.DoctorName</p>
+                    <p>
+                        <strong>Status:</strong>
+                        @if (Model.Status == "Processed")
+                        {
+                            <span style="color: #28a745; font-weight: bold;">✓ @Model.Status</span>
+                        }
+                        else if (Model.Status == "Partially Processed")
+                        {
+                            <span style="color: #ffc107; font-weight: bold;">⚠ @Model.Status</span>
+                        }
+                        else if (Model.Status == "Rejected")
+                        {
+                            <span style="color: #dc3545; font-weight: bold;">✗ @Model.Status</span>
+                        }
+                        else
+                        {
+                            <span>@Model.Status</span>
+                        }
+                    </p>
+                </div>
+            </div>
+
+            <!-- PDF VIEWER CARD -->
+            <div class="card pdf-card">
+                <div class="pdf-header">
+                    <h3><i class="fas fa-file-pdf"></i> Prescription Document</h3>
+                </div>
+                <div id="pdfViewer">
+                    @if (ViewBag.PrescriptionPdf != null)
+                    {
+                        <iframe src="data:application/pdf;base64,@Convert.ToBase64String(ViewBag.PrescriptionPdf)"
+                                style="width: 100%; height: 100%; border: none;"></iframe>
+                    }
+                    else
+                    {
+                        <div style="text-align: center; color: #95a5a6;">
+                            <i class="fas fa-file-pdf" style="font-size: 48px; margin-bottom: 15px;"></i>
+                            <p>No prescription PDF available</p>
+                        </div>
+                    }
+                </div>
+                <div class="pdf-controls">
+                    <a href="@Url.Action("Download", "ScriptsProcessed", new { id = Model.PrescriptionID })" class="btn btn-download">
+                        <i class="fas fa-download"></i> Download PDF
+                    </a>
+                    <button onclick="window.print()" class="btn btn-print">
+                        <i class="fas fa-print"></i> Print Details
+                    </button>
+                </div>
+            </div>
+
+            <!-- MEDICATIONS CARD -->
+            <div class="card medications-card">
+                <h3><i class="fas fa-pills"></i> Medication Details</h3>
+
+                @if (Model.ScriptLines != null && Model.ScriptLines.Any())
+                {
+                    @foreach (var medication in Model.ScriptLines)
+                    {
+                        var statusClass = medication.Status?.ToLower() switch
+                        {
+                            "approved" => "medication-approved",
+                            "rejected" => "medication-rejected",
+                            _ => "medication-pending"
+                        };
+
+                        var statusBadgeClass = medication.Status?.ToLower() switch
+                        {
+                            "approved" => "status-approved",
+                            "rejected" => "status-rejected",
+                            _ => "status-pending"
+                        };
+
+                        <div class="medication-card @statusClass">
+                            <div class="medication-header">
+                                <div class="medication-name">@medication.MedicationName</div>
+                                <span class="medication-status @statusBadgeClass">
+                                    @medication.Status
+                                </span>
+                            </div>
+
+                            <div class="medication-details">
+                                <div class="detail-item">
+                                    <span class="detail-label">Quantity</span>
+                                    <span class="detail-value">@medication.Quantity</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Instructions</span>
+                                    <span class="detail-value">@medication.Instructions</span>
+                                </div>
+                                @if (medication.ApprovedDate.HasValue)
+                                {
+                                    <div class="detail-item">
+                                        <span class="detail-label">Approved Date</span>
+                                        <span class="detail-value">@medication.ApprovedDate.Value.ToString("dd MMM yyyy HH:mm")</span>
+                                    </div>
+                                }
+                                @if (medication.RejectedDate.HasValue)
+                                {
+                                    <div class="detail-item">
+                                        <span class="detail-label">Rejected Date</span>
+                                        <span class="detail-value">@medication.RejectedDate.Value.ToString("dd MMM yyyy HH:mm")</span>
+                                    </div>
+                                }
+                            </div>
+
+                            @if (medication.Status == "Rejected" && !string.IsNullOrEmpty(medication.RejectionReason))
+                            {
+                                <div class="rejection-reason">
+                                    <div class="reason-label">
+                                        <i class="fas fa-exclamation-circle"></i>
+                                        Rejection Reason
+                                    </div>
+                                    <div class="reason-text">@medication.RejectionReason</div>
+                                </div>
+                            }
+
+                            @if (medication.Status == "Approved")
+                            {
+                                <div class="timestamp">
+                                    <i class="fas fa-check-circle" style="color: #28a745;"></i>
+                                    Medication approved for dispensing
+                                </div>
+                            }
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="no-medications">
+                        <i class="fas fa-pills"></i>
+                        <h3>No Medications Found</h3>
+                        <p>This prescription doesn't contain any processed medications.</p>
+                    </div>
+                }
+            </div>
+
+            <!-- ACTIONS CARD -->
+            <div class="card actions-card">
+                <div class="action-buttons">
+                    <a href="@Url.Action("ProcessedScripts", "ScriptsProcessed")" class="btn btn-back">
+                        <i class="fas fa-arrow-left"></i> Back to Processed Scripts
+                    </a>
+                    <a href="@Url.Action("Download", "ScriptsProcessed", new { id = Model.PrescriptionID })" class="btn btn-download">
+                        <i class="fas fa-download"></i> Download Prescription PDF
+                    </a>
+                    <button onclick="window.print()" class="btn btn-print">
+                        <i class="fas fa-print"></i> Print All Details
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Toggle sidebar
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            const toggleBtn = document.querySelector('.toggle-sidebar i');
+            const menuToggle = document.querySelector('.menu-toggle');
+
+            sidebar.classList.toggle('collapsed');
+
+            if (sidebar.classList.contains('collapsed')) {
+                toggleBtn.classList.remove('fa-chevron-left');
+                toggleBtn.classList.add('fa-chevron-right');
+            } else {
+                toggleBtn.classList.remove('fa-chevron-right');
+                toggleBtn.classList.add('fa-chevron-left');
+            }
+        }
+
+        // PDF viewer controls
+        function zoomIn() {
+            const iframe = document.querySelector('#pdfViewer iframe');
+            if (iframe) {
+                const currentZoom = parseFloat(iframe.style.zoom) || 1;
+                iframe.style.zoom = (currentZoom + 0.1) + '';
+            }
+        }
+
+        function zoomOut() {
+            const iframe = document.querySelector('#pdfViewer iframe');
+            if (iframe) {
+                const currentZoom = parseFloat(iframe.style.zoom) || 1;
+                if (currentZoom > 0.5) {
+                    iframe.style.zoom = (currentZoom - 0.1) + '';
+                }
+            }
+        }
+
+        function resetZoom() {
+            const iframe = document.querySelector('#pdfViewer iframe');
+            if (iframe) {
+                iframe.style.zoom = '1';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Processed prescription details loaded');
+
+            // Add keyboard shortcuts for PDF navigation
+            document.addEventListener('keydown', function(e) {
+                const iframe = document.querySelector('#pdfViewer iframe');
+                if (iframe && document.activeElement !== iframe) {
+                    if (e.ctrlKey && e.key === '+') {
+                        e.preventDefault();
+                        zoomIn();
+                    } else if (e.ctrlKey && e.key === '-') {
+                        e.preventDefault();
+                        zoomOut();
+                    } else if (e.ctrlKey && e.key === '0') {
+                        e.preventDefault();
+                        resetZoom();
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
