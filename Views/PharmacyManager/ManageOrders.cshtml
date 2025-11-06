@@ -6,6 +6,9 @@
 }
 
 <div class="container mt-4">
+    <div class=" mb-3">
+        <a asp-action="Orders" class="btn btn-success">Order Medication</a>
+    </div>
     <div class="card p-3">
         <h5 class="title-underline">Medication Orders</h5>
         <div class="card-body">
@@ -22,34 +25,41 @@
                 <tbody>
                     @foreach (var order in Model)
                     {
-                        // Group by supplier name
-                        var supplierGroups = order.OrderLines
-                        .GroupBy(ol => ol.Medication.Supplier.SupplierName);
+                        var lineCount = order.OrderLines.Count();
+                        bool first = true;
 
-                        foreach (var group in supplierGroups)
+                        foreach (var line in order.OrderLines)
                         {
-                            var lineCount = group.Count();
-                            bool first = true;
+                            <tr>
+                                @if (first)
+                                {
+                                    <td rowspan="@lineCount">@order.StockOrder.OrderDate.ToShortDateString()</td>
+                                    <td rowspan="@lineCount">@order.StockOrder.Supplier?.SupplierName</td>
+                                }
 
-                            foreach (var line in group)
-                            {
-                                <tr>
-                                    @if (first)
-                                    {
-                                        <td rowspan="@lineCount">@order.StockOrder.OrderDate.ToShortDateString()</td>
-                                        <td rowspan="@lineCount">@group.Key</td>
-                                    }
+                                <td>@line.Medication.MedicationName</td>
+                                <td>@line.OrderQuantity</td>
 
-                                    <td>@line.Medication.MedicationName</td>
-                                    <td>@line.OrderQuantity</td>
-
-                                    @if (first)
-                                    {
-                                        <td rowspan="@lineCount">@order.StockOrder.Status</td>
-                                        first = false;
-                                    }
-                                </tr>
-                            }
+                                @if (first)
+                                {
+                                    <td rowspan="@lineCount">
+                                        @if (order.StockOrder.Status == "Ordered")
+                                        {
+                                            <form asp-action="UpdateOrderStatus" asp-route-id="@order.StockOrder.StockOrderID" method="post" class="d-inline">
+                                                <input type="hidden" name="newStatus" value="Received" />
+                                                <button type="submit" class="btn btn-sm btn-primary">
+                                                    Mark as Received
+                                                </button>
+                                            </form>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-success">@order.StockOrder.Status</span>
+                                        }
+                                    </td>
+                                    first = false;
+                                }
+                            </tr>
                         }
                     }
                 </tbody>

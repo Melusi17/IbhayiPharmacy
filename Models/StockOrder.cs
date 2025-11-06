@@ -16,6 +16,6 @@ namespace IbhayiPharmacy.Models
       
         [Required]
         public string Status { get; set; }
-
+        public Supplier Supplier { get;  set; }
     }
 }

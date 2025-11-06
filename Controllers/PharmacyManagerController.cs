@@ -8,9 +8,13 @@ using IbhayiPharmacy.Models.PharmacyManagerVM;
 using Microsoft.Extensions.Options;
 using SmtpSettings = IbhayiPharmacy.Models.PharmacyManagerVM.SmtpSettings;
 using IbhayiPharmacy.Utility; // ADDED: For SD.Role_Pharmacist
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
+
 
 namespace IbhayiPharmacy.Controllers
 {
+    [Authorize(Policy = "Pharmacy Manager")]
     public class PharmacyManagerController : Controller
     {
         private readonly ApplicationDbContext _db;
@@ -519,8 +523,9 @@ namespace IbhayiPharmacy.Controllers
         //Orders
         public IActionResult ManageOrders()
         {
-            // Include customer, pharmacist, and order lines with medications & suppliers
+             
             var orders = _db.StockOrders
+        .Include(o => o.Supplier) // ✅ Include Supplier here
         .Select(o => new StockOrderVM
         {
             StockOrder = o,
@@ -532,12 +537,9 @@ namespace IbhayiPharmacy.Controllers
         })
         .ToList();
 
-
-
-
-
-
             return View(orders);
+
+         
         }
 
 
@@ -615,6 +617,23 @@ namespace IbhayiPharmacy.Controllers
 
             _db.SaveChanges();
 
+            return RedirectToAction("ManageOrders");
+        }
+        [HttpPost]
+        public IActionResult UpdateOrderStatus(int id, string newStatus)
+        {
+            var order = _db.StockOrders.FirstOrDefault(o => o.StockOrderID == id);
+
+            if (order == null)
+            {
+                return NotFound();
+            }
+
+            order.Status = newStatus;
+
+            _db.SaveChanges();
+
+            TempData["Message"] = "Order status updated successfully.";
             return RedirectToAction("ManageOrders");
         }
 
