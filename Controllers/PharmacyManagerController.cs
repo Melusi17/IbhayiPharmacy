@@ -10,6 +10,7 @@ using SmtpSettings = IbhayiPharmacy.Models.PharmacyManagerVM.SmtpSettings;
 using IbhayiPharmacy.Utility; // ADDED: For SD.Role_Pharmacist
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
+using SendGrid.Helpers.Mail;
 
 
 namespace IbhayiPharmacy.Controllers
@@ -316,7 +317,24 @@ namespace IbhayiPharmacy.Controllers
             ViewBag.ActiveIngredients = _db.Active_Ingredients.ToList();
             return View(med);
         }
+        [HttpPost]
+        public IActionResult DeleteMedication(int id)
+        {
 
+            var med = _db.Medications
+                .Include(m => m.Medication_Ingredients)
+                .FirstOrDefault(m => m.MedcationID == id);
+
+            if (med == null)
+                return NotFound();
+
+            _db.Medication_Ingredients.RemoveRange(med.Medication_Ingredients);
+            _db.Medications.Remove(med);
+            _db.SaveChanges();
+
+            TempData["Message"] = $"{med.MedicationName} has been deleted.";
+            return RedirectToAction("ManageMedication");
+        }
 
 
 
@@ -469,32 +487,53 @@ namespace IbhayiPharmacy.Controllers
                 return View(pham);
             }
         }
+     
         [HttpGet]
         public IActionResult EditPharmacist(int id)
         {
             var pharmacist = _db.Pharmacists
-                                .Include(p => p.ApplicationUser)
-                                .FirstOrDefault(p => p.PharmacistID == id);
-            if (pharmacist == null) return NotFound();
+                .Include(p => p.ApplicationUser)
+                .FirstOrDefault(p => p.PharmacistID == id);
+
+            if (pharmacist == null)
+            {
+                return NotFound();
+            }
 
             return View(pharmacist);
         }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult EditPharmacist(Pharmacist pham)
         {
-            if (!ModelState.IsValid) return View(pham);
+          
 
-            if (ModelState.IsValid)
+            var existingPharmacist = _db.Pharmacists
+                .Include(p => p.ApplicationUser)
+                .FirstOrDefault(p => p.PharmacistID == pham.PharmacistID);
+
+            if (existingPharmacist == null)
             {
-                _db.Pharmacists.Update(pham);
-                _db.SaveChanges();
-                return RedirectToAction("ManageDoctor");
+                return NotFound();
             }
 
+            // Update linked user info
+            existingPharmacist.ApplicationUser.Name = pham.ApplicationUser.Name;
+            existingPharmacist.ApplicationUser.Surname = pham.ApplicationUser.Surname;
+            existingPharmacist.ApplicationUser.Email = pham.ApplicationUser.Email;
+            existingPharmacist.ApplicationUser.CellphoneNumber = pham.ApplicationUser.CellphoneNumber;
+            existingPharmacist.ApplicationUser.IDNumber = pham.ApplicationUser.IDNumber;
+
+            // Pharmacist-specific field
+            existingPharmacist.HealthCouncilRegNo = pham.HealthCouncilRegNo;
+
             _db.SaveChanges();
+
+            TempData["SuccessMessage"] = "Pharmacist details updated successfully.";
             return RedirectToAction("ManagePharmacists");
         }
+
 
         public IActionResult DeletePharmacist(int id)
         {
@@ -622,20 +661,40 @@ namespace IbhayiPharmacy.Controllers
         [HttpPost]
         public IActionResult UpdateOrderStatus(int id, string newStatus)
         {
-            var order = _db.StockOrders.FirstOrDefault(o => o.StockOrderID == id);
+            // Load the stock order along with its details and medications
+            var order = _db.StockOrders
+                .Include(o => o.OrderDetails)
+                    .ThenInclude(d => d.Medication)
+                .FirstOrDefault(o => o.StockOrderID == id);
 
             if (order == null)
-            {
                 return NotFound();
+
+            // Only add quantities if status changes to Received and hasn't already been received
+            if (newStatus == "Received" && order.Status != "Received")
+            {
+                foreach (var detail in order.OrderDetails)
+                {
+                    if (detail.Medication != null)
+                    {
+                        detail.Medication.QuantityOnHand += detail.OrderQuantity;
+                    }
+                }
+                order.Status = "Received";
+               
+                _db.SaveChanges();
+
+                TempData["Message"] = "Order marked as received and stock updated.";
+            }
+            else
+            {
+                order.Status = newStatus;
+                _db.SaveChanges();
             }
 
-            order.Status = newStatus;
-
-            _db.SaveChanges();
-
-            TempData["Message"] = "Order status updated successfully.";
             return RedirectToAction("ManageOrders");
         }
+
 
 
 

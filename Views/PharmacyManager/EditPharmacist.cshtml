@@ -1,0 +1,55 @@
+﻿@model IbhayiPharmacy.Models.Pharmacist
+
+@{
+    ViewData["Title"] = "Edit Pharmacist";
+    Layout = "~/Views/Shared/_ManagerLayout.cshtml";
+}
+
+<div class="card p-3 mt-4">
+    <h5 class="title-underline">Edit Pharmacist</h5>
+    <div class="card-body">
+        <form asp-action="EditPharmacist" method="post">
+            @Html.AntiForgeryToken()
+            @Html.HiddenFor(m => m.PharmacistID)
+            @Html.HiddenFor(m => m.ApplicationUser.Id)
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="ApplicationUser.Name" class="form-label">First Name</label>
+                    <input asp-for="ApplicationUser.Name" class="form-control" />
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label asp-for="ApplicationUser.Surname" class="form-label">Surname</label>
+                    <input asp-for="ApplicationUser.Surname" class="form-control" />
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="ApplicationUser.IDNumber" class="form-label">ID Number</label>
+                <input asp-for="ApplicationUser.IDNumber" class="form-control" />
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="ApplicationUser.CellphoneNumber" class="form-label">Cellphone Number</label>
+                <input asp-for="ApplicationUser.CellphoneNumber" class="form-control" />
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="HealthCouncilRegNo" class="form-label">Health Council Reg. Number</label>
+                <input asp-for="HealthCouncilRegNo" class="form-control" />
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="ApplicationUser.Email" class="form-label">Email Address</label>
+                <input asp-for="ApplicationUser.Email" class="form-control" />
+            </div>
+
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+            <a asp-action="ManagePharmacists" class="btn btn-secondary ms-2">Cancel</a>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

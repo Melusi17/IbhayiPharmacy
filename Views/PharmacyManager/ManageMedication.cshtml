@@ -57,6 +57,11 @@
                                 <span class="text-muted">No ingredients</span>
                             }
                         </td>
+                        <td>
+                            <form asp-action="DeleteMedication" asp-route-id="@med.MedcationID" method="post" class="d-inline">
+                                <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                            </form>
+                        </td>
                     </tr>
                 }
             </tbody>

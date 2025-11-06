@@ -4,6 +4,7 @@ using IbhayiPharmacy.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace IbhayiPharmacy.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251106104204_pharm2")]
+    partial class pharm2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1842,15 +1845,15 @@ namespace IbhayiPharmacy.Migrations
                         {
                             Id = "customer-1",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "07dcdaaa-5f31-4351-8de5-326763efa748",
+                            ConcurrencyStamp = "59e60a3e-54fc-43af-8663-198dfa03083a",
                             Email = "thabo.mokoena@example.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
                             NormalizedEmail = "THABO.MOKOENA@EXAMPLE.COM",
                             NormalizedUserName = "THABO.MOKOENA@EXAMPLE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAECTlDBKZrvTikQqbxPZGM76Kh7ei93WWecLMYOO/R+ilGh6SVH18ynK6biDU2Rh5mg==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEJjEk/mBs+frdn8gChQddUTm2EEdzMxXQ5Uj1/N9F6C2O8Wt9ZPKog+ZPNnt1+iI3Q==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "b93a5a6d-13df-4bc1-9812-44ddaff95daf",
+                            SecurityStamp = "9145482e-6d76-4e32-b4a8-ab51dd1ee81b",
                             TwoFactorEnabled = false,
                             UserName = "thabo.mokoena@example.com",
                             CellphoneNumber = "082 345 6789",
@@ -1862,15 +1865,15 @@ namespace IbhayiPharmacy.Migrations
                         {
                             Id = "customer-2",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "853b810e-e017-4ac4-b256-7bb01430c418",
+                            ConcurrencyStamp = "abfe19cc-dc7a-4af1-af38-e9be95411c0c",
                             Email = "lerato.khumalo@example.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
                             NormalizedEmail = "LERATO.KHUMALO@EXAMPLE.COM",
                             NormalizedUserName = "LERATO.KHUMALO@EXAMPLE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEBFo4GWnRVYxTresfmwzpfAUswJUzPc0jDvEnqdKKXEsLmbZjFkuzYlOrpKdfRYG4w==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEGQbeIgSgrSGk80nDGmgyAktmTZMS8ScibcCsUiGI7Kr6zE32ktkPMvcorHLUE8Prg==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "c4c25753-281a-4fc3-8692-35d3c70e74d3",
+                            SecurityStamp = "37e388a8-d6f6-4903-a803-463a06fa3b0c",
                             TwoFactorEnabled = false,
                             UserName = "lerato.khumalo@example.com",
                             CellphoneNumber = "083 567 8910",
@@ -1882,15 +1885,15 @@ namespace IbhayiPharmacy.Migrations
                         {
                             Id = "customer-3",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "26962d93-23bf-45c1-ae0a-ed6b21055293",
+                            ConcurrencyStamp = "e4c5cf4e-942e-420c-9fee-5e7eff731ffc",
                             Email = "sipho.dlamini@example.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
                             NormalizedEmail = "SIPHO.DLAMINI@EXAMPLE.COM",
                             NormalizedUserName = "SIPHO.DLAMINI@EXAMPLE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEBTmYw/oTEufTlLTXkA538luepM9J3L+Zapf/1kL5myBsdKnRpOcknjmn18Y16glPQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEGH1KKjPu21QLgQ2Dm2DRDvA1928d0KfPXEUjShx/rt80PqYkA7yPJnt2BcSzS99HQ==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "5ac8722e-7bae-4eb0-8fdc-ec7b3f158d05",
+                            SecurityStamp = "8e5fd49b-3383-437b-b8e1-b46d6eb79d18",
                             TwoFactorEnabled = false,
                             UserName = "sipho.dlamini@example.com",
                             CellphoneNumber = "084 123 4567",
@@ -1902,15 +1905,15 @@ namespace IbhayiPharmacy.Migrations
                         {
                             Id = "customer-4",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "3b84aa9b-93b2-46a6-a158-13a362874ef4",
+                            ConcurrencyStamp = "e4c13e90-b76a-43fd-aa0c-9833db16a57f",
                             Email = "naledi.maseko@example.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
                             NormalizedEmail = "NALEDI.MASEKO@EXAMPLE.COM",
                             NormalizedUserName = "NALEDI.MASEKO@EXAMPLE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEJKE73BKzlApjWDzY/tlV6QIOlCtdlFss1xKnsrpruH+Vw0URg3PEY1otzzdQ/VZGQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEIml9dtCDLoorDwIm/ufFVb5qvcsk3SdzPJikABXEmohCza6qzUMe69kp1yfg/0HxA==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "88d7e0b7-5344-43ae-9087-392202db4cde",
+                            SecurityStamp = "5633eb67-0c1e-42fa-8566-d62b6c59135c",
                             TwoFactorEnabled = false,
                             UserName = "naledi.maseko@example.com",
                             CellphoneNumber = "081 234 9876",
@@ -1922,15 +1925,15 @@ namespace IbhayiPharmacy.Migrations
                         {
                             Id = "customer-5",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "62131394-9535-403d-9723-600ed0f05841",
+                            ConcurrencyStamp = "c5fc0b87-40a4-43ef-8e28-6dafae63121c",
                             Email = "pieter.vdm@example.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
                             NormalizedEmail = "PIETER.VDM@EXAMPLE.COM",
                             NormalizedUserName = "PIETER.VDM@EXAMPLE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEMQRkS5ObCSQS8MMOs0vDJEc6C17ke++iZvaGPYAPpqcjFInNgXb4CscbMmcnNBnVw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAECNHbHpH8Nia9Y5V03cTfk3A9GPIsSmCLV0JZPb3M48mwlIMXjZSofXqpPSQ+GJZlA==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "b29518b5-17b8-4ffb-aef4-3bc57cdd9f5f",
+                            SecurityStamp = "5146d365-cbc2-4100-9bba-8e8f2bd66fdb",
                             TwoFactorEnabled = false,
                             UserName = "pieter.vdm@example.com",
                             CellphoneNumber = "072 345 1234",
@@ -1942,15 +1945,15 @@ namespace IbhayiPharmacy.Migrations
                         {
                             Id = "customer-6",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "dadf3cc6-b0ad-40bb-b519-121670b815ea",
+                            ConcurrencyStamp = "a8d91338-73ae-4f8c-bf53-5fc941383a99",
                             Email = "karabo.nkosi@example.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
                             NormalizedEmail = "KARABO.NKOSI@EXAMPLE.COM",
                             NormalizedUserName = "KARABO.NKOSI@EXAMPLE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEFlMvLazWhj3MZRkgoKc3qQAffHrQw1jYdrsnYvpa+RNLpmv8bJK8vuqSLfkmCxsMA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEDmncBeBVe6X2XSti5YBPhFTOc5sIKow+dRjcRxzo7LzPuLHoP5kZjfXD8cFhNOWig==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "96465aea-3537-4a98-bf22-407fbbd89f35",
+                            SecurityStamp = "3113a7cf-242e-4380-b630-d018b74d05a3",
                             TwoFactorEnabled = false,
                             UserName = "karabo.nkosi@example.com",
                             CellphoneNumber = "079 876 5432",
@@ -1962,15 +1965,15 @@ namespace IbhayiPharmacy.Migrations
                         {
                             Id = "customer-7",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "71a1dde9-4800-4b02-a126-d52fdec0d2f0",
+                            ConcurrencyStamp = "e13370b2-7eef-4bfd-9c11-8eb7abc448ff",
                             Email = "annelise.botha@example.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
                             NormalizedEmail = "ANNELISE.BOTHA@EXAMPLE.COM",
                             NormalizedUserName = "ANNELISE.BOTHA@EXAMPLE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAENnWo+AKgnaEbyKL7BVmsdgLegnhMf63utOBRmimVA1g3/fHxMcojlO1CqnooGRRJQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEKfvOw9cE26Y8hKKH2jnarP2OephthTy6LwsCyt9btcw4CYWGPRsbD8/QPtpOmbdMw==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "6d151f9d-218d-42aa-a173-fc8c339264ac",
+                            SecurityStamp = "d9c5ba74-b3e5-458c-9365-a8214b7bcd4d",
                             TwoFactorEnabled = false,
                             UserName = "annelise.botha@example.com",
                             CellphoneNumber = "078 234 5678",
@@ -1982,15 +1985,15 @@ namespace IbhayiPharmacy.Migrations
                         {
                             Id = "customer-8",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "06aeaca9-8bd6-4f64-99ff-dea46b4602b7",
+                            ConcurrencyStamp = "8668572f-72a4-4d46-a9f8-3180fb9625b9",
                             Email = "kagiso.motloung@example.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
                             NormalizedEmail = "KAGISO.MOTLOUNG@EXAMPLE.COM",
                             NormalizedUserName = "KAGISO.MOTLOUNG@EXAMPLE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEFAKlpCM8JtVYaUzsShIWttNKxYD2ZZWl/XzkyZ+lQeBgd/JrSS52i6pc8mqN7/0Ig==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEMlNox8yUBitrGHhVeZH9gjJ5ccPkUuO9got1COvWXwB6X9U5EQB9WbBPNDJ6XGbLg==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "3f831d9f-b2e7-4b51-9745-5f8ad3982d65",
+                            SecurityStamp = "80d11750-6d02-4be5-9e3f-d24d01c80678",
                             TwoFactorEnabled = false,
                             UserName = "kagiso.motloung@example.com",
                             CellphoneNumber = "084 567 8901",
@@ -2002,15 +2005,15 @@ namespace IbhayiPharmacy.Migrations
                         {
                             Id = "customer-9",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "5a850438-eeff-4345-9eae-1c3bd9c88e1d",
+                            ConcurrencyStamp = "298bd39a-a358-4d37-a908-bc72901e1f15",
                             Email = "sibusiso.gumede@example.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
                             NormalizedEmail = "SIBUSISO.GUMEDE@EXAMPLE.COM",
                             NormalizedUserName = "SIBUSISO.GUMEDE@EXAMPLE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEMyDy3CdnDmFTTWFoTCOgIteLdwV2n8tNtcRin9tTfwNNbhI14yBUDvDtPrnPijzwQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEEzLUS/Qgf4TBxTA1lDUtn2ttIKeC7CKo8Tv1znVw6Y/NRCpB4C03BvGjs5YKmZt1Q==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "eef31eee-0ae9-488d-90f5-17dfbb49986b",
+                            SecurityStamp = "f24cd8e6-a93d-450c-8890-6a7c13f8b69c",
                             TwoFactorEnabled = false,
                             UserName = "sibusiso.gumede@example.com",
                             CellphoneNumber = "071 234 8901",
@@ -2022,15 +2025,15 @@ namespace IbhayiPharmacy.Migrations
                         {
                             Id = "customer-10",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "108d5729-c7ce-4f72-b9e3-799bdc2a31fe",
+                            ConcurrencyStamp = "96a64426-38f3-4b80-ab2b-11831ee10ccd",
                             Email = "michelle.pretorius@example.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
                             NormalizedEmail = "MICHELLE.PRETORIUS@EXAMPLE.COM",
                             NormalizedUserName = "MICHELLE.PRETORIUS@EXAMPLE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAECwyT0RtQs8gF4PSkb+qksTg+4A8L3MwLmB9qJl42U7l9K23fj6yA079zH78xPx2ag==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEOrLW6xC3CwU9qOciEQ5Sy0jmstnLbvBQ+TETdIuKkcxQybEmPq/oi1THeC0NYnwsA==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "3826a94b-1f6c-4755-b3e6-aa19757fc000",
+                            SecurityStamp = "c22617ff-c14d-4d74-875a-d27f721659f0",
                             TwoFactorEnabled = false,
                             UserName = "michelle.pretorius@example.com",
                             CellphoneNumber = "073 456 7890",
@@ -2042,15 +2045,15 @@ namespace IbhayiPharmacy.Migrations
                         {
                             Id = "customer-11",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "20db1c6a-bafc-4ecf-b912-022599cad4b5",
+                            ConcurrencyStamp = "087f23f3-b213-4c18-96d3-816e3c0d0d9c",
                             Email = "vusi.zulu@example.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
                             NormalizedEmail = "VUSI.ZULU@EXAMPLE.COM",
                             NormalizedUserName = "VUSI.ZULU@EXAMPLE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEGHh1fzSTd1PaJTmtC3GGzRYDw3s+64a+iVw1TrTaiZJOgwReZ7X7aa3xxHo3aSGwg==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEHL3dHbzO2Plo++xMla7/W5QyYArNiJ8QLf2zCbRMEt5FD3fR6kr2n2egKGdAaX0Ow==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "113c33da-6099-4989-a296-f3a10cc518a5",
+                            SecurityStamp = "3d8ea441-bb62-4b22-96b0-f76097941371",
                             TwoFactorEnabled = false,
                             UserName = "vusi.zulu@example.com",
                             CellphoneNumber = "082 987 6543",
@@ -2062,15 +2065,15 @@ namespace IbhayiPharmacy.Migrations
                         {
                             Id = "customer-12",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "9696c3b9-1b0c-4901-aa06-6bdac6ee2681",
+                            ConcurrencyStamp = "d6f851bd-7416-4841-a6a3-4ab6e6cc0402",
                             Email = "aisha.jacobs@example.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
                             NormalizedEmail = "AISHA.JACOBS@EXAMPLE.COM",
                             NormalizedUserName = "AISHA.JACOBS@EXAMPLE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEKI8SrwmgCPSfOfUp9Y+QoyHei0IcdPV2N2zCIFboJgbs+Y8xvG0kWjXpov/Jo6CDQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEDiOvNgySk6DmKTmY/NVFejIePGf1E2pqlVb+FjLsg+hDPGc04yMTOvHjnNYL5Rwxg==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "23eacc39-20a7-49d1-9226-f19041e70f02",
+                            SecurityStamp = "2a29c1df-8321-41d7-ad92-9b89109d7ee2",
                             TwoFactorEnabled = false,
                             UserName = "aisha.jacobs@example.com",
                             CellphoneNumber = "079 123 4567",
@@ -2082,15 +2085,15 @@ namespace IbhayiPharmacy.Migrations
                         {
                             Id = "customer-13",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "5687c666-5223-4b10-a7a5-81b0aa38c9a2",
+                            ConcurrencyStamp = "02a5a56e-b7c5-454d-8555-681250f2d01a",
                             Email = "johan.deklerk@example.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
                             NormalizedEmail = "JOHAN.DEKLERK@EXAMPLE.COM",
                             NormalizedUserName = "JOHAN.DEKLERK@EXAMPLE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEDnsC3xfOaMoIawiX5qK+BAsTklq4Ho12S6N0Xr9niU11c31MCYoqJcwQRcjrDp9aQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAELLzT0iJ1fGvQzaLdbAPo12r1L6dYHhc7f9fZtImbGAQZG3XtBhEuwLahXfQdOOFag==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "b690dbd0-037c-47a7-a1a9-0a1c84c9b413",
+                            SecurityStamp = "624d46e5-93c5-41c9-bd4c-0ad54554c563",
                             TwoFactorEnabled = false,
                             UserName = "johan.deklerk@example.com",
                             CellphoneNumber = "074 567 8901",
@@ -2102,15 +2105,15 @@ namespace IbhayiPharmacy.Migrations
                         {
                             Id = "customer-14",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "55f9b0cf-932d-424b-97a2-270e83e4e22f",
+                            ConcurrencyStamp = "d547c1aa-b942-4923-83c6-9cf6083bdd27",
                             Email = "thandiwe.sithole@example.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
                             NormalizedEmail = "THANDIWE.SITHOLE@EXAMPLE.COM",
                             NormalizedUserName = "THANDIWE.SITHOLE@EXAMPLE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEIPK+QgoH7n7x3tFFhRtJwT6TqbDfyKA+optGrmW6m2lKEr43A4wDJuim58z/q7KNg==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEHm6uKGhxAgvs5wxtaG3zkkINnQQJuVYPREOXHvmp5tG9IBXoUFCfxogcD4FV32E/g==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "03f221c9-3b64-4f90-af69-e913856a14a7",
+                            SecurityStamp = "10326425-bc9c-4c6d-b7fe-735d2a1090d4",
                             TwoFactorEnabled = false,
                             UserName = "thandiwe.sithole@example.com",
                             CellphoneNumber = "078 987 6543",
@@ -2122,15 +2125,15 @@ namespace IbhayiPharmacy.Migrations
                         {
                             Id = "customer-15",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "bfd59ffa-7843-49d7-9fed-8104000776c2",
+                            ConcurrencyStamp = "88e386ce-8c8c-4191-843f-51562b4c426a",
                             Email = "riaan.vw@example.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
                             NormalizedEmail = "RIAAN.VW@EXAMPLE.COM",
                             NormalizedUserName = "RIAAN.VW@EXAMPLE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEN2fkGlRVw2pJInuA0ZpfMRK5qy8qFXUopTSrbZffyG0WkJCXl6rK/hwEvupC/sWcQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEOj4iCabR2sAyt3eb06dajr0gFNuEXLOUwDJ7CXIaIhI1r8y+VfC4Fr4/sAPBqGxTA==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "ded3f27c-6910-46fa-9e04-fc3ca1e1a4f5",
+                            SecurityStamp = "49e45ade-3a26-48fb-9fcf-e57578e16cb5",
                             TwoFactorEnabled = false,
                             UserName = "riaan.vw@example.com",
                             CellphoneNumber = "071 345 6789",
@@ -2142,15 +2145,15 @@ namespace IbhayiPharmacy.Migrations
                         {
                             Id = "customer-16",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "8a9ed2bf-e2c5-4fc0-9147-ce0d4c2d2f98",
+                            ConcurrencyStamp = "21dd6282-631a-44b9-b807-c8522852a91d",
                             Email = "palesa.molefe@example.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
                             NormalizedEmail = "PALESA.MOLEFE@EXAMPLE.COM",
                             NormalizedUserName = "PALESA.MOLEFE@EXAMPLE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEAIbar0wGJVuEo0c01itveLOqbB9q6Pl7UB3a+GyIGfebyxw0XWacsixwEEId5Ov2Q==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEOn0ySvoXTWwENwLuTOAtFS7/xzozZhAiZ1yGRPNYV9CLH+fR9LRh20mDQnAlaS9LA==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "f07638b3-9908-47e9-b951-582eeda0df50",
+                            SecurityStamp = "a9cc1298-f5ec-49e8-8965-6ca3194c2227",
                             TwoFactorEnabled = false,
                             UserName = "palesa.molefe@example.com",
                             CellphoneNumber = "083 234 5678",
@@ -2162,15 +2165,15 @@ namespace IbhayiPharmacy.Migrations
                         {
                             Id = "customer-17",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "432094ed-1d89-48ae-bd03-803e8745aa25",
+                            ConcurrencyStamp = "987a2f89-4a6a-47df-8f9e-3d951f44c6f0",
                             Email = "kobus.smit@example.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
                             NormalizedEmail = "KOBUS.SMIT@EXAMPLE.COM",
                             NormalizedUserName = "KOBUS.SMIT@EXAMPLE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEKMm3v9CZI2cHiYd9gmGgz7pH2Wa4GMczs3DRt0yXliohvJ5LvNJbLImEHHf9rqwGg==",
+                            PasswordHash = "AQAAAAIAAYagAAAAENQ5piZnow8drAvom5SE4VxtvmaSRqHIK0nAuc21f+0wS9uBeZXO7r8CXDIrmBUgtw==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "2f2cb0a2-bb92-4f77-8d02-0a0a2db31e23",
+                            SecurityStamp = "3d3c0014-bc59-47e6-bc42-013f4c8c0292",
                             TwoFactorEnabled = false,
                             UserName = "kobus.smit@example.com",
                             CellphoneNumber = "072 987 1234",
@@ -2182,15 +2185,15 @@ namespace IbhayiPharmacy.Migrations
                         {
                             Id = "customer-18",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "9fc32eb4-75d8-413d-9df3-19251a0bfd03",
+                            ConcurrencyStamp = "7b0e431b-7b09-4f54-8486-28a1dc35dd93",
                             Email = "zanele.mthembu@example.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
                             NormalizedEmail = "ZANELE.MTHEMBU@EXAMPLE.COM",
                             NormalizedUserName = "ZANELE.MTHEMBU@EXAMPLE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEEAUo7zvE07zVbOrNTSPHKpoHd9WUL8OG31xJ7EtU6HLSHzFx9Xo7j6U0oZ8EUnJmA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEEvW+Enp4lJ5RuxjJZcTOX3olcsiDkJnxOzbtHvn3WdLGt3kp5J11gSHcw7o7DjIvA==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "6137134c-f3b0-4a6d-9c02-6a49bd6f6b24",
+                            SecurityStamp = "5b8a605f-c09b-4fd6-9774-86e6d0fd7dc6",
                             TwoFactorEnabled = false,
                             UserName = "zanele.mthembu@example.com",
                             CellphoneNumber = "079 456 7890",
@@ -2202,15 +2205,15 @@ namespace IbhayiPharmacy.Migrations
                         {
                             Id = "customer-19",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "475d4354-ad46-4704-a407-c3aafa0e586e",
+                            ConcurrencyStamp = "c3b1aff9-c19f-476f-a706-22fdcf431e4e",
                             Email = "annelise@example.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
                             NormalizedEmail = "ANNELISE@EXAMPLE.COM",
                             NormalizedUserName = "ANNELISE@EXAMPLE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEPYrSBTNgUFsJtB5GIqRAcREftay21RmDtwnKanKKeBto/d6HKELYgrxFd7GwqV1NA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAELpuEAF1nzFQ0m4/4Mpy3xopq+709AwctJqA4Pwj6htryMRULQBHrIX7P1RjT0jFng==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "adfcbcf8-0194-44c7-9e27-183e61ed2ca2",
+                            SecurityStamp = "69645c0f-99d0-4fee-ad7b-4319230bf61a",
                             TwoFactorEnabled = false,
                             UserName = "annelise@example.com",
                             CellphoneNumber = "074 123 4567",
@@ -2222,15 +2225,15 @@ namespace IbhayiPharmacy.Migrations
                         {
                             Id = "customer-20",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "4bc4933d-ace6-4ab8-9390-a1f2975a760a",
+                            ConcurrencyStamp = "9854cc1f-859f-42a9-92cf-ed1da226ee98",
                             Email = "nomsa.ndlovu@example.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
                             NormalizedEmail = "NOMSA.NDLOVU@EXAMPLE.COM",
                             NormalizedUserName = "NOMSA.NDLOVU@EXAMPLE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEMlz+MSJ1Jogfy9LEYZ0FM6mnUA5qozd8US2QVNbGdrXNCNh0uV/rjG3r7GYh5t5EQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEH2nRPQMEcw3ribupibpbiobfUblag67YTCGX9qd4f/djo+KNkhtTyK6QEwYgAS/Aw==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "1d38841b-34b0-4a4f-ac78-7ddd272d1829",
+                            SecurityStamp = "b289d4a6-99b5-4af4-8404-1d65b9216ba1",
                             TwoFactorEnabled = false,
                             UserName = "nomsa.ndlovu@example.com",
                             CellphoneNumber = "081 567 8901",
@@ -2242,15 +2245,15 @@ namespace IbhayiPharmacy.Migrations
                         {
                             Id = "pharmacist-1",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "b1a6048a-90ae-42bf-bffb-810cc868eb32",
+                            ConcurrencyStamp = "c48b3560-ddad-49eb-a7ad-d6022e062379",
                             Email = "lindile@example.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
                             NormalizedEmail = "LINDILE@EXAMPLE.COM",
                             NormalizedUserName = "LINDILE@EXAMPLE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEMYK+miUBWiA7god88bYXEd0yrpidGipb/La5B+XYgXCct9x2aasXWeAI2tD7RTZWw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEAmWassDByjgaciVhfVcRKin3Us1Tkt12xv/bnTC8Qkpqaxgljjad1LXGhrNRJzH7g==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "c8b29617-8c7e-43b9-b1fe-a6c8b4c684cf",
+                            SecurityStamp = "81894cab-ce6c-4996-a081-5abe223cca6f",
                             TwoFactorEnabled = false,
                             UserName = "lindile@example.com",
                             CellphoneNumber = "061 2345 678",
@@ -2262,15 +2265,15 @@ namespace IbhayiPharmacy.Migrations
                         {
                             Id = "pharmacist-2",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "b24ae0e9-e0c1-4a30-b8ce-2bea27ecad49",
+                            ConcurrencyStamp = "52ff982d-351c-449b-ab07-dd91305c0685",
                             Email = "dorothy@example.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
                             NormalizedEmail = "DOROTHY@EXAMPLE.COM",
                             NormalizedUserName = "DOROTHY@EXAMPLE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEDucA+/p5QHl/mEC9/MiSa4efvEXDIW6Gcch7am6nfrlYE3Gr+ltB/Mqel/F7c63iQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEJLTf4iYsWHfV3/x2fFXxdPp9JWM4+jxCZo2qRqSQrNUfyPmxPf+DDdccxkqikf6AA==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "9726c6c0-5917-47a7-9064-48d822b4cf70",
+                            SecurityStamp = "bc99ecf8-164d-4cdf-961d-ada76ae993cc",
                             TwoFactorEnabled = false,
                             UserName = "dorothy@example.com",
                             CellphoneNumber = "062 2345 678",
@@ -2282,15 +2285,15 @@ namespace IbhayiPharmacy.Migrations
                         {
                             Id = "pharmacist-3",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "71c98e3d-f116-4f88-ae8b-0e7e3baa645e",
+                            ConcurrencyStamp = "4f5eef6f-a112-49ac-830c-c9ee5bab5f9d",
                             Email = "marcel@example.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
                             NormalizedEmail = "MARCEL@EXAMPLE.COM",
                             NormalizedUserName = "MARCEL@EXAMPLE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAELPXJNTe7haKOfDXC37NhvCTxJd27des6rQMXtn4hIfcr0WzhYd+GJyTKOx+46gLJQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEPIgZKZWWY78GzTTVWDSKWskvTPZapqptbQq0FDziyD5XkAIsRpO4ANtdEQ396e4ZA==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "a729fd59-d9a3-424b-b4ff-6d415ecd3f42",
+                            SecurityStamp = "17f7308d-7ab0-42d4-806c-f39c73665f7e",
                             TwoFactorEnabled = false,
                             UserName = "marcel@example.com",
                             CellphoneNumber = "063 2345 678",
@@ -2302,15 +2305,15 @@ namespace IbhayiPharmacy.Migrations
                         {
                             Id = "pharmacist-4",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "312755fd-ade8-4bf8-9ab4-069bb4936f44",
+                            ConcurrencyStamp = "6dddae62-4897-4a4f-bfcc-ec0f0655f996",
                             Email = "s224113038@mandela.ac.za",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
                             NormalizedEmail = "S224113038@MANDELA.AC.ZA",
                             NormalizedUserName = "S224113038@MANDELA.AC.ZA",
-                            PasswordHash = "AQAAAAIAAYagAAAAEHTVhaD5yjlcUVkV76Ht3tgZwPFsytwQs/G/E9GJIOMeZQxQkXv7159CriSzhivRrA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEMM7yRyyq7Xl73+PzjV8Piq8VhS+x/HBN8XCviHplTLpCBvzZtUBoP6U5XxAGv/mAQ==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "145dc039-2e41-4bd7-9f92-b5a057e84677",
+                            SecurityStamp = "6a6abf7b-8300-4912-8801-c4eeed9d5bb2",
                             TwoFactorEnabled = false,
                             UserName = "s224113038@mandela.ac.za",
                             CellphoneNumber = "063 2345 678",
@@ -2322,15 +2325,15 @@ namespace IbhayiPharmacy.Migrations
                         {
                             Id = "manager-1",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "c7985a0b-13c2-451e-a6a8-6756e1919137",
+                            ConcurrencyStamp = "139ce1b0-3263-4c20-8231-de9f0cc9163a",
                             Email = "s224378449@mandela.ac.za",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
                             NormalizedEmail = "S224378449@MANDELA.AC.ZA",
                             NormalizedUserName = "S224378449@MANDELA.AC.ZA",
-                            PasswordHash = "AQAAAAIAAYagAAAAEDIuz9cM5UG1UQLfJSmfr5WniJoM1oucWZSEfOY35itrJOdk75DJdkd2voEpVzpQAw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEN8IDNlS5bxR5mN2vDWaGJyylaqSZay4K79brQJdLAwucCaTFQ/VmXgFvQSiaf3chA==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "852dc65b-7aaa-4811-92a5-5222b801c05b",
+                            SecurityStamp = "6edea1bd-7398-407f-9271-4b5a0fc673e5",
                             TwoFactorEnabled = false,
                             UserName = "s224378449@mandela.ac.za",
                             CellphoneNumber = "082 289 4758",
@@ -2345,7 +2348,7 @@ namespace IbhayiPharmacy.Migrations
                     b.HasOne("IbhayiPharmacy.Models.ApplicationUser", "ApplicationUser")
                         .WithMany()
                         .HasForeignKey("ApplicationUserId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("ApplicationUser");
@@ -2356,13 +2359,13 @@ namespace IbhayiPharmacy.Migrations
                     b.HasOne("IbhayiPharmacy.Models.Active_Ingredient", "Active_Ingredient")
                         .WithMany()
                         .HasForeignKey("Active_IngredientID")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("IbhayiPharmacy.Models.Customer", "Customer")
                         .WithMany("CustomerAllergies")
                         .HasForeignKey("CustomerID")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Active_Ingredient");
@@ -2382,13 +2385,13 @@ namespace IbhayiPharmacy.Migrations
                     b.HasOne("IbhayiPharmacy.Models.DosageForm", "DosageForm")
                         .WithMany()
                         .HasForeignKey("DosageFormID")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("IbhayiPharmacy.Models.Supplier", "Supplier")
                         .WithMany()
                         .HasForeignKey("SupplierID")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("DosageForm");
@@ -2401,13 +2404,13 @@ namespace IbhayiPharmacy.Migrations
                     b.HasOne("IbhayiPharmacy.Models.Active_Ingredient", "Active_Ingredients")
                         .WithMany()
                         .HasForeignKey("Active_IngredientID")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("IbhayiPharmacy.Models.Medication", "Medications")
                         .WithMany("Medication_Ingredients")
                         .HasForeignKey("MedicationID")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Active_Ingredients");
@@ -2420,7 +2423,7 @@ namespace IbhayiPharmacy.Migrations
                     b.HasOne("IbhayiPharmacy.Models.Customer", "Customer")
                         .WithMany()
                         .HasForeignKey("CustomerID")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("IbhayiPharmacy.Models.Doctor", "Doctor")
@@ -2443,19 +2446,19 @@ namespace IbhayiPharmacy.Migrations
                     b.HasOne("IbhayiPharmacy.Models.Medication", "Medications")
                         .WithMany()
                         .HasForeignKey("MedicationID")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("IbhayiPharmacy.Models.Order", "Order")
                         .WithMany("OrderLines")
                         .HasForeignKey("OrderID")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("IbhayiPharmacy.Models.ScriptLine", "ScriptLine")
                         .WithMany()
                         .HasForeignKey("ScriptLineID")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Medications");
@@ -2470,7 +2473,7 @@ namespace IbhayiPharmacy.Migrations
                     b.HasOne("IbhayiPharmacy.Models.ApplicationUser", "ApplicationUser")
                         .WithMany()
                         .HasForeignKey("ApplicationUserId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("ApplicationUser");
@@ -2481,7 +2484,7 @@ namespace IbhayiPharmacy.Migrations
                     b.HasOne("IbhayiPharmacy.Models.Pharmacist", "Pharmacist")
                         .WithMany()
                         .HasForeignKey("PharmacistID")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Pharmacist");
@@ -2492,7 +2495,7 @@ namespace IbhayiPharmacy.Migrations
                     b.HasOne("IbhayiPharmacy.Models.ApplicationUser", "ApplicationUser")
                         .WithMany()
                         .HasForeignKey("ApplicationUserId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("ApplicationUser");
@@ -2503,7 +2506,7 @@ namespace IbhayiPharmacy.Migrations
                     b.HasOne("IbhayiPharmacy.Models.Medication", "Medications")
                         .WithMany()
                         .HasForeignKey("MedicationID")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("IbhayiPharmacy.Models.NewScript", null)
@@ -2513,7 +2516,7 @@ namespace IbhayiPharmacy.Migrations
                     b.HasOne("IbhayiPharmacy.Models.Prescription", "Prescriptions")
                         .WithMany()
                         .HasForeignKey("PrescriptionID")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Medications");
@@ -2526,7 +2529,7 @@ namespace IbhayiPharmacy.Migrations
                     b.HasOne("IbhayiPharmacy.Models.ApplicationUser", "ApplicationUser")
                         .WithMany()
                         .HasForeignKey("ApplicationUserId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("IbhayiPharmacy.Models.Doctor", "Doctors")
@@ -2543,13 +2546,13 @@ namespace IbhayiPharmacy.Migrations
                     b.HasOne("IbhayiPharmacy.Models.Medication", "Medications")
                         .WithMany()
                         .HasForeignKey("MedicationID")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("IbhayiPharmacy.Models.Prescription", "Prescriptions")
                         .WithMany("scriptLines")
                         .HasForeignKey("PrescriptionID")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Medications");
@@ -2562,7 +2565,7 @@ namespace IbhayiPharmacy.Migrations
                     b.HasOne("IbhayiPharmacy.Models.Supplier", "Supplier")
                         .WithMany()
                         .HasForeignKey("SupplierID")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Supplier");
@@ -2573,13 +2576,13 @@ namespace IbhayiPharmacy.Migrations
                     b.HasOne("IbhayiPharmacy.Models.Medication", "Medication")
                         .WithMany()
                         .HasForeignKey("MedicationID")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("IbhayiPharmacy.Models.StockOrder", null)
                         .WithMany("OrderDetails")
                         .HasForeignKey("StockOrderID")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Medication");
@@ -2590,7 +2593,7 @@ namespace IbhayiPharmacy.Migrations
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
@@ -2599,7 +2602,7 @@ namespace IbhayiPharmacy.Migrations
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
@@ -2608,7 +2611,7 @@ namespace IbhayiPharmacy.Migrations
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
@@ -2617,13 +2620,13 @@ namespace IbhayiPharmacy.Migrations
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
@@ -2632,7 +2635,7 @@ namespace IbhayiPharmacy.Migrations
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 

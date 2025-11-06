@@ -17,5 +17,6 @@ namespace IbhayiPharmacy.Models
         [Required]
         public string Status { get; set; }
         public Supplier Supplier { get;  set; }
+        public IEnumerable<StockOrderDetail> OrderDetails { get; internal set; }
     }
 }
